@@ -1,0 +1,91 @@
+id: ex-rag-validate-citations
+version: 1
+status: published
+lessonId: rag-grounded-citations
+language: python
+topics: [citations, rag]
+title:
+  en: Validate citations against the retrieved chunks
+  hinglish: Citations ko retrieved chunks ke against validate karo
+prompt:
+  en: |
+    The model was asked to cite chunk ids in square brackets, like `[c1]` or `[guide-2]`. A citation
+    id contains only letters, digits, `-`, `_` and `#`. Implement:
+
+    1. `validate_citations(answer, retrieved_ids)` — returns
+       `{"valid": [...], "invalid": [...]}`: the cited ids, each listed **once**, in order of first
+       appearance, split by whether they are in `retrieved_ids`.
+    2. `supported_answer(answer, retrieved_ids)` — split the answer into sentences after `.`, `!` or
+       `?` followed by whitespace, drop every sentence that cites an invalid id, and join the rest
+       with single spaces. Sentences without citations are kept.
+  hinglish: |
+    Model ko kaha gaya tha ki chunk ids square brackets mein cite kare, jaise `[c1]` ya `[guide-2]`.
+    Citation id mein sirf letters, digits, `-`, `_` aur `#` hote hain. Implement karo:
+
+    1. `validate_citations(answer, retrieved_ids)` — `{"valid": [...], "invalid": [...]}` return
+       kare: cited ids, har ek **ek baar**, pehli baar aane ke order mein, is hisaab se bante ki woh
+       `retrieved_ids` mein hain ya nahi.
+    2. `supported_answer(answer, retrieved_ids)` — answer ko `.`, `!` ya `?` ke baad whitespace par
+       sentences mein todo, har woh sentence hatao jo invalid id cite kare, aur baaki ko single spaces
+       se jodo. Bina citation wale sentences rehte hain.
+starterCode: |
+  import re
+
+
+  def validate_citations(answer, retrieved_ids):
+      pass
+
+
+  def supported_answer(answer, retrieved_ids):
+      pass
+tests:
+  - id: split
+    name: separates valid and invalid citations
+    code: |
+      r = validate_citations("A [c1]. B [c9]. C [c2] [c1].", {"c1", "c2"})
+      assert r == {"valid": ["c1", "c2"], "invalid": ["c9"]}, r
+  - id: id-format
+    name: accepts ids with dashes, underscores and hashes, ignores other brackets
+    code: |
+      r = validate_citations("See [guide-2#3] and [notes_v1] but not [two words].", {"guide-2#3"})
+      assert r == {"valid": ["guide-2#3"], "invalid": ["notes_v1"]}, r
+  - id: no-citations
+    name: no citations gives empty lists
+    code: |
+      assert validate_citations("Nothing cited here.", {"c1"}) == {"valid": [], "invalid": []}
+  - id: supported
+    name: drops sentences with invalid citations
+    code: |
+      answer = "Refunds take 5 days [c1]. Cash is also possible [c7]! Contact support [c2]."
+      assert supported_answer(answer, {"c1", "c2"}) == "Refunds take 5 days [c1]. Contact support [c2]."
+  - id: keeps-uncited
+    name: keeps sentences without citations
+    code: |
+      assert supported_answer("Hello. Fact [x].", {"y"}) == "Hello."
+hints:
+  en:
+    - 'The pattern r"\[([A-Za-z0-9#_-]+)\]" captures one id per bracket'
+    - list(dict.fromkeys(ids)) removes duplicates while keeping order
+    - 'Split sentences with re.split(r"(?<=[.!?])\s+", answer)'
+  hinglish:
+    - 'Pattern r"\[([A-Za-z0-9#_-]+)\]" har bracket se ek id pakadta hai'
+    - list(dict.fromkeys(ids)) order rakhte hue duplicates hata deta hai
+    - 'Sentences ko re.split(r"(?<=[.!?])\s+", answer) se todo'
+solution: |
+  import re
+
+  CITATION = re.compile(r"\[([A-Za-z0-9#_-]+)\]")
+
+
+  def validate_citations(answer, retrieved_ids):
+      cited = list(dict.fromkeys(CITATION.findall(answer)))
+      return {
+          "valid": [c for c in cited if c in retrieved_ids],
+          "invalid": [c for c in cited if c not in retrieved_ids],
+      }
+
+
+  def supported_answer(answer, retrieved_ids):
+      sentences = re.split(r"(?<=[.!?])\s+", answer.strip())
+      kept = [s for s in sentences if all(c in retrieved_ids for c in CITATION.findall(s))]
+      return " ".join(kept)

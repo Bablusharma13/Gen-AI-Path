@@ -1,0 +1,185 @@
+id: ai-gradient-descent
+slug: loss-and-gradient-descent
+version: 1
+status: published
+estimatedMinutes: 35
+prerequisites: [ai-vectors-similarity]
+topics: [gradient-descent, training-inference, loss-functions]
+title:
+  en: Loss functions and gradient descent
+  hinglish: Loss functions aur gradient descent
+summary:
+  en: How a model "learns" — measure the error with a loss, find which way reduces it with the gradient, and take small steps.
+  hinglish: Model kaise "seekhta" hai — loss se error naapo, gradient se pata karo kaunsi disha usse kam karti hai, aur chhote steps lo.
+objectives:
+  en:
+    - Explain what a loss function measures
+    - Describe the gradient as the direction of steepest increase
+    - Explain how the learning rate affects training
+    - Run and interpret a tiny gradient-descent training loop
+  hinglish:
+    - Samjhana ki loss function kya naapta hai
+    - Gradient ko sabse tez badhne ki disha ke roop mein samjhana
+    - Learning rate training ko kaise affect karta hai, yeh batana
+    - Ek chhota gradient-descent training loop chalana aur samajhna
+sections:
+  explanation:
+    en: |
+      Training means finding parameter values that make predictions good. To make "good" precise
+      we define a **loss function** — one number that is small when predictions are close to the
+      truth. For predicting numbers, a common loss is **mean squared error (MSE)**:
+      `MSE = average((prediction − target)²)`.
+
+      Imagine the loss as a **landscape**: every possible combination of parameters is a location,
+      and the height is the loss. Training = walking downhill to a low point.
+
+      The **gradient** tells us, for each parameter, how much the loss would increase if we nudged
+      that parameter up. So we move each parameter a little in the **opposite** direction:
+
+      `parameter = parameter − learning_rate × gradient`
+
+      Repeat this thousands of times and the loss falls. That is **gradient descent**.
+
+      The **learning rate** is a hyperparameter:
+
+      - too small → painfully slow progress
+      - too large → steps overshoot the valley; the loss bounces or explodes
+      - just right → the loss drops quickly and settles
+
+      LLMs are trained with exactly this idea (plus clever variants like Adam and huge amounts of
+      data and compute): their loss measures how badly they predicted the next token.
+    hinglish: |
+      Training ka matlab hai aise parameter values dhoondhna jinse predictions achhe hon. "Achha" ko
+      precise banane ke liye hum **loss function** define karte hain — ek number jo tab chhota hota
+      hai jab predictions sach ke paas hon. Numbers predict karne ke liye common loss hai **mean
+      squared error (MSE)**: `MSE = average((prediction − target)²)`.
+
+      Loss ko ek **pahaadi landscape** socho: parameters ka har combination ek location hai, aur
+      unchaai loss hai. Training = neeche ki taraf chal kar sabse neeche point tak pahunchna.
+
+      **Gradient** batata hai ki har parameter ko thoda upar khiskaane par loss kitna badhega. Isliye
+      hum har parameter ko thoda **ulti** disha mein le jaate hain:
+
+      `parameter = parameter − learning_rate × gradient`
+
+      Yeh hazaaron baar dohrao aur loss girta jaata hai. Yahi **gradient descent** hai.
+
+      **Learning rate** ek hyperparameter hai:
+
+      - bahut chhota → bahut dheemi progress
+      - bahut bada → steps ghaati ke paar nikal jaate hain; loss uchhalta hai ya explode karta hai
+      - sahi → loss jaldi girta hai aur settle ho jaata hai
+
+      LLMs isi idea se train hote hain (Adam jaise smart variants aur bahut zyada data aur compute ke
+      saath): unka loss naapta hai ki unhone agla token kitna galat predict kiya.
+  analogy:
+    en: |
+      You are on a foggy hill at night and want to reach the valley. You can only feel the slope
+      under your feet (the gradient). Each step you go downhill a little (learning rate). Huge
+      strides make you leap over the valley; tiny shuffles take all night.
+    hinglish: |
+      Aap raat ko dhundh bhari pahaadi par ho aur ghaati tak pahunchna hai. Aap sirf pairon ke neeche
+      ki dhalaan mehsoos kar sakte ho (gradient). Har step par thoda neeche jaate ho (learning rate).
+      Bahut lambe kadam ghaati ke paar le jaate hain; bahut chhote kadam poori raat le lete hain.
+  visual:
+    en: |
+      Open the Gradient Descent lab. It fits a line to a few points and shows the loss after every
+      step. Try learning rates of 0.01, 0.05 and 0.3 and watch the loss curve.
+    hinglish: |
+      Gradient Descent lab kholo. Yeh kuch points par ek line fit karta hai aur har step ke baad loss
+      dikhata hai. 0.01, 0.05 aur 0.3 learning rates try karo aur loss curve dekho.
+  guidedExercise:
+    en: |
+      1. Run the code example and read how `loss`, `w` and `b` change over the steps.
+      2. Change `learning_rate` to `0.005` — how many steps until the loss is below 0.01?
+      3. Change it to `0.3` — what happens to the loss, and why?
+      4. Add a fifth point that does not lie on the line (for example `(4, 12)`) and see that the
+         loss can no longer reach zero.
+    hinglish: |
+      1. Code example chalao aur dekho steps ke saath `loss`, `w` aur `b` kaise badalte hain.
+      2. `learning_rate` ko `0.005` karo — loss 0.01 se neeche kitne steps mein aata hai?
+      3. Ise `0.3` karo — loss ka kya hota hai, aur kyun?
+      4. Ek paanchwa point add karo jo line par na ho (jaise `(4, 12)`) aur dekho ab loss zero tak
+         nahi pahunch sakta.
+  challenge:
+    en: |
+      Add an "early stopping" rule: stop when the loss improves by less than 1e-6 between two
+      steps, and print the step number where training stopped.
+    hinglish: |
+      Ek "early stopping" rule add karo: jab do steps ke beech loss 1e-6 se kam improve ho to ruk
+      jao, aur print karo training kis step par ruki.
+  commonMistakes:
+    en:
+      - Adding the gradient instead of subtracting it (walking uphill)
+      - Choosing a learning rate so large that the loss diverges
+      - Judging a model only by training loss instead of loss on unseen data
+      - Thinking a loss of zero always means a good model — it may have memorised noise
+    hinglish:
+      - Gradient ko subtract karne ki jagah add karna (upar chadhna)
+      - Itna bada learning rate chunna ki loss diverge ho jaaye
+      - Model ko sirf training loss se judge karna, unseen data ke loss se nahi
+      - Maanna ki zero loss ka matlab hamesha achha model — usne shayad noise yaad kar liya ho
+  projectApplication:
+    en: |
+      In the Fine-Tuning Experiment you will watch real training and validation loss curves.
+      Reading them correctly — and spotting overfitting — starts with the intuition from this lesson.
+    hinglish: |
+      Fine-Tuning Experiment mein aap asli training aur validation loss curves dekhoge. Unhe sahi
+      padhna — aur overfitting pakadna — isi lesson ki intuition se shuru hota hai.
+  summary:
+    en:
+      - A loss function turns "how wrong" into a single number
+      - The gradient points uphill; we step the other way
+      - The learning rate controls step size — too big diverges, too small crawls
+      - LLM training is gradient descent at enormous scale
+    hinglish:
+      - Loss function "kitna galat" ko ek number mein badalta hai
+      - Gradient upar ki taraf point karta hai; hum ulti taraf step lete hain
+      - Learning rate step size control karta hai — bahut bada diverge, bahut chhota rengta hai
+      - LLM training bahut bade scale par gradient descent hai
+codeExamples:
+  - id: gd-linear
+    title:
+      en: Fitting a line with gradient descent
+      hinglish: Gradient descent se line fit karna
+    variants:
+      python: |
+        # Fit y = w * x + b to points that lie on y = 2x + 1, using gradient descent on MSE.
+        xs = [0.0, 1.0, 2.0, 3.0]
+        ys = [1.0, 3.0, 5.0, 7.0]
+        w, b = 0.0, 0.0
+        learning_rate = 0.05
+
+
+        def mse(w, b):
+            return sum((w * x + b - y) ** 2 for x, y in zip(xs, ys)) / len(xs)
+
+
+        for step in range(101):
+            errors = [w * x + b - y for x, y in zip(xs, ys)]
+            grad_w = 2 * sum(e * x for e, x in zip(errors, xs)) / len(xs)
+            grad_b = 2 * sum(errors) / len(xs)
+            if step in (0, 1, 2, 5, 10, 25, 50, 100):
+                print(f"step {step:3d}  loss={mse(w, b):8.4f}  w={w:.3f}  b={b:.3f}")
+            w -= learning_rate * grad_w
+            b -= learning_rate * grad_b
+    expectedOutput: |
+      step   0  loss= 21.0000  w=0.000  b=0.000
+      step   1  loss=  7.0587  w=0.850  b=0.400
+      step   2  loss=  2.3730  w=1.343  b=0.633
+      step   5  loss=  0.0908  w=1.888  b=0.893
+      step  10  loss=  0.0009  w=2.009  b=0.958
+      step  25  loss=  0.0002  w=2.011  b=0.976
+      step  50  loss=  0.0000  w=2.005  b=0.989
+      step 100  loss=  0.0000  w=2.001  b=0.997
+lab:
+  id: gradient-descent
+  config:
+    learningRate: 0.05
+    steps: 60
+  prompt:
+    en: Find the largest learning rate that still converges. What does the loss curve look like just above it?
+    hinglish: Sabse bada learning rate dhoondo jo abhi bhi converge kare. Usse thoda upar loss curve kaisa dikhta hai?
+exerciseIds: [ex-ai-gradient-step]
+assessmentId: quiz-ai-gradient-descent
+relatedLessonIds: [ai-datasets-metrics]

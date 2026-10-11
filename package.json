@@ -1,0 +1,38 @@
+{
+  "name": "genpath-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GenPath AI — From Zero to Generative AI Engineer. Learn, Build, Deploy.",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @genpath/api --filter @genpath/web dev",
+    "dev:api": "pnpm --filter @genpath/api dev",
+    "dev:web": "pnpm --filter @genpath/web dev",
+    "dev:worker": "pnpm --filter @genpath/api dev:worker",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm -r test",
+    "content:validate": "pnpm --filter @genpath/api content:validate",
+    "seed": "pnpm --filter @genpath/api seed",
+    "create-admin": "pnpm --filter @genpath/api create-admin",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "exercises:verify": "pnpm --filter @genpath/api exercises:verify"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.8",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.71.1"
+  }
+}

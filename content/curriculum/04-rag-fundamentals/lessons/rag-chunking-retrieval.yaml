@@ -1,0 +1,218 @@
+id: rag-chunking-retrieval
+slug: chunking-and-retrieval
+version: 1
+status: published
+estimatedMinutes: 45
+prerequisites: [llm-prompting-structured, ai-vectors-similarity]
+topics: [rag, chunking, hybrid-search, embeddings]
+title:
+  en: The RAG pipeline — chunking and hybrid retrieval
+  hinglish: RAG pipeline — chunking aur hybrid retrieval
+summary:
+  en: How documents become searchable chunks, why combining keyword and vector scores beats either alone, and why permission filters belong inside the retrieval query.
+  hinglish: Documents searchable chunks kaise bante hain, keyword aur vector scores milana akele kisi ek se behtar kyun hai, aur permission filters retrieval query ke andar hi kyun hone chahiye.
+objectives:
+  en:
+    - Describe the ingestion and query stages of a RAG pipeline
+    - Choose a chunking strategy with overlap and explain the trade-offs
+    - Combine keyword and vector scores into one ranking
+    - Explain why access control must be applied during retrieval
+  hinglish:
+    - RAG pipeline ke ingestion aur query stages samjhana
+    - Overlap ke saath chunking strategy chunna aur trade-offs samjhana
+    - Keyword aur vector scores ko ek ranking mein jodna
+    - Samjhana ki access control retrieval ke dauraan hi kyun lagna chahiye
+sections:
+  explanation:
+    en: |
+      **Retrieval-augmented generation (RAG)** answers questions from *your* documents: first find
+      the relevant passages, then ask the model to answer using only them. It has two stages.
+
+      **Ingestion (offline, once per document change)**
+
+      1. *Extract* text from files (Markdown, PDF, DOCX…).
+      2. *Chunk* it into passages. Split along structure first — headings, paragraphs, code blocks —
+         then enforce a size limit (often a few hundred tokens) with a small **overlap** so an answer
+         is not cut in half at a boundary. Small chunks are precise but lose context; large chunks
+         keep context but dilute similarity and cost more prompt tokens.
+      3. *Embed* each chunk and *store* the vector with metadata: source, position, heading path,
+         **organisation / access scope**, and the embedding model name.
+
+      **Query (online, per question)**
+
+      1. Embed the question with the **same** embedding model.
+      2. **Retrieve** candidates. Vector search finds paraphrases ("money back" ≈ "refund"); keyword
+         search (such as BM25) finds exact terms, codes and names that embeddings blur. **Hybrid**
+         retrieval combines both — for example `score = α·keyword + (1−α)·vector` after normalising
+         each to the same range.
+      3. **Filter by permission inside the query** — only chunks the user may see are candidates. Never
+         retrieve everything and hope the prompt keeps secrets: once text is in the prompt, no
+         instruction reliably hides it.
+      4. Optionally **rerank** the top candidates with a stronger model.
+      5. Pass the best chunks to generation (next lesson).
+
+      Each stage can fail on its own, so you measure retrieval separately from answers.
+    hinglish: |
+      **Retrieval-augmented generation (RAG)** *aapke* documents se sawaalon ke jawab deta hai: pehle
+      relevant passages dhoondho, phir model se kaho ki sirf unhi se answer de. Iske do stages hain.
+
+      **Ingestion (offline, har document change par ek baar)**
+
+      1. Files (Markdown, PDF, DOCX…) se text *extract* karo.
+      2. Use passages mein *chunk* karo. Pehle structure se split karo — headings, paragraphs, code
+         blocks — phir size limit lagao (aksar kuch sau tokens) thode **overlap** ke saath taaki
+         boundary par answer beech se na kate. Chhote chunks precise par context kho dete hain; bade
+         chunks context rakhte hain par similarity dilute karte hain aur zyada prompt tokens lete hain.
+      3. Har chunk ko *embed* karo aur vector ko metadata ke saath *store* karo: source, position,
+         heading path, **organisation / access scope**, aur embedding model ka naam.
+
+      **Query (online, har sawaal par)**
+
+      1. Sawaal ko **usi** embedding model se embed karo.
+      2. Candidates **retrieve** karo. Vector search paraphrases pakadta hai ("money back" ≈ "refund");
+         keyword search (jaise BM25) exact terms, codes aur names pakadta hai jinhe embeddings dhundhla
+         kar dete hain. **Hybrid** retrieval dono ko jodta hai — jaise har ek ko same range mein
+         normalise karke `score = α·keyword + (1−α)·vector`.
+      3. **Permission filter query ke andar lagao** — sirf wahi chunks candidates hon jo user dekh
+         sakta hai. Sab retrieve karke yeh umeed mat karo ki prompt secrets chhupa lega: text prompt
+         mein aa gaya to koi instruction use reliably chhupa nahi sakta.
+      4. Chaaho to top candidates ko strong model se **rerank** karo.
+      5. Best chunks generation ko do (agla lesson).
+
+      Har stage alag se fail ho sakta hai, isliye retrieval ko answers se alag naapa jaata hai.
+  analogy:
+    en: |
+      A librarian (retrieval) finds the right pages and an expert (the model) writes the answer from
+      those pages only. If the librarian brings the wrong pages, even the best expert answers badly —
+      and a librarian who fetches confidential files for anyone is a security incident, however
+      careful the expert is.
+    hinglish: |
+      Librarian (retrieval) sahi pages dhoondhta hai aur expert (model) sirf unhi pages se answer
+      likhta hai. Librarian galat pages laaye to best expert bhi bura answer dega — aur jo librarian
+      kisi ke liye bhi confidential files le aaye, woh security incident hai, chahe expert kitna bhi
+      savdhaan ho.
+  visual:
+    en: |
+      In the RAG Pipeline lab, step through chunking, scoring, ranking and prompt assembly. Change
+      the chunk size and overlap, then the keyword weight, and watch which chunks reach the prompt.
+    hinglish: |
+      RAG Pipeline lab mein chunking, scoring, ranking aur prompt assembly step-by-step dekho. Chunk
+      size aur overlap badlo, phir keyword weight, aur dekho kaunse chunks prompt tak pahunchte hain.
+  guidedExercise:
+    en: |
+      1. Run the code example. Why does `refund-2` rank above `refund-1` for this question?
+      2. Set `alpha = 1.0` (keyword only) and `alpha = 0.0` (lexical vector stand-in only). Does the order change?
+      3. Add a document that mentions "30 days" but is about something else (for example a trial
+         period). Does it sneak into the top results? What would help?
+    hinglish: |
+      1. Code example chalao. Is sawaal ke liye `refund-2` `refund-1` se upar kyun aata hai?
+      2. `alpha = 1.0` (sirf keyword) aur `alpha = 0.0` (sirf lexical vector stand-in) set karo. Kya order badalta hai?
+      3. Ek aisa document jodo jo "30 days" kehta ho par kisi aur cheez ke baare mein ho (jaise trial
+         period). Kya woh top results mein ghus jaata hai? Kya madad karega?
+  challenge:
+    en: |
+      Add an `org` field to every document and a `user_org` argument to the search function. Filter
+      before ranking so a user can never retrieve another organisation's documents, and write an
+      assertion that proves it.
+    hinglish: |
+      Har document mein `org` field aur search function mein `user_org` argument jodo. Ranking se pehle
+      filter karo taaki user kabhi doosri organisation ke documents retrieve na kar sake, aur ek
+      assertion likho jo yeh saabit kare.
+  commonMistakes:
+    en:
+      - Embedding queries and documents with different models
+      - Splitting in the middle of tables or code blocks because only size was considered
+      - Adding raw keyword and vector scores without normalising them to the same range
+      - Filtering permissions after generation instead of inside retrieval
+      - Tuning chunk size by feel instead of measuring on labelled questions
+    hinglish:
+      - Queries aur documents ko alag models se embed karna
+      - Sirf size dekhkar tables ya code blocks ke beech se todna
+      - Keyword aur vector scores ko same range mein normalise kiye bina jodna
+      - Permissions retrieval ke andar ke bajaye generation ke baad filter karna
+      - Labelled questions par naapne ke bajaye feel se chunk size tune karna
+  projectApplication:
+    en: |
+      The Documentation Q&A Assistant project asks you to build exactly this retriever, make
+      ingestion idempotent with content hashes, and choose chunk size from measured hit rates. This
+      platform's knowledge base uses the same pipeline with organisation filters.
+    hinglish: |
+      Documentation Q&A Assistant project mein aap bilkul yahi retriever banaoge, content hashes se
+      ingestion ko idempotent karoge, aur measured hit rates se chunk size chunoge. Is platform ka
+      knowledge base bhi organisation filters ke saath yahi pipeline use karta hai.
+  summary:
+    en:
+      - Ingestion extracts, chunks, embeds and stores vectors with metadata
+      - Chunk along structure with a small overlap; measure, do not guess, the size
+      - Hybrid retrieval combines exact keyword matching with semantic similarity
+      - Permission filters belong inside the retrieval query
+    hinglish:
+      - Ingestion extract, chunk, embed karke metadata ke saath vectors store karta hai
+      - Structure ke hisaab se thode overlap ke saath chunk karo; size naapo, guess mat karo
+      - Hybrid retrieval exact keyword matching ko semantic similarity se jodta hai
+      - Permission filters retrieval query ke andar hone chahiye
+codeExamples:
+  - id: hybrid-ranking
+    title:
+      en: Hybrid ranking — keyword overlap plus similarity
+      hinglish: Hybrid ranking — keyword overlap plus similarity
+    description:
+      en: Uses a bag-of-words cosine as a lexical stand-in for embedding similarity so it runs without any model. Real systems use an embedding model and BM25.
+      hinglish: Bina kisi model ke chalne ke liye embedding similarity ki jagah bag-of-words cosine (lexical stand-in) use karta hai. Asli systems embedding model aur BM25 use karte hain.
+    variants:
+      python: |
+        import math
+        import re
+        from collections import Counter
+
+        docs = {
+            "refund-1": "Refunds are available within 30 days of purchase with the original receipt.",
+            "refund-2": "After 30 days we offer store credit instead of a refund.",
+            "shipping": "Standard shipping takes 3 to 5 business days within India.",
+        }
+
+
+        def words(text):
+            return re.findall(r"[a-z0-9]+", text.lower())
+
+
+        def keyword_score(query, text):
+            # Fraction of query words that appear in the text (a simple stand-in for BM25).
+            q = set(words(query))
+            return len(q & set(words(text))) / len(q)
+
+
+        def bow_cosine(a, b):
+            # Bag-of-words cosine: a lexical stand-in for embedding similarity in this demo.
+            ca, cb = Counter(words(a)), Counter(words(b))
+            dot = sum(ca[w] * cb[w] for w in ca)
+            return dot / (math.sqrt(sum(v * v for v in ca.values())) * math.sqrt(sum(v * v for v in cb.values())))
+
+
+        query = "Can I get a refund after 30 days?"
+        alpha = 0.3  # weight of the keyword score
+        ranked = sorted(
+            ((alpha * keyword_score(query, t) + (1 - alpha) * bow_cosine(query, t), doc_id) for doc_id, t in docs.items()),
+            reverse=True,
+        )
+        for score, doc_id in ranked:
+            print(f"{doc_id:9} {score:.3f}")
+    expectedOutput: |
+      refund-2  0.561
+      refund-1  0.218
+      shipping  0.116
+lab:
+  id: rag-pipeline
+  config:
+    question: Can I get a refund after three weeks?
+    chunkSize: 40
+    overlap: 8
+    topK: 3
+    keywordWeight: 0.3
+  prompt:
+    en: Set the keyword weight to 0 and then to 1. Which setting retrieves the chunk that actually answers the question?
+    hinglish: Keyword weight ko 0 aur phir 1 karo. Kaunsi setting woh chunk retrieve karti hai jo sach mein sawaal ka answer deta hai?
+exerciseIds: [ex-rag-hybrid-rank]
+assessmentId: quiz-rag-chunking-retrieval
+projectIds: [rag-docs-assistant]
+relatedLessonIds: [ai-vectors-similarity, rag-grounded-citations]

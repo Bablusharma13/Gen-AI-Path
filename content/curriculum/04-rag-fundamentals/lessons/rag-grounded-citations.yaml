@@ -1,0 +1,175 @@
+id: rag-grounded-citations
+slug: grounded-answers-and-citations
+version: 1
+status: published
+estimatedMinutes: 40
+prerequisites: [rag-chunking-retrieval]
+topics: [rag, citations, rag-evaluation, hallucination]
+title:
+  en: Grounded answers, verified citations and RAG evaluation
+  hinglish: Grounded answers, verified citations aur RAG evaluation
+summary:
+  en: Make the model answer only from retrieved chunks, check every citation in code, refuse when the sources are silent, and measure retrieval with hit rate and MRR.
+  hinglish: Model ko sirf retrieved chunks se answer karwao, har citation code mein check karo, sources chup hon to mana karo, aur hit rate aur MRR se retrieval naapo.
+objectives:
+  en:
+    - Build a grounded prompt with identified chunks
+    - Validate citations against the retrieved set and drop unsupported claims
+    - Add a not-found path based on retrieval scores
+    - Compute hit rate at k and mean reciprocal rank
+  hinglish:
+    - Identified chunks ke saath grounded prompt banana
+    - Citations ko retrieved set ke against validate karna aur unsupported claims hatana
+    - Retrieval scores par based not-found path jodna
+    - Hit rate at k aur mean reciprocal rank calculate karna
+sections:
+  explanation:
+    en: |
+      **Grounded generation.** Give each retrieved chunk an id and place the chunks in delimited
+      data blocks. Instruct the model to answer only from them, to cite chunk ids for every claim,
+      and to say it cannot find the answer when the chunks do not contain it. Remind it that the
+      chunks are data, not instructions.
+
+      **Verify, do not trust.** The model can still invent a citation or cite a chunk that does not
+      support the sentence. Code can catch the first problem cheaply: extract the cited ids and
+      compare them with the ids you actually retrieved. Drop (or flag) any sentence that relies on an
+      unknown id. Checking that a cited chunk really *supports* the sentence is harder — use human
+      review or a calibrated judge for that, and measure it.
+
+      **The not-found path.** If the best retrieval score is below a threshold — chosen from labelled
+      data, not by feel — skip the model and reply that the documents do not cover the question. This
+      is cheaper and more honest than letting the model improvise.
+
+      **Measuring retrieval.** Build a labelled set: each question with the chunk ids that answer it.
+
+      - **Hit rate @k**: the share of questions where at least one relevant chunk appears in the top k.
+      - **MRR** (mean reciprocal rank): average of `1 / rank` of the *first* relevant result (0 if
+        none was retrieved). It rewards putting the right chunk first.
+
+      Measure answers separately: citation validity (in code), faithfulness and relevance (human or
+      judge), and refusal accuracy on questions the corpus cannot answer.
+    hinglish: |
+      **Grounded generation.** Har retrieved chunk ko ek id do aur chunks ko delimited data blocks mein
+      rakho. Model ko kaho ki sirf unhi se answer de, har claim ke liye chunk ids cite kare, aur chunks
+      mein answer na ho to keh de ki nahi mila. Yaad dilao ki chunks data hain, instructions nahi.
+
+      **Verify karo, bharosa nahi.** Model phir bhi citation bana sakta hai ya aisa chunk cite kar sakta
+      hai jo sentence ko support na kare. Pehli problem code sasti mein pakad leta hai: cited ids nikalo
+      aur unhe sach mein retrieve hue ids se compare karo. Jo sentence unknown id par tika ho use hatao
+      (ya flag karo). Cited chunk sach mein sentence ko *support* karta hai ya nahi, yeh check karna
+      mushkil hai — iske liye human review ya calibrated judge use karo, aur ise naapo.
+
+      **Not-found path.** Agar best retrieval score threshold se neeche ho — jo labelled data se chuna
+      gaya ho, feel se nahi — to model ko skip karo aur jawab do ki documents is sawaal ko cover nahi
+      karte. Yeh model ko improvise karne dene se sasta aur zyada imaandar hai.
+
+      **Retrieval naapna.** Ek labelled set banao: har sawaal ke saath woh chunk ids jo answer dete hain.
+
+      - **Hit rate @k**: kitne sawaalon mein kam se kam ek relevant chunk top k mein aaya.
+      - **MRR** (mean reciprocal rank): *pehle* relevant result ke `1 / rank` ka average (kuch retrieve
+        na hua to 0). Yeh sahi chunk ko pehle rakhne ko reward karta hai.
+
+      Answers ko alag naapo: citation validity (code mein), faithfulness aur relevance (human ya judge),
+      aur un sawaalon par refusal accuracy jinka answer corpus mein nahi hai.
+  analogy:
+    en: |
+      A student's essay with footnotes: the teacher first checks that each footnote points to a real
+      book on the reading list (cheap, mechanical), then spot-checks that the book actually says what
+      the essay claims (slower, needs judgement). An essay on a topic outside the reading list should
+      say "not covered" rather than invent sources.
+    hinglish: |
+      Footnotes wala student ka essay: teacher pehle check karta hai ki har footnote reading list ki
+      asli kitaab ki taraf point karta hai (sasta, mechanical), phir spot-check karta hai ki kitaab
+      sach mein wahi kehti hai jo essay claim karta hai (dheema, judgement chahiye). Reading list se bahar
+      ke topic par essay ko sources banane ke bajaye "cover nahi hai" kehna chahiye.
+  guidedExercise:
+    en: |
+      1. Run the code example. Which citation is invalid, and which sentence was removed because of it?
+      2. Change `best_score` to 0.6. What happens, and what would the next step be?
+      3. For three questions about a document you know well, write down the chunk that should answer
+         each. That is the start of a labelled set.
+    hinglish: |
+      1. Code example chalao. Kaunsa citation invalid hai, aur uski wajah se kaunsa sentence hata?
+      2. `best_score` ko 0.6 karo. Kya hota hai, aur agla step kya hoga?
+      3. Kisi document ke baare mein jo aap achhe se jaante ho, teen sawaal likho aur har ek ke liye
+         woh chunk jo answer de. Yahi labelled set ki shuruaat hai.
+  challenge:
+    en: |
+      Some answers cite the right chunk but say something the chunk does not contain. Design (in
+      words) a review process that measures this on 30 sampled answers per week, and what you would do
+      if the rate rose.
+    hinglish: |
+      Kuch answers sahi chunk cite karte hain par aisi baat kehte hain jo chunk mein nahi hai. Ek review
+      process (shabdon mein) design karo jo har hafte 30 sampled answers par ise naape, aur rate badhne
+      par aap kya karoge.
+  commonMistakes:
+    en:
+      - Showing citations to users without checking that they were actually retrieved
+      - Letting the model answer from general knowledge when retrieval found nothing
+      - Choosing the not-found threshold without labelled data
+      - Reporting only answer quality, so retrieval failures are invisible
+      - Assuming a valid citation id means the claim is supported
+    hinglish:
+      - Bina check kiye ki woh sach mein retrieve hue the, users ko citations dikhana
+      - Retrieval mein kuch na mile to model ko general knowledge se answer dene dena
+      - Labelled data ke bina not-found threshold chunna
+      - Sirf answer quality report karna, jisse retrieval failures dikhte hi nahi
+      - Maan lena ki valid citation id ka matlab claim supported hai
+  projectApplication:
+    en: |
+      The Documentation Q&A Assistant project requires validated citations, a not-found path and an
+      evaluation report with hit@k and MRR. The knowledge-base answers in this platform drop any
+      citation that does not match a retrieved chunk.
+    hinglish: |
+      Documentation Q&A Assistant project mein validated citations, not-found path aur hit@k aur MRR ke
+      saath evaluation report zaroori hai. Is platform ke knowledge-base answers har woh citation hata
+      dete hain jo retrieved chunk se match na kare.
+  summary:
+    en:
+      - Give chunks ids, delimit them as data, and require citations
+      - Validate cited ids in code and drop unsupported sentences
+      - Below a measured threshold, reply "not found" without calling the model
+      - Measure retrieval with hit rate @k and MRR, answers with faithfulness and refusals
+    hinglish:
+      - Chunks ko ids do, data ke roop mein delimit karo, aur citations zaroori karo
+      - Cited ids code mein validate karo aur unsupported sentences hatao
+      - Measured threshold se neeche, model call kiye bina "not found" jawab do
+      - Retrieval ko hit rate @k aur MRR se naapo, answers ko faithfulness aur refusals se
+codeExamples:
+  - id: validate-citations
+    title:
+      en: Validating citations and the not-found path
+      hinglish: Citations validate karna aur not-found path
+    description:
+      en: The answer string is a hard-coded example of a model reply; no model is called.
+      hinglish: Answer string model reply ka hard-coded example hai; koi model call nahi hota.
+    variants:
+      python: |
+        import re
+
+        retrieved = {"c1": "Refunds within 30 days.", "c2": "After 30 days: store credit."}
+        answer = "You can get a refund within 30 days [c1]. After that you get store credit [c2] or cash [c7]."
+
+        cited = re.findall(r"\[(c\d+)\]", answer)
+        valid = [c for c in dict.fromkeys(cited) if c in retrieved]
+        invalid = [c for c in dict.fromkeys(cited) if c not in retrieved]
+        print("cited:", cited)
+        print("valid:", valid, "| invalid:", invalid)
+
+        # Remove sentences that rely on an invalid citation instead of showing them.
+        sentences = re.split(r"(?<=[.!?])\s+", answer)
+        kept = [s for s in sentences if not any(f"[{c}]" in s for c in invalid)]
+        print("shown to the user:", " ".join(kept))
+
+        # Not-found path: if the best retrieval score is below the threshold, do not call the model.
+        best_score, threshold = 0.18, 0.35
+        print("not found" if best_score < threshold else "call the model")
+    expectedOutput: |
+      cited: ['c1', 'c2', 'c7']
+      valid: ['c1', 'c2'] | invalid: ['c7']
+      shown to the user: You can get a refund within 30 days [c1].
+      not found
+exerciseIds: [ex-rag-validate-citations, ex-rag-retrieval-metrics]
+assessmentId: quiz-rag-grounded-citations
+projectIds: [rag-docs-assistant]
+relatedLessonIds: [rag-chunking-retrieval, ai-datasets-metrics]

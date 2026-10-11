@@ -1,0 +1,112 @@
+id: quiz-py-variables-types
+version: 1
+status: published
+courseId: python-foundations
+lessonId: py-variables-types
+passingPercent: 70
+title:
+  en: 'Check: variables and data types'
+  hinglish: 'Check: variables aur data types'
+objectives:
+  en:
+    - Identify Python types
+    - Predict conversion behaviour
+  hinglish:
+    - Python types pehchanna
+    - Conversion ka behaviour predict karna
+questions:
+  - id: type-of-temperature
+    type: single_choice
+    topics: [data-types]
+    prompt:
+      en: What is the type of `temperature` after `temperature = 0.7`?
+      hinglish: '`temperature = 0.7` ke baad `temperature` ka type kya hai?'
+    options:
+      - id: a
+        text: { en: int, hinglish: int }
+      - id: b
+        text: { en: float, hinglish: float }
+      - id: c
+        text: { en: str, hinglish: str }
+      - id: d
+        text: { en: decimal, hinglish: decimal }
+    correctOptionIds: [b]
+    explanation:
+      en: Numbers with a decimal point are `float` in Python.
+      hinglish: Decimal point wale numbers Python mein `float` hote hain.
+  - id: int-conversion
+    type: single_choice
+    topics: [data-types]
+    prompt:
+      en: What happens when Python runs `int("3.5")`?
+      hinglish: Jab Python `int("3.5")` run karta hai to kya hota hai?
+    options:
+      - id: a
+        text: { en: It returns 3, hinglish: 3 return karta hai }
+      - id: b
+        text: { en: It returns 4, hinglish: 4 return karta hai }
+      - id: c
+        text: { en: It raises a ValueError, hinglish: ValueError raise karta hai }
+      - id: d
+        text: { en: It returns 3.5, hinglish: 3.5 return karta hai }
+    correctOptionIds: [c]
+    explanation:
+      en: '`int()` will not guess how to round a decimal string, so it raises `ValueError`. Use `int(float("3.5"))` if truncation is what you want.'
+      hinglish: '`int()` decimal string ko round karne ka guess nahi karta, isliye `ValueError` deta hai. Truncation chahiye to `int(float("3.5"))` use karo.'
+  - id: falsy-values
+    type: multiple_choice
+    topics: [data-types]
+    prompt:
+      en: Which of these values are "falsy" (treated as False in an `if`)?
+      hinglish: Inmein se kaunsi values "falsy" hain (`if` mein False maani jaati hain)?
+    options:
+      - id: a
+        text: { en: '0', hinglish: '0' }
+      - id: b
+        text: { en: '""  (empty string)', hinglish: '""  (khaali string)' }
+      - id: c
+        text: { en: None, hinglish: None }
+      - id: d
+        text: { en: '"False"  (a non-empty string)', hinglish: '"False"  (non-empty string)' }
+    correctOptionIds: [a, b, c]
+    explanation:
+      en: Zero, empty containers/strings and None are falsy. Any non-empty string — even "False" — is truthy.
+      hinglish: Zero, khaali containers/strings aur None falsy hain. Koi bhi non-empty string — "False" bhi — truthy hai.
+  - id: why-fstring
+    type: short_text
+    topics: [strings]
+    prompt:
+      en: Why are f-strings a good way to build prompts? Answer in one or two sentences.
+      hinglish: Prompts banane ke liye f-strings achha tarika kyun hain? Ek-do lines mein jawab do.
+    rubric:
+      - id: insert-values
+        idea:
+          en: They insert variable values directly into the text
+          hinglish: Variables ki values seedha text mein daal dete hain
+        anyOf:
+          [
+            variable,
+            variables,
+            value,
+            values,
+            insert,
+            inserts,
+            placeholder,
+            placeholders,
+            daal,
+            embed,
+            interpolate,
+            interpolation,
+          ]
+      - id: readable
+        idea:
+          en: The result is readable and less error-prone than concatenation
+          hinglish: Result readable hota hai aur concatenation se kam error-prone
+        anyOf: [readable, clean, clear, easy, simple, concatenation, aasaan, saaf, errors, mistakes]
+    requiredGroups: 1
+    sampleAnswer:
+      en: f-strings insert variable values directly into text, which is more readable and less error-prone than gluing strings together with +.
+      hinglish: f-strings variable values ko seedha text mein daal dete hain, jo + se strings jodne se zyada readable aur kam error-prone hai.
+    explanation:
+      en: 'Prompts mix fixed instructions with changing data. f-strings keep both in one readable template.'
+      hinglish: 'Prompts mein fixed instructions aur badalta data dono hote hain. f-strings dono ko ek readable template mein rakhte hain.'

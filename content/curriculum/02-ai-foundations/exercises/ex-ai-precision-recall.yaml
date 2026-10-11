@@ -1,0 +1,89 @@
+id: ex-ai-precision-recall
+version: 1
+status: published
+lessonId: ai-datasets-metrics
+language: python
+topics: [evaluation-metrics]
+title:
+  en: Compute precision, recall and F1
+  hinglish: Precision, recall aur F1 nikaalo
+prompt:
+  en: |
+    Write `classification_report(y_true, y_pred, positive=1)` returning a dict with keys
+    `"precision"`, `"recall"` and `"f1"` (floats).
+
+    - Treat the label `positive` as the positive class; everything else is negative.
+    - When a ratio has a zero denominator (for example, the model never predicted positive),
+      return `0.0` for that metric instead of crashing.
+    - Raise `ValueError` if the two lists have different lengths.
+  hinglish: |
+    `classification_report(y_true, y_pred, positive=1)` likho jo `"precision"`, `"recall"` aur `"f1"`
+    keys wala dict (floats) return kare.
+
+    - Label `positive` positive class hai; baaki sab negative.
+    - Jab kisi ratio ka denominator zero ho (jaise model ne kabhi positive predict hi nahi kiya),
+      to crash hone ki jagah us metric ke liye `0.0` return karo.
+    - Dono lists ki lengths alag hon to `ValueError` raise karo.
+starterCode: |
+  def classification_report(y_true, y_pred, positive=1):
+      pass
+tests:
+  - id: example
+    name: matches the lesson example
+    code: |
+      r = classification_report([1, 0, 1, 1, 0, 0, 1, 0, 0, 0], [1, 1, 0, 1, 1, 0, 1, 0, 0, 0])
+      assert abs(r["precision"] - 0.6) < 1e-9
+      assert abs(r["recall"] - 0.75) < 1e-9
+      assert abs(r["f1"] - 2 * 0.6 * 0.75 / 1.35) < 1e-9
+  - id: lazy-model
+    name: a model that never predicts positive scores zero, without crashing
+    code: |
+      r = classification_report([1, 0, 0, 1], [0, 0, 0, 0])
+      assert r == {"precision": 0.0, "recall": 0.0, "f1": 0.0}
+  - id: string-labels
+    name: supports any positive label
+    code: |
+      r = classification_report(["spam", "ham", "spam"], ["spam", "spam", "spam"], positive="spam")
+      assert abs(r["precision"] - 2 / 3) < 1e-9 and r["recall"] == 1.0
+  - id: perfect
+    name: perfect predictions
+    code: |
+      assert classification_report([1, 0, 1], [1, 0, 1]) == {"precision": 1.0, "recall": 1.0, "f1": 1.0}
+  - id: mismatch
+    name: rejects different lengths
+    code: |
+      try:
+          classification_report([1, 0], [1])
+      except ValueError:
+          pass
+      else:
+          raise AssertionError("expected ValueError")
+hints:
+  en:
+    - Count tp, fp and fn in one loop over zip(y_true, y_pred)
+    - Write a small helper safe_div(a, b) that returns 0.0 when b == 0
+    - F1 is safe_div(2 * p * r, p + r)
+  hinglish:
+    - zip(y_true, y_pred) par ek loop mein tp, fp aur fn gino
+    - Ek chhota helper safe_div(a, b) likho jo b == 0 par 0.0 de
+    - F1 hai safe_div(2 * p * r, p + r)
+solution: |
+  def classification_report(y_true, y_pred, positive=1):
+      if len(y_true) != len(y_pred):
+          raise ValueError("y_true and y_pred must have the same length")
+      tp = fp = fn = 0
+      for t, p in zip(y_true, y_pred):
+          if p == positive and t == positive:
+              tp += 1
+          elif p == positive:
+              fp += 1
+          elif t == positive:
+              fn += 1
+
+      def safe_div(a, b):
+          return a / b if b else 0.0
+
+      precision = safe_div(tp, tp + fp)
+      recall = safe_div(tp, tp + fn)
+      f1 = safe_div(2 * precision * recall, precision + recall)
+      return {"precision": float(precision), "recall": float(recall), "f1": float(f1)}

@@ -1,0 +1,117 @@
+id: quiz-rag-grounded-citations
+version: 1
+status: published
+courseId: rag-fundamentals
+lessonId: rag-grounded-citations
+passingPercent: 70
+title:
+  en: 'Check: grounded answers and RAG evaluation'
+  hinglish: 'Check: grounded answers aur RAG evaluation'
+objectives:
+  en:
+    - Validate citations, use a not-found path and compute retrieval metrics
+  hinglish:
+    - Citations validate karna, not-found path use karna aur retrieval metrics nikaalna
+questions:
+  - id: unknown-citation
+    type: single_choice
+    topics: [citations]
+    prompt:
+      en: The model cites [c9], but only c1–c4 were retrieved. What should the application do?
+      hinglish: Model [c9] cite karta hai, par sirf c1–c4 retrieve hue the. Application ko kya karna chahiye?
+    options:
+      - id: a
+        text:
+          en: Show it — the model probably knows a better source
+          hinglish: Dikhao — model ko shayad behtar source pata hai
+      - id: b
+        text:
+          en: Drop or flag the claim that relies on [c9]
+          hinglish: '[c9] par tike claim ko hatao ya flag karo'
+      - id: c
+        text:
+          en: Rename c9 to c4
+          hinglish: c9 ko c4 rename kar do
+    correctOptionIds: [b]
+    explanation:
+      en: A citation that does not match a retrieved chunk is unsupported and must not be presented as a source.
+      hinglish: Jo citation kisi retrieved chunk se match na kare woh unsupported hai aur use source ki tarah nahi dikhana chahiye.
+  - id: mrr-value
+    type: single_choice
+    topics: [rag-evaluation]
+    prompt:
+      en: For two questions, the first relevant chunk was at rank 1 and at rank 4. What is the MRR?
+      hinglish: Do sawaalon mein pehla relevant chunk rank 1 aur rank 4 par tha. MRR kya hai?
+    options:
+      - id: a
+        text:
+          en: '0.625'
+          hinglish: '0.625'
+      - id: b
+        text:
+          en: '2.5'
+          hinglish: '2.5'
+      - id: c
+        text:
+          en: '0.5'
+          hinglish: '0.5'
+    correctOptionIds: [a]
+    explanation:
+      en: (1/1 + 1/4) / 2 = 0.625.
+      hinglish: (1/1 + 1/4) / 2 = 0.625.
+  - id: not-found
+    type: single_choice
+    topics: [rag, hallucination]
+    prompt:
+      en: The best retrieval score is far below your measured threshold. What is the best behaviour?
+      hinglish: Best retrieval score aapke measured threshold se bahut neeche hai. Sabse achha behaviour kya hai?
+    options:
+      - id: a
+        text:
+          en: Ask the model to answer from its general knowledge
+          hinglish: Model se general knowledge se answer karwao
+      - id: b
+        text:
+          en: Reply that the documents do not cover this, without calling the model
+          hinglish: Model call kiye bina jawab do ki documents ise cover nahi karte
+      - id: c
+        text:
+          en: Lower the threshold until something matches
+          hinglish: Kuch match hone tak threshold kam karte raho
+    correctOptionIds: [b]
+    explanation:
+      en: The not-found path is cheaper and more honest than letting the model improvise.
+      hinglish: Not-found path model ko improvise karne dene se sasta aur zyada imaandar hai.
+  - id: separate-metrics
+    explanation:
+      en: Retrieval and generation fail for different reasons; separate metrics tell you which stage to fix.
+      hinglish: Retrieval aur generation alag wajah se fail hote hain; alag metrics batate hain kaunsa stage theek karna hai.
+    type: short_text
+    topics: [rag-evaluation]
+    prompt:
+      en: Why should you measure retrieval quality separately from answer quality?
+      hinglish: Retrieval quality ko answer quality se alag kyun naapna chahiye?
+    rubric:
+      - id: different-fixes
+        idea:
+          en: Failures have different causes and fixes; if the right chunk is never retrieved, prompt changes cannot help
+          hinglish: Failures ke causes aur fixes alag hote hain; sahi chunk retrieve hi na ho to prompt badalne se madad nahi milegi
+        anyOf:
+          [
+            cause,
+            causes,
+            fix,
+            fixes,
+            different,
+            retrieve,
+            retrieved,
+            chunk,
+            diagnose,
+            where,
+            which stage,
+            alag,
+            wajah,
+          ]
+    sampleAnswer:
+      en: A bad answer can come from retrieval (the right chunk was never found) or generation (the model misused it). Measuring each separately shows which stage to fix.
+      hinglish: Bura answer retrieval (sahi chunk mila hi nahi) ya generation (model ne galat use kiya) se aa sakta hai. Dono ko alag naapne se pata chalta hai kaunsa stage theek karna hai.

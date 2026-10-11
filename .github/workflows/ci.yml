@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      mongo:
+        image: mongo:8.0
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      TEST_MONGODB_URI: mongodb://127.0.0.1:27017
+      TEST_REDIS_URL: redis://127.0.0.1:6379
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm content:validate
+      - name: Verify exercises and code examples with real Python
+        run: pnpm exercises:verify
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm build
+      - name: Dependency audit (report only)
+        run: pnpm audit --prod --audit-level high || true
+
+  e2e:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      mongo:
+        image: mongo:8.0
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      MONGODB_URI: mongodb://127.0.0.1:27017/genpath_ai
+      WEB_URL: http://localhost:3000
+      API_URL: http://localhost:4000
+      # Labelled mock AI (development only) so the mentor and knowledge-base flows run without a provider.
+      AI_PROVIDER: mock
+      RATE_LIMIT_MULTIPLIER: '20'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Generate throwaway secrets
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 48)" >> "$GITHUB_ENV"
+          echo "JWT_REFRESH_SECRET=$(openssl rand -hex 48)" >> "$GITHUB_ENV"
+      - run: pnpm build
+      - run: pnpm seed
+      - name: Start API and web
+        run: |
+          node apps/api/dist/index.js > api.log 2>&1 &
+          (cd apps/web && npx next start -p 3000 > ../../web.log 2>&1 &)
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:3000/api/v1/health/ready > /dev/null && exit 0
+            sleep 1
+          done
+          echo "Servers did not become ready"; cat api.log web.log; exit 1
+      - name: Playwright (system Chrome)
+        run: pnpm --filter @genpath/web exec playwright test --workers=1
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            test-results/
+            api.log
+            web.log

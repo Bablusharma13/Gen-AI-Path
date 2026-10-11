@@ -1,0 +1,283 @@
+id: rag-docs-assistant
+version: 1
+status: published
+order: 2
+level: intermediate
+estimatedHours: 14
+tracks: [A, B, D]
+techStack:
+  [Python or TypeScript, Embedding API or local model, MongoDB or SQLite, LLM API, pytest or Vitest]
+lessonIds: [ai-vectors-similarity, ai-datasets-metrics, py-http-apis]
+title:
+  en: Documentation Q&A Assistant (RAG) with citations
+  hinglish: Citations ke saath Documentation Q&A Assistant (RAG)
+summary:
+  en: Ingest a folder of Markdown docs, retrieve the most relevant chunks for a question and answer only from them — with citations that are checked in code and a refusal when the docs do not contain the answer.
+  hinglish: Markdown docs ka ek folder ingest karo, sawaal ke liye sabse relevant chunks retrieve karo aur sirf unhi se answer do — aise citations ke saath jo code mein check hote hain, aur docs mein answer na ho to saaf mana karo.
+problemStatement:
+  en: |
+    Teams lose hours searching internal docs. Build an assistant that answers questions about one
+    documentation set (pick an open-source project's docs or write your own) and shows where every
+    answer came from. "Grounded" is the whole point: if the retrieved chunks do not contain the
+    answer, the assistant must say so instead of guessing. You will also measure retrieval quality
+    with a small labelled question set, so improvements are numbers, not feelings.
+  hinglish: |
+    Teams internal docs dhoondhne mein ghante barbaad karti hain. Ek assistant banao jo ek
+    documentation set (kisi open-source project ke docs lo ya apne khud likho) ke baare mein sawaalon
+    ke jawab de aur dikhaye ki har answer kahan se aaya. Poora point "grounded" hona hai: agar
+    retrieved chunks mein answer nahi hai, to assistant guess karne ke bajaye yeh bataye. Aap ek
+    chhote labelled question set se retrieval quality bhi naapoge, taaki improvements numbers hon,
+    feelings nahi.
+requirements:
+  en:
+    - Ingest .md files — split by headings, then into chunks of about 300–500 tokens with a small overlap
+    - Store each chunk with its source file, heading path, position and a content hash (re-ingesting an unchanged file does nothing)
+    - Embed chunks and queries with the same embedding model; store the model name with every vector
+    - Retrieve the top-k chunks by cosine similarity, with a minimum-score threshold
+    - Answer with an LLM using only the retrieved chunks, delimited as data in the prompt
+    - Every answer lists citations (file + heading); citations that do not match a retrieved chunk are rejected in code
+    - When nothing passes the threshold, reply "I could not find this in the documentation" — no model call needed
+    - A /debug view or flag shows the retrieved chunks and their scores
+  hinglish:
+    - .md files ingest karo — headings se split karo, phir lagbhag 300–500 tokens ke chunks mein, thode overlap ke saath
+    - Har chunk ko uski source file, heading path, position aur content hash ke saath store karo (unchanged file dobara ingest karne par kuch na ho)
+    - Chunks aur queries ko ek hi embedding model se embed karo; har vector ke saath model ka naam store karo
+    - Cosine similarity se top-k chunks retrieve karo, minimum-score threshold ke saath
+    - Sirf retrieved chunks se LLM ke through answer do, prompt mein data ke roop mein delimited
+    - Har answer citations (file + heading) list kare; jo citation kisi retrieved chunk se match na kare woh code mein reject ho
+    - Jab kuch bhi threshold pass na kare, jawab do "Mujhe yeh documentation mein nahi mila" — model call ki zaroorat nahi
+    - Ek /debug view ya flag retrieved chunks aur unke scores dikhaye
+acceptanceCriteria:
+  en:
+    - A labelled set of at least 20 questions (with the file that should answer each) is committed
+    - The evaluation script reports hit rate @k and MRR for retrieval, and the prompt version
+    - Out-of-scope questions in the labelled set get the "not found" reply in at least 80% of cases
+    - No answer shown to the user contains a citation to a chunk that was not retrieved
+    - Re-running ingestion on unchanged docs creates no new chunks or embeddings
+    - Deleting a source file removes its chunks and vectors on the next ingestion run
+  hinglish:
+    - Kam se kam 20 sawaalon ka labelled set (har sawaal ke saath woh file jo answer de) commit ho
+    - Evaluation script retrieval ke liye hit rate @k aur MRR, aur prompt version report kare
+    - Labelled set ke out-of-scope sawaalon ko kam se kam 80% cases mein "not found" reply mile
+    - User ko dikhaye gaye kisi answer mein aise chunk ka citation na ho jo retrieve nahi hua
+    - Unchanged docs par ingestion dobara chalane se koi naya chunk ya embedding na bane
+    - Source file delete karne par agle ingestion run mein uske chunks aur vectors hat jaayein
+architecture:
+  en: |
+    ```
+    ingest:  docs/*.md → parse headings → chunk (overlap) → hash → embed (batch) → store
+    ask:     question → embed → top-k cosine → threshold → prompt with <chunk id=…> blocks
+             → LLM → parse answer + cited ids → drop ids not in the retrieved set → render
+    eval:    labelled.jsonl → retrieval metrics (hit@k, MRR) + answer checks → report.md
+    ```
+    Keep ingestion, retrieval and generation as separate modules with their own tests. The
+    retriever must work (and be testable) without any LLM.
+  hinglish: |
+    ```
+    ingest:  docs/*.md → headings parse → chunk (overlap) → hash → embed (batch) → store
+    ask:     question → embed → top-k cosine → threshold → <chunk id=…> blocks ke saath prompt
+             → LLM → answer + cited ids parse → retrieved set mein na hone wale ids hatao → render
+    eval:    labelled.jsonl → retrieval metrics (hit@k, MRR) + answer checks → report.md
+    ```
+    Ingestion, retrieval aur generation ko alag modules rakho, har ek ke apne tests ke saath.
+    Retriever bina kisi LLM ke kaam kare (aur testable ho).
+dataModel:
+  en: |
+    ```json
+    {"chunkId": "install.md#3", "source": "install.md", "headingPath": ["Install", "Docker"],
+     "position": 3, "text": "…", "hash": "sha256:…", "tokens": 412,
+     "embedding": {"model": "text-embedding-…", "dims": 768, "vector": [0.012, …]}}
+    ```
+  hinglish: |
+    ```json
+    {"chunkId": "install.md#3", "source": "install.md", "headingPath": ["Install", "Docker"],
+     "position": 3, "text": "…", "hash": "sha256:…", "tokens": 412,
+     "embedding": {"model": "text-embedding-…", "dims": 768, "vector": [0.012, …]}}
+    ```
+apiDesign:
+  en: |
+    `POST /ask` — `{ "question": string, "k"?: number }` → `{ answer, citations: [{chunkId, source, heading}], found: boolean, promptVersion }`.
+    `POST /ingest` (admin only) re-indexes the docs folder and returns counts (added, updated, removed, unchanged).
+  hinglish: |
+    `POST /ask` — `{ "question": string, "k"?: number }` → `{ answer, citations: [{chunkId, source, heading}], found: boolean, promptVersion }`.
+    `POST /ingest` (sirf admin) docs folder ko re-index karta hai aur counts deta hai (added, updated, removed, unchanged).
+milestones:
+  - id: ingestion
+    title:
+      en: Ingestion you can re-run
+      hinglish: Aisi ingestion jo dobara chal sake
+    description:
+      en: Parse, chunk, hash and store documents so re-runs are idempotent and deletions propagate.
+      hinglish: Documents ko parse, chunk, hash aur store karo taaki re-runs idempotent hon aur deletions propagate hon.
+    checklist:
+      en:
+        [
+          Heading-aware chunking with overlap,
+          Content hashes skip unchanged chunks,
+          Removed files lose their chunks,
+        ]
+      hinglish:
+        [
+          Overlap ke saath heading-aware chunking,
+          Content hashes unchanged chunks skip karte hain,
+          Hatayi gayi files ke chunks bhi hat jaate hain,
+        ]
+  - id: retrieval
+    title:
+      en: Retrieval and a labelled set
+      hinglish: Retrieval aur labelled set
+    description:
+      en: Embed, search and measure — write the labelled questions before tuning anything.
+      hinglish: Embed, search aur measure — kuch bhi tune karne se pehle labelled questions likho.
+    checklist:
+      en:
+        [
+          20+ labelled questions including out-of-scope ones,
+          hit@k and MRR are computed,
+          Threshold chosen from data and documented,
+        ]
+      hinglish:
+        [
+          Out-of-scope sawaalon ke saath 20+ labelled questions,
+          hit@k aur MRR calculate hote hain,
+          Threshold data se chuna gaya aur documented hai,
+        ]
+  - id: grounded-answers
+    title:
+      en: Grounded answers with checked citations
+      hinglish: Checked citations ke saath grounded answers
+    description:
+      en: Generate answers only from retrieved chunks and validate every citation in code.
+      hinglish: Sirf retrieved chunks se answers generate karo aur har citation code mein validate karo.
+    checklist:
+      en:
+        [
+          Chunks are delimited as data in the prompt,
+          Unknown citation ids are dropped,
+          Not-found path skips the model call,
+        ]
+      hinglish:
+        [
+          Prompt mein chunks data ke roop mein delimited hain,
+          Unknown citation ids hata diye jaate hain,
+          Not-found path model call skip karta hai,
+        ]
+  - id: interface
+    title:
+      en: Interface and debug view
+      hinglish: Interface aur debug view
+    description:
+      en: A small web UI or CLI that shows answers, citations and (optionally) the retrieved chunks with scores.
+      hinglish: Ek chhota web UI ya CLI jo answers, citations aur (optional) scores ke saath retrieved chunks dikhaye.
+    checklist:
+      en:
+        [
+          Citations link to the source section,
+          Debug view shows scores,
+          Errors from the model or embedder are shown clearly,
+        ]
+      hinglish:
+        [
+          Citations source section se link hote hain,
+          Debug view scores dikhata hai,
+          Model ya embedder ke errors saaf dikhte hain,
+        ]
+  - id: evaluation
+    title:
+      en: Evaluation report
+      hinglish: Evaluation report
+    description:
+      en: Compare at least two configurations (chunk size, k or embedding model) on your labelled set and write up the result.
+      hinglish: Apne labelled set par kam se kam do configurations (chunk size, k ya embedding model) compare karo aur result likho.
+    checklist:
+      en:
+        [
+          report.md with a results table,
+          Each run records config and prompt version,
+          Limitations are stated honestly,
+        ]
+      hinglish:
+        [
+          Results table ke saath report.md,
+          Har run config aur prompt version record karta hai,
+          Limitations imaandari se likhi hain,
+        ]
+testRequirements:
+  en:
+    - Chunker tests (headings, overlap, very long paragraphs, empty files)
+    - Idempotency test — ingest twice, counts unchanged; delete a file, its chunks disappear
+    - Retriever tests with tiny hand-made vectors (no network)
+    - Citation validation tests (valid, unknown id, duplicate id)
+    - Prompt test that the question and chunks sit inside delimited data blocks
+  hinglish:
+    - Chunker tests (headings, overlap, bahut lambe paragraphs, khaali files)
+    - Idempotency test — do baar ingest, counts same; file delete karo, uske chunks gayab
+    - Chhote haath se bane vectors ke saath retriever tests (bina network)
+    - Citation validation tests (valid, unknown id, duplicate id)
+    - Prompt test ki question aur chunks delimited data blocks ke andar hain
+securityChecklist:
+  en:
+    - Document text is untrusted — instructions inside documents are never followed
+    - Only an admin can trigger ingestion; the docs folder path is fixed in config, not user input
+    - The model output is rendered as plain text or sanitised Markdown — never raw HTML
+    - API keys stay on the server; logs contain ids and scores, not full document text
+  hinglish:
+    - Document text untrusted hai — documents ke andar likhe instructions kabhi follow nahi hote
+    - Sirf admin ingestion trigger kar sakta hai; docs folder ka path config mein fixed hai, user input nahi
+    - Model output plain text ya sanitised Markdown ke roop mein render hota hai — raw HTML kabhi nahi
+    - API keys server par rehti hain; logs mein ids aur scores hote hain, poora document text nahi
+deployment:
+  en: |
+    Containerise the API (Dockerfile + compose with the database). Ingestion runs as a separate
+    command, not on every boot. Document the cost: embedding calls per ingestion and model calls
+    per question.
+  hinglish: |
+    API ko containerise karo (Dockerfile + database ke saath compose). Ingestion ek alag command ke
+    roop mein chale, har boot par nahi. Cost document karo: har ingestion par embedding calls aur
+    har sawaal par model calls.
+readmeRequirements:
+  en:
+    - Architecture diagram for ingest, ask and eval
+    - Which docs you indexed and their licence
+    - Evaluation table with the configurations you compared
+    - How "not found" is decided and its known failure cases
+    - Cost and latency per question, measured
+  hinglish:
+    - Ingest, ask aur eval ka architecture diagram
+    - Kaunse docs index kiye aur unka licence
+    - Compare ki gayi configurations ke saath evaluation table
+    - '"Not found" kaise decide hota hai aur uske known failure cases'
+    - Har sawaal ka measured cost aur latency
+rubric:
+  - id: retrieval-quality
+    points: 30
+    criterion:
+      en: Retrieval quality and measurement
+      hinglish: Retrieval quality aur measurement
+    excellent:
+      en: Labelled set, hit@k and MRR are reported; the chosen configuration is justified by numbers.
+      hinglish: Labelled set, hit@k aur MRR report hain; chuni gayi configuration numbers se justified hai.
+  - id: grounding
+    points: 30
+    criterion:
+      en: Grounding and citations
+      hinglish: Grounding aur citations
+    excellent:
+      en: Citations are validated in code, not-found works, and injected instructions in docs have no effect.
+      hinglish: Citations code mein validate hote hain, not-found kaam karta hai, aur docs mein daale gaye instructions ka koi asar nahi.
+  - id: engineering
+    points: 25
+    criterion:
+      en: Engineering quality
+      hinglish: Engineering quality
+    excellent:
+      en: Idempotent ingestion, separated modules, offline tests for chunking, retrieval and citations.
+      hinglish: Idempotent ingestion, alag modules, chunking, retrieval aur citations ke offline tests.
+  - id: documentation
+    points: 15
+    criterion:
+      en: Documentation and honesty
+      hinglish: Documentation aur imaandari
+    excellent:
+      en: README with measured cost/latency and clearly stated limitations.
+      hinglish: Measured cost/latency aur saaf likhi limitations ke saath README.

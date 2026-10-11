@@ -1,0 +1,202 @@
+id: ai-vectors-similarity
+slug: vectors-and-similarity
+version: 2
+status: published
+estimatedMinutes: 30
+prerequisites: [ai-landscape]
+topics: [vectors, vector-similarity, embeddings]
+title:
+  en: Vectors, dot products and cosine similarity
+  hinglish: Vectors, dot products aur cosine similarity
+summary:
+  en: How lists of numbers represent things, and how dot products and cosine similarity measure "how alike" two things are — the core of semantic search.
+  hinglish: Numbers ki lists cheezon ko kaise represent karti hain, aur dot product aur cosine similarity kaise naapte hain ki do cheezein "kitni milti-julti" hain — semantic search ka core.
+objectives:
+  en:
+    - Represent items as vectors of features
+    - Compute a dot product and a vector length (norm)
+    - Compute cosine similarity and interpret values near 1, 0 and -1
+    - Explain why normalized vectors make dot product equal cosine similarity
+  hinglish:
+    - Items ko features ke vectors ke roop mein represent karna
+    - Dot product aur vector length (norm) calculate karna
+    - Cosine similarity calculate karna aur 1, 0 aur -1 ke paas wali values samjhana
+    - Samjhana ki normalized vectors mein dot product cosine similarity ke barabar kyun hota hai
+sections:
+  explanation:
+    en: |
+      A **vector** is an ordered list of numbers, e.g. `[0.9, 0.8, 0.1]`. Each position is a
+      **dimension**. If dimensions meant *(is an animal, is cute, is about money)*, then "cat"
+      might be `[0.9, 0.8, 0.1]` and "invoice" `[0.1, 0.05, 0.95]`.
+
+      The **dot product** multiplies matching positions and adds them up:
+      `a · b = a₁b₁ + a₂b₂ + … + aₙbₙ`. It is large when two vectors point the same way.
+
+      The **norm** (length) is `‖a‖ = √(a · a)`.
+
+      **Cosine similarity** divides the dot product by both lengths:
+      `cos(a, b) = (a · b) / (‖a‖ ‖b‖)`. It ignores *how long* the vectors are and only measures the
+      **angle** between them:
+
+      - ≈ 1 → pointing the same way (very similar)
+      - ≈ 0 → unrelated (perpendicular)
+      - ≈ -1 → opposite
+
+      Real **embedding models** turn text into vectors with hundreds or thousands of dimensions that
+      nobody hand-designed — the dimensions are learned. Semantic search embeds your query and every
+      document, then returns the documents with the highest cosine similarity. Many embedding APIs
+      return **normalized** vectors (length 1); then the dot product *is* the cosine similarity,
+      which is cheaper to compute.
+    hinglish: |
+      **Vector** numbers ki ek ordered list hai, jaise `[0.9, 0.8, 0.1]`. Har position ek
+      **dimension** hai. Agar dimensions ka matlab ho *(jaanwar hai, cute hai, paison ke baare mein
+      hai)*, to "cat" shayad `[0.9, 0.8, 0.1]` hoga aur "invoice" `[0.1, 0.05, 0.95]`.
+
+      **Dot product** matching positions ko multiply karke jodta hai:
+      `a · b = a₁b₁ + a₂b₂ + … + aₙbₙ`. Jab do vectors ek hi disha mein point karein to yeh bada hota hai.
+
+      **Norm** (length) hai `‖a‖ = √(a · a)`.
+
+      **Cosine similarity** dot product ko dono lengths se divide karti hai:
+      `cos(a, b) = (a · b) / (‖a‖ ‖b‖)`. Yeh vectors kitne *lambe* hain ise ignore karti hai aur sirf
+      unke beech ka **angle** naapti hai:
+
+      - ≈ 1 → ek hi disha (bahut similar)
+      - ≈ 0 → unrelated (perpendicular)
+      - ≈ -1 → ulti disha
+
+      Asli **embedding models** text ko sau ya hazaar dimensions wale vectors mein badalte hain jinhe
+      kisi ne haath se design nahi kiya — dimensions seekhe jaate hain. Semantic search aapki query
+      aur har document ko embed karta hai, phir sabse zyada cosine similarity wale documents deta hai.
+      Kai embedding APIs **normalized** vectors (length 1) dete hain; tab dot product *hi* cosine
+      similarity hota hai, jo compute karna sasta hai.
+  analogy:
+    en: |
+      Two people pointing at the sky: cosine similarity asks *are they pointing at the same star?*
+      It does not care whether one has a longer arm. Euclidean distance would care about arm length
+      — which is why cosine is preferred for comparing meaning.
+    hinglish: |
+      Do log aasmaan ki taraf ishaara kar rahe hain: cosine similarity poochti hai *kya dono ek hi
+      taare ki taraf ishaara kar rahe hain?* Kiska haath lamba hai, isse use farak nahi padta.
+      Euclidean distance haath ki lambai ki parwah karti — isliye meaning compare karne ke liye
+      cosine pasand kiya jaata hai.
+  visual:
+    en: |
+      Open the Embedding Similarity lab: change sentences and watch the cosine scores and the 2D
+      projection update. Remember the projection squeezes many dimensions into two, so distances on
+      the chart are approximate.
+    hinglish: |
+      Embedding Similarity lab kholo: sentences badlo aur cosine scores aur 2D projection ko update
+      hote dekho. Yaad rakho projection kai dimensions ko do mein dabata hai, isliye chart par
+      distances approximate hain.
+  guidedExercise:
+    en: |
+      1. Compute `[1, 2, 3] · [4, 5, 6]` by hand (answer: 32), then in Python.
+      2. Compute the norm of `[3, 4]` (answer: 5).
+      3. Compute the cosine similarity of `[1, 0]` and `[0, 1]` (answer: 0) — perpendicular.
+      4. Show that `cosine(a, 2*a)` is 1: scaling does not change direction.
+    hinglish: |
+      1. `[1, 2, 3] · [4, 5, 6]` haath se calculate karo (answer: 32), phir Python mein.
+      2. `[3, 4]` ka norm nikaalo (answer: 5).
+      3. `[1, 0]` aur `[0, 1]` ki cosine similarity nikaalo (answer: 0) — perpendicular.
+      4. Dikhao ki `cosine(a, 2*a)` 1 hai: scale karne se disha nahi badalti.
+  challenge:
+    en: |
+      Write `top_k(query, docs, k)` that returns the indices of the `k` documents most similar to a
+      query vector. This is a brute-force vector search — exactly what a vector database speeds up.
+    hinglish: |
+      `top_k(query, docs, k)` likho jo query vector se sabse similar `k` documents ke indices return
+      kare. Yeh brute-force vector search hai — bilkul wahi jise vector database tez banata hai.
+  commonMistakes:
+    en:
+      - Comparing vectors from different embedding models (their spaces are unrelated)
+      - Forgetting to handle zero vectors, which cause division by zero
+      - Treating a 2D visualisation as an exact picture of high-dimensional similarity
+      - Using raw dot product on un-normalized vectors and favouring long documents
+    hinglish:
+      - Alag embedding models ke vectors compare karna (unke spaces ka koi rishta nahi)
+      - Zero vectors handle karna bhoolna, jo division by zero dete hain
+      - 2D visualisation ko high-dimensional similarity ki exact tasveer maan lena
+      - Un-normalized vectors par raw dot product use karna aur lambe documents ko favour karna
+  projectApplication:
+    en: |
+      The RAG Knowledge Assistant ranks document chunks by cosine similarity to the question. You
+      will see the actual scores in its retrieval diagnostics — and learn to distrust results whose
+      best score is low.
+    hinglish: |
+      RAG Knowledge Assistant document chunks ko question se cosine similarity ke hisaab se rank
+      karta hai. Uske retrieval diagnostics mein aap asli scores dekhoge — aur seekhoge ki jab best
+      score low ho to results par bharosa mat karo.
+  summary:
+    en:
+      - Vectors are ordered lists of numbers; each position is a dimension
+      - Dot product = sum of element-wise products; norm = √(a · a)
+      - Cosine similarity measures direction only, from -1 to 1
+      - For normalized vectors, dot product equals cosine similarity
+    hinglish:
+      - Vectors numbers ki ordered lists hain; har position ek dimension hai
+      - Dot product = element-wise products ka sum; norm = √(a · a)
+      - Cosine similarity sirf disha naapti hai, -1 se 1 tak
+      - Normalized vectors mein dot product cosine similarity ke barabar hota hai
+codeExamples:
+  - id: cosine-from-scratch
+    title:
+      en: Cosine similarity from scratch
+      hinglish: Cosine similarity scratch se
+    description:
+      en: Toy 3-dimensional vectors with hand-picked meanings. Real embeddings are learned and much larger.
+      hinglish: Haath se chune matlab wale toy 3-dimensional vectors. Asli embeddings seekhe hue aur kaafi bade hote hain.
+    variants:
+      python: |
+        import math
+
+        def dot(a, b):
+            return sum(x * y for x, y in zip(a, b))
+
+        def norm(a):
+            return math.sqrt(dot(a, a))
+
+        def cosine(a, b):
+            return dot(a, b) / (norm(a) * norm(b))
+
+        cat = [0.9, 0.8, 0.1]
+        kitten = [0.85, 0.75, 0.2]
+        invoice = [0.1, 0.05, 0.95]
+
+        print(f"dot(cat, kitten)       = {dot(cat, kitten):.3f}")
+        print(f"cosine(cat, kitten)    = {cosine(cat, kitten):.3f}")
+        print(f"cosine(cat, invoice)   = {cosine(cat, invoice):.3f}")
+        print(f"cosine(cat, 2 * cat)   = {cosine(cat, [2 * x for x in cat]):.3f}")
+      typescript: |
+        const dot = (a: number[], b: number[]) => a.reduce((sum, x, i) => sum + x * b[i]!, 0);
+        const norm = (a: number[]) => Math.sqrt(dot(a, a));
+        const cosine = (a: number[], b: number[]) => dot(a, b) / (norm(a) * norm(b));
+
+        const cat = [0.9, 0.8, 0.1];
+        const kitten = [0.85, 0.75, 0.2];
+        const invoice = [0.1, 0.05, 0.95];
+
+        console.log(`dot(cat, kitten)       = ${dot(cat, kitten).toFixed(3)}`);
+        console.log(`cosine(cat, kitten)    = ${cosine(cat, kitten).toFixed(3)}`);
+        console.log(`cosine(cat, invoice)   = ${cosine(cat, invoice).toFixed(3)}`);
+        console.log(`cosine(cat, 2 * cat)   = ${cosine(cat, cat.map((x) => 2 * x)).toFixed(3)}`);
+    expectedOutput: |
+      dot(cat, kitten)       = 1.385
+      cosine(cat, kitten)    = 0.996
+      cosine(cat, invoice)   = 0.195
+      cosine(cat, 2 * cat)   = 1.000
+lab:
+  id: embeddings
+  config:
+    sentences:
+      - The cat sat on the mat
+      - A kitten is sleeping on the rug
+      - Please pay the attached invoice
+      - Your payment is overdue
+  prompt:
+    en: Which pair of sentences scores highest? Does that match your intuition about their meaning?
+    hinglish: Kaunsa sentence pair sabse zyada score karta hai? Kya woh unke meaning ki aapki intuition se match karta hai?
+exerciseIds: [ex-ai-cosine-similarity]
+assessmentId: quiz-ai-vectors-similarity
+projectIds: [rag-docs-assistant]
+relatedLessonIds: [ai-landscape]

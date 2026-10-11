@@ -1,0 +1,209 @@
+id: llm-attention
+slug: self-attention
+version: 1
+status: published
+estimatedMinutes: 40
+prerequisites: [llm-next-token, ai-vectors-similarity]
+topics: [attention, transformers, vectors]
+title:
+  en: Self-attention — how tokens look at each other
+  hinglish: Self-attention — tokens ek doosre ko kaise dekhte hain
+summary:
+  en: The idea that made transformers work. Each token compares its query with every key, turns the scores into weights with softmax, and mixes the values — so "it" can borrow meaning from "cat".
+  hinglish: Woh idea jisne transformers ko kaamyaab banaya. Har token apni query ko har key se compare karta hai, softmax se scores ko weights banata hai, aur values ko milata hai — taaki "it" "cat" se matlab udhaar le sake.
+objectives:
+  en:
+    - Explain queries, keys and values
+    - Compute scaled dot-product attention for one token
+    - Explain the causal mask used by decoder models
+    - Explain why attention cost grows with the square of the sequence length
+  hinglish:
+    - Queries, keys aur values samjhana
+    - Ek token ke liye scaled dot-product attention calculate karna
+    - Decoder models mein use hone wala causal mask samjhana
+    - Samjhana ki attention ki cost sequence length ke square ke saath kyun badhti hai
+sections:
+  explanation:
+    en: |
+      Inside a transformer every token is a vector. Before attention, each vector is multiplied by
+      three learned matrices to produce:
+
+      - a **query** — what this token is looking for,
+      - a **key** — what this token offers to others,
+      - a **value** — the information it passes on if chosen.
+
+      For one token, attention does three steps:
+
+      1. **Score** every token by the dot product of this token's query with that token's key, divided
+         by `√d` (the vector size) so the numbers stay in a sensible range.
+      2. **Softmax** the scores into weights that add up to 1.
+      3. **Mix**: the new vector is the weighted sum of all value vectors.
+
+      In matrix form for all tokens at once: `Attention(Q, K, V) = softmax(QKᵀ / √d) V`.
+
+      **Multi-head attention** runs several of these in parallel with different learned matrices, so
+      one head can track grammar while another tracks which noun a pronoun refers to.
+
+      **Causal mask.** Decoder models such as GPT-style LLMs generate left to right, so a token may
+      only attend to itself and earlier tokens. Future positions get a score of −∞ before softmax,
+      which makes their weight exactly 0.
+
+      **Cost.** Every token compares with every other token, so a sequence of `n` tokens needs about
+      `n²` scores per head and layer. Doubling the context roughly quadruples this part of the work —
+      one reason long contexts are slower and more expensive.
+
+      The weights in a real model are learned during training; nobody hand-writes them. Attention
+      weights also are not a complete explanation of *why* a model produced an answer.
+    hinglish: |
+      Transformer ke andar har token ek vector hai. Attention se pehle har vector ko teen seekhe hue
+      matrices se multiply karke banta hai:
+
+      - **query** — yeh token kya dhoondh raha hai,
+      - **key** — yeh token doosron ko kya offer karta hai,
+      - **value** — chune jaane par yeh kya information aage deta hai.
+
+      Ek token ke liye attention teen steps karta hai:
+
+      1. **Score**: is token ki query ka har token ki key ke saath dot product, `√d` (vector size) se
+         divide, taaki numbers theek range mein rahein.
+      2. **Softmax**: scores ko aise weights banao jinka total 1 ho.
+      3. **Mix**: naya vector saare value vectors ka weighted sum hai.
+
+      Saare tokens ke liye ek saath matrix form: `Attention(Q, K, V) = softmax(QKᵀ / √d) V`.
+
+      **Multi-head attention** alag seekhe hue matrices ke saath aise kai heads parallel chalata hai,
+      taaki ek head grammar track kare aur doosra yeh ki pronoun kis noun ki baat kar raha hai.
+
+      **Causal mask.** GPT jaise decoder models left se right generate karte hain, isliye token sirf
+      khud ko aur pehle ke tokens ko dekh sakta hai. Future positions ko softmax se pehle −∞ score milta
+      hai, jisse unka weight exactly 0 ho jaata hai.
+
+      **Cost.** Har token har doosre token se compare hota hai, isliye `n` tokens ke sequence ko har
+      head aur layer mein lagbhag `n²` scores chahiye. Context double karne se kaam ka yeh hissa lagbhag
+      chaar guna ho jaata hai — lambe contexts slow aur mehnge hone ki ek wajah.
+
+      Asli model ke weights training mein seekhe jaate hain; koi unhe haath se nahi likhta. Attention
+      weights yeh poori tarah explain bhi nahi karte ki model ne answer *kyun* diya.
+  analogy:
+    en: |
+      In a meeting, each person (token) has a question in mind (query) and a name badge describing
+      their expertise (key). They listen most to the people whose badges match their question, and
+      combine what those people say (values) into their own updated understanding.
+    hinglish: |
+      Meeting mein har insaan (token) ke mann mein ek sawaal (query) hai aur gale mein uski expertise
+      batata badge (key) hai. Woh sabse zyada unki sunta hai jinke badge uske sawaal se match karte hain,
+      aur jo woh kehte hain (values) use milakar apni samajh update karta hai.
+  visual:
+    en: |
+      In the Attention lab, pick the token "it" and step through the computation: query·key scores,
+      scaling, softmax, then the weighted sum. Toggle the causal mask and see later tokens drop to 0.
+    hinglish: |
+      Attention lab mein token "it" chuno aur computation step-by-step dekho: query·key scores, scaling,
+      softmax, phir weighted sum. Causal mask toggle karo aur dekho baad ke tokens 0 ho jaate hain.
+  guidedExercise:
+    en: |
+      1. Run the code example. Which token does "it" attend to most, and why (compare the dot products)?
+      2. Change the query of "it" to `[0.1, 0.9]`. How do the weights change?
+      3. Remove the `/ math.sqrt(d)` scaling and use larger vectors (multiply every query by 10). What
+         happens to the weights?
+    hinglish: |
+      1. Code example chalao. "it" sabse zyada kis token ko attend karta hai, aur kyun (dot products
+         compare karo)?
+      2. "it" ki query `[0.1, 0.9]` kar do. Weights kaise badalte hain?
+      3. `/ math.sqrt(d)` scaling hata do aur bade vectors use karo (har query ko 10 se multiply karo).
+         Weights ka kya hota hai?
+  challenge:
+    en: |
+      Write `causal_attention(queries, keys, values)` that returns the output vector for every
+      position, where position `i` may only attend to positions `0..i`.
+    hinglish: |
+      `causal_attention(queries, keys, values)` likho jo har position ka output vector de, jahan
+      position `i` sirf `0..i` positions ko attend kar sake.
+  commonMistakes:
+    en:
+      - Forgetting the √d scaling, which makes softmax too peaked as vectors grow
+      - Mixing up keys and values — keys decide the weights, values are what gets mixed
+      - Thinking attention weights fully explain a model's reasoning
+      - Assuming longer context is free — cost and latency grow quickly with length
+    hinglish:
+      - √d scaling bhoolna, jisse vectors bade hone par softmax bahut nukeela ho jaata hai
+      - Keys aur values mix-up karna — keys weights tay karti hain, values woh hain jo milaye jaate hain
+      - Maanna ki attention weights model ki reasoning poori explain karte hain
+      - Maanna ki lamba context free hai — cost aur latency length ke saath tezi se badhte hain
+  projectApplication:
+    en: |
+      When you choose how many retrieved chunks to put in a RAG prompt, you are trading answer quality
+      against the cost of a longer context — the n² effect from this lesson.
+    hinglish: |
+      Jab aap tay karte ho ki RAG prompt mein kitne retrieved chunks daalne hain, to aap answer quality
+      ko lambe context ki cost ke against tol rahe ho — is lesson ka n² effect.
+  summary:
+    en:
+      - Each token has a query, key and value, produced by learned matrices
+      - Weights = softmax(q·k / √d); output = weighted sum of values
+      - Decoders use a causal mask so tokens cannot see the future
+      - Attention compares all pairs of tokens, so cost grows roughly with n²
+    hinglish:
+      - Har token ki query, key aur value hoti hai, jo seekhe hue matrices se banti hain
+      - Weights = softmax(q·k / √d); output = values ka weighted sum
+      - Decoders causal mask use karte hain taaki tokens future na dekh sakein
+      - Attention tokens ke saare pairs compare karta hai, isliye cost lagbhag n² ke saath badhti hai
+codeExamples:
+  - id: scaled-dot-product
+    title:
+      en: Scaled dot-product attention for one token
+      hinglish: Ek token ke liye scaled dot-product attention
+    description:
+      en: Tiny hand-picked 2-dimensional vectors so the arithmetic is visible. Real models learn vectors with hundreds of dimensions.
+      hinglish: Chhote haath se chune 2-dimensional vectors taaki hisaab dikhe. Asli models sau-o dimensions wale vectors seekhte hain.
+    variants:
+      python: |
+        import math
+
+        # Three tokens, each with a tiny 2-dimensional query, key and value.
+        tokens = ["cat", "sat", "it"]
+        queries = [[1.0, 0.0], [0.0, 1.0], [0.9, 0.1]]
+        keys = [[1.0, 0.0], [0.0, 1.0], [0.5, 0.5]]
+        values = [[1.0, 0.0], [0.0, 1.0], [0.5, 0.5]]
+
+
+        def softmax(xs):
+            top = max(xs)
+            exps = [math.exp(x - top) for x in xs]
+            return [e / sum(exps) for e in exps]
+
+
+        def attend(q, keys, values):
+            d = len(q)
+            scores = [sum(a * b for a, b in zip(q, k)) / math.sqrt(d) for k in keys]
+            weights = softmax(scores)
+            output = [sum(w * v[i] for w, v in zip(weights, values)) for i in range(len(values[0]))]
+            return weights, output
+
+
+        weights, output = attend(queries[2], keys, values)
+        for tok, w in zip(tokens, weights):
+            print(f"'it' attends to {tok!r:6} with weight {w:.3f}")
+        print("new vector for 'it':", [round(x, 3) for x in output])
+
+        # Causal mask: token 1 ('sat') may only look at tokens 0 and 1.
+        w_causal, _ = attend(queries[1], keys[:2], values[:2])
+        print("causal weights for 'sat':", [round(w, 3) for w in w_causal])
+    expectedOutput: |
+      'it' attends to 'cat'  with weight 0.431
+      'it' attends to 'sat'  with weight 0.245
+      'it' attends to 'it'   with weight 0.325
+      new vector for 'it': [0.593, 0.407]
+      causal weights for 'sat': [0.33, 0.67]
+lab:
+  id: attention
+  config:
+    sentence: The cat sat on the mat because it was tired
+    focus: 7
+    causal: false
+  prompt:
+    en: With "it" selected, which earlier token gets the most weight? Then turn on the causal mask and select "cat" — which tokens can it still attend to?
+    hinglish: '"it" select karke dekho, kis pehle wale token ko sabse zyada weight milta hai? Phir causal mask on karke "cat" chuno — woh ab kin tokens ko attend kar sakta hai?'
+exerciseIds: [ex-llm-attention-weights]
+assessmentId: quiz-llm-attention
+relatedLessonIds: [ai-vectors-similarity, llm-next-token]

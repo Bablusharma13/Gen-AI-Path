@@ -1,0 +1,171 @@
+id: py-functions
+slug: functions
+version: 1
+status: published
+estimatedMinutes: 30
+prerequisites: [py-collections]
+topics: [python-basics, functions, chunking]
+title:
+  en: Functions, parameters and type hints
+  hinglish: Functions, parameters aur type hints
+summary:
+  en: Package logic into reusable, typed functions — and write the sliding-window chunker every RAG system needs.
+  hinglish: Logic ko reusable, typed functions mein pack karo — aur woh sliding-window chunker likho jo har RAG system ko chahiye.
+objectives:
+  en:
+    - Define functions with positional, keyword and default parameters
+    - Return values instead of printing them
+    - Document functions with type hints and docstrings
+    - Validate inputs and fail early with clear errors
+  hinglish:
+    - Positional, keyword aur default parameters wale functions banana
+    - Values print karne ki jagah return karna
+    - Type hints aur docstrings se functions document karna
+    - Inputs validate karna aur clear errors ke saath jaldi fail karna
+sections:
+  explanation:
+    en: |
+      A **function** gives a name to a piece of logic so you can reuse and test it:
+
+      ```python
+      def estimate_tokens(text: str, chars_per_token: float = 4.0) -> int:
+          """Rough token estimate for English text."""
+          return max(1, round(len(text) / chars_per_token))
+      ```
+
+      - **Parameters** are the inputs (`text`, `chars_per_token`). A **default** makes one optional.
+      - Callers can pass arguments by position or by **keyword**: `estimate_tokens(doc, chars_per_token=3.5)`.
+        Keywords make calls self-explanatory.
+      - **`return`** hands a value back. A function that only `print`s cannot be reused or tested.
+      - **Type hints** (`text: str`, `-> int`) document intent and let tools catch mistakes.
+      - A **docstring** explains what the function does and any assumptions.
+
+      Good functions **validate their inputs** and raise clear errors early. If someone asks for a
+      chunk size of 0, raising `ValueError("size must be positive")` is far better than an infinite
+      loop three files away.
+
+      Avoid **mutable default arguments** like `def f(items=[])` — the same list is shared across
+      calls. Use `items=None` and create a new list inside.
+    hinglish: |
+      **Function** logic ke ek tukde ko naam deta hai taaki use reuse aur test kar sako:
+
+      ```python
+      def estimate_tokens(text: str, chars_per_token: float = 4.0) -> int:
+          """Rough token estimate for English text."""
+          return max(1, round(len(text) / chars_per_token))
+      ```
+
+      - **Parameters** inputs hain (`text`, `chars_per_token`). **Default** kisi parameter ko optional banata hai.
+      - Callers arguments position se ya **keyword** se de sakte hain: `estimate_tokens(doc, chars_per_token=3.5)`.
+        Keywords se call khud samajh aa jaati hai.
+      - **`return`** value wapas deta hai. Jo function sirf `print` kare, use reuse ya test nahi kar sakte.
+      - **Type hints** (`text: str`, `-> int`) intent document karte hain aur tools ko galtiyan pakadne dete hain.
+      - **Docstring** batata hai function kya karta hai aur kya assumptions hain.
+
+      Achhe functions apne **inputs validate** karte hain aur jaldi clear errors raise karte hain.
+      Agar koi chunk size 0 maange, to `ValueError("size must be positive")` raise karna teen files
+      door infinite loop se kahin behtar hai.
+
+      **Mutable default arguments** jaise `def f(items=[])` se bacho — wahi list har call mein share
+      hoti hai. `items=None` use karo aur andar nayi list banao.
+  analogy:
+    en: |
+      A function is a **recipe card**. Parameters are the ingredients you hand over, defaults are
+      "a pinch of salt unless you say otherwise", and `return` is the finished dish placed back in
+      your hands — not a photo of it posted on a wall (`print`).
+    hinglish: |
+      Function ek **recipe card** hai. Parameters woh ingredients hain jo aap dete ho, defaults
+      "jab tak aap na kaho, ek chutki namak" hain, aur `return` tayyar dish hai jo wapas aapke haath
+      mein aati hai — deewar par lagi uski photo (`print`) nahi.
+  visual:
+    en: |
+      Sliding-window chunking with size 4 and overlap 1 over 10 words:
+      `[w0 w1 w2 w3]`, `[w3 w4 w5 w6]`, `[w6 w7 w8 w9]` — each window starts `size - overlap = 3`
+      words after the previous one, so neighbouring chunks share one word of context.
+    hinglish: |
+      10 words par size 4 aur overlap 1 ke saath sliding-window chunking:
+      `[w0 w1 w2 w3]`, `[w3 w4 w5 w6]`, `[w6 w7 w8 w9]` — har window pichli se `size - overlap = 3`
+      words aage shuru hoti hai, isliye padosi chunks ek word ka context share karte hain.
+  guidedExercise:
+    en: |
+      1. Write `estimate_tokens` above and call it with a sentence, then with `chars_per_token=3`.
+      2. Add a check that raises `ValueError` if `chars_per_token <= 0`.
+      3. Call it with keyword arguments in the opposite order to see that order no longer matters.
+      4. Add a docstring and read it back with `help(estimate_tokens)`.
+    hinglish: |
+      1. Upar wala `estimate_tokens` likho aur ek sentence ke saath call karo, phir `chars_per_token=3` ke saath.
+      2. Check add karo jo `chars_per_token <= 0` par `ValueError` raise kare.
+      3. Keyword arguments ulte order mein dekar call karo aur dekho ab order matter nahi karta.
+      4. Docstring add karo aur `help(estimate_tokens)` se padho.
+  challenge:
+    en: |
+      Extend your chunker with an optional `max_chunks` parameter that stops early, and write three
+      asserts that prove it works.
+    hinglish: |
+      Apne chunker mein optional `max_chunks` parameter add karo jo jaldi ruk jaaye, aur teen
+      asserts likho jo prove karein ki yeh kaam karta hai.
+  commonMistakes:
+    en:
+      - Printing a result instead of returning it
+      - Mutable default arguments such as items=[]
+      - Functions that silently accept invalid input and fail later
+      - Very long functions that do five jobs — split them
+    hinglish:
+      - Result return karne ki jagah print karna
+      - items=[] jaise mutable default arguments
+      - Functions jo invalid input chupchap accept karke baad mein fail hote hain
+      - Bahut lambe functions jo paanch kaam karte hain — unhe split karo
+  projectApplication:
+    en: |
+      In the RAG Knowledge Assistant, chunking is a pure function (`text → chunks`) with validated
+      size and overlap. Pure functions like this are trivial to unit test — and chunking bugs are
+      among the most common causes of bad retrieval.
+    hinglish: |
+      RAG Knowledge Assistant mein chunking ek pure function (`text → chunks`) hai jiske size aur
+      overlap validated hain. Aise pure functions ko unit test karna bahut aasaan hai — aur chunking
+      bugs kharab retrieval ki sabse common wajahon mein se hain.
+  summary:
+    en:
+      - Functions name logic so it can be reused and tested
+      - Return values; use keyword arguments for clarity
+      - Type hints and docstrings document intent
+      - Validate inputs early; never use mutable defaults
+    hinglish:
+      - Functions logic ko naam dete hain taaki reuse aur test ho sake
+      - Values return karo; clarity ke liye keyword arguments use karo
+      - Type hints aur docstrings intent document karte hain
+      - Inputs jaldi validate karo; mutable defaults kabhi nahi
+codeExamples:
+  - id: py-estimate-tokens
+    title:
+      en: A typed, validated helper
+      hinglish: Typed, validated helper
+    variants:
+      python: |
+        def estimate_tokens(text: str, chars_per_token: float = 4.0) -> int:
+            """Very rough token estimate (≈4 characters per token for English).
+
+            Real tokenizers differ by model — use them when accuracy matters.
+            """
+            if chars_per_token <= 0:
+                raise ValueError("chars_per_token must be positive")
+            return max(1, round(len(text) / chars_per_token))
+
+
+        print(estimate_tokens("Embeddings map text to vectors."))
+        print(estimate_tokens(chars_per_token=3, text="Embeddings map text to vectors."))
+      typescript: |
+        /** Very rough token estimate (≈4 characters per token for English). */
+        export function estimateTokens(text: string, charsPerToken = 4): number {
+          if (charsPerToken <= 0) throw new RangeError("charsPerToken must be positive");
+          return Math.max(1, Math.round(text.length / charsPerToken));
+        }
+
+        console.log(estimateTokens("Embeddings map text to vectors."));
+        console.log(estimateTokens("Embeddings map text to vectors.", 3));
+    expectedOutput: |
+      8
+      10
+exerciseIds: [ex-py-chunk-words]
+assessmentId: quiz-py-functions
+relatedLessonIds: [py-collections]

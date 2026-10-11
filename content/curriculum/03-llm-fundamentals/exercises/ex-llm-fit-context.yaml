@@ -1,0 +1,113 @@
+id: ex-llm-fit-context
+version: 1
+status: published
+lessonId: llm-tokens-context
+language: python
+topics: [context-window, tokens]
+title:
+  en: Fit a conversation into a token budget
+  hinglish: Conversation ko token budget mein fit karo
+prompt:
+  en: |
+    Implement `fit_messages(messages, budget, count_tokens)`.
+
+    - `messages` is a list of dicts like `{"role": "user", "content": "..."}`. The first message
+      may have the role `"system"`.
+    - `count_tokens(text)` returns the number of tokens in a string (the tests pass a simple
+      word counter; real code would pass the provider's tokenizer).
+    - Return a **new list** that always keeps the system message (if present) at the start, then
+      the **most recent** other messages whose total fits in `budget` (system tokens included).
+    - Walk backwards from the newest message and **stop at the first one that does not fit** — never
+      skip a message to squeeze an older one in, because that would leave a gap in the conversation.
+    - Keep the original order. Do not modify the input list.
+    - Raise `ValueError` if the system message alone is larger than the budget.
+  hinglish: |
+    `fit_messages(messages, budget, count_tokens)` implement karo.
+
+    - `messages` dicts ki list hai jaise `{"role": "user", "content": "..."}`. Pehle message ka
+      role `"system"` ho sakta hai.
+    - `count_tokens(text)` string ke tokens ginta hai (tests simple word counter dete hain; asli code
+      provider ka tokenizer dega).
+    - Ek **nayi list** return karo jo system message (agar hai) ko hamesha shuru mein rakhe, phir
+      **sabse naye** doosre messages jinka total `budget` mein fit ho (system tokens samet).
+    - Sabse naye message se peeche chalo aur **pehle aise message par ruk jao jo fit na ho** — kisi
+      purane ko ghusane ke liye message skip mat karo, warna conversation mein gap aa jaayega.
+    - Original order bana rahe. Input list ko modify mat karo.
+    - Akela system message hi budget se bada ho to `ValueError` raise karo.
+starterCode: |
+  def fit_messages(messages, budget, count_tokens):
+      pass
+tests:
+  - id: all-fit
+    name: keeps everything when it fits
+    code: |
+      words = lambda t: len(t.split())
+      msgs = [{"role": "system", "content": "be brief"}, {"role": "user", "content": "hi there"}]
+      assert fit_messages(msgs, 10, words) == msgs
+  - id: newest-first
+    name: drops the oldest turns first and keeps the system message
+    code: |
+      words = lambda t: len(t.split())
+      msgs = [
+          {"role": "system", "content": "you are a tutor"},
+          {"role": "user", "content": "one two three"},
+          {"role": "assistant", "content": "four five"},
+          {"role": "user", "content": "six"},
+      ]
+      result = fit_messages(msgs, 7, words)
+      assert result == [msgs[0], msgs[2], msgs[3]], result
+  - id: no-gaps
+    name: stops at the first message that does not fit
+    code: |
+      words = lambda t: len(t.split())
+      msgs = [
+          {"role": "user", "content": "a"},
+          {"role": "assistant", "content": "b c d e f g h"},
+          {"role": "user", "content": "i"},
+      ]
+      assert fit_messages(msgs, 3, words) == [msgs[2]]
+  - id: no-system
+    name: works without a system message and does not mutate the input
+    code: |
+      words = lambda t: len(t.split())
+      msgs = [{"role": "user", "content": "x y"}, {"role": "assistant", "content": "z"}]
+      copy = [dict(m) for m in msgs]
+      assert fit_messages(msgs, 1, words) == [msgs[1]]
+      assert msgs == copy
+  - id: system-too-big
+    name: raises when the system message alone does not fit
+    code: |
+      words = lambda t: len(t.split())
+      msgs = [{"role": "system", "content": "a b c d e"}, {"role": "user", "content": "hi"}]
+      try:
+          fit_messages(msgs, 3, words)
+      except ValueError:
+          pass
+      else:
+          raise AssertionError("expected ValueError")
+hints:
+  en:
+    - Separate the system message (if messages[0]["role"] == "system") from the rest first
+    - Start `used` at the system message's token count and check it against the budget
+    - Loop over reversed(rest); break as soon as used + cost > budget
+    - Reverse the kept messages back before returning
+  hinglish:
+    - Pehle system message (agar messages[0]["role"] == "system") ko baaki se alag karo
+    - '`used` ko system message ke token count se shuru karo aur budget se check karo'
+    - reversed(rest) par loop karo; jaise hi used + cost > budget ho, break karo
+    - Return karne se pehle rakhe gaye messages ko wapas reverse karo
+solution: |
+  def fit_messages(messages, budget, count_tokens):
+      system = [messages[0]] if messages and messages[0]["role"] == "system" else []
+      rest = messages[len(system):]
+      used = sum(count_tokens(m["content"]) for m in system)
+      if used > budget:
+          raise ValueError("system message does not fit in the budget")
+      kept = []
+      for message in reversed(rest):
+          cost = count_tokens(message["content"])
+          if used + cost > budget:
+              break
+          kept.append(message)
+          used += cost
+      return system + list(reversed(kept))

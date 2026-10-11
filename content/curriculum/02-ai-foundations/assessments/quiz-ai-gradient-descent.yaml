@@ -1,0 +1,81 @@
+id: quiz-ai-gradient-descent
+version: 1
+status: published
+courseId: ai-foundations
+lessonId: ai-gradient-descent
+passingPercent: 70
+title:
+  en: 'Check: loss and gradient descent'
+  hinglish: 'Check: loss aur gradient descent'
+objectives:
+  en:
+    - Explain the update rule and the role of the learning rate
+  hinglish:
+    - Update rule aur learning rate ka role samjhana
+questions:
+  - id: update-direction
+    type: single_choice
+    topics: [gradient-descent]
+    prompt:
+      en: In gradient descent, how is a parameter updated?
+      hinglish: Gradient descent mein parameter kaise update hota hai?
+    options:
+      - id: a
+        text:
+          {
+            en: parameter + learning_rate × gradient,
+            hinglish: parameter + learning_rate × gradient,
+          }
+      - id: b
+        text:
+          {
+            en: parameter − learning_rate × gradient,
+            hinglish: parameter − learning_rate × gradient,
+          }
+      - id: c
+        text: { en: parameter × gradient, hinglish: parameter × gradient }
+    correctOptionIds: [b]
+    explanation:
+      en: The gradient points towards increasing loss, so we subtract it to go downhill.
+      hinglish: Gradient badhte loss ki taraf point karta hai, isliye neeche jaane ke liye use subtract karte hain.
+  - id: big-lr
+    type: single_choice
+    topics: [gradient-descent]
+    prompt:
+      en: Training loss jumps around and then becomes huge. What is the most likely cause?
+      hinglish: Training loss uchhalta hai aur phir bahut bada ho jaata hai. Sabse sambhavit wajah?
+    options:
+      - id: a
+        text: { en: Learning rate too small, hinglish: Learning rate bahut chhota }
+      - id: b
+        text: { en: Learning rate too large, hinglish: Learning rate bahut bada }
+      - id: c
+        text: { en: Too much training data, hinglish: Bahut zyada training data }
+    correctOptionIds: [b]
+    explanation:
+      en: Steps that are too large overshoot the minimum, so the loss oscillates or diverges.
+      hinglish: Bahut bade steps minimum ke paar nikal jaate hain, isliye loss oscillate ya diverge karta hai.
+  - id: loss-purpose
+    type: short_text
+    topics: [loss-functions]
+    prompt:
+      en: In your own words, what is a loss function for?
+      hinglish: Apne shabdon mein, loss function kis liye hota hai?
+    rubric:
+      - id: measures-error
+        idea:
+          en: It measures how wrong the model's predictions are as a single number
+          hinglish: Yeh ek number mein naapta hai ki model ke predictions kitne galat hain
+        anyOf: [measure, measures, error, wrong, difference, distance, how far, galat, naapta, farq]
+      - id: guides-training
+        idea:
+          en: Training tries to minimise it
+          hinglish: Training ise minimise karne ki koshish karti hai
+        anyOf: [minimise, minimize, reduce, lower, optimise, optimize, training, kam karna, ghatana]
+    requiredGroups: 1
+    sampleAnswer:
+      en: A loss function measures how wrong the predictions are as one number, and training adjusts the parameters to minimise it.
+      hinglish: Loss function ek number mein naapta hai ki predictions kitne galat hain, aur training parameters ko adjust karke ise minimise karti hai.
+    explanation:
+      en: Without a loss there is no definition of "better", so there is nothing to optimise.
+      hinglish: Loss ke bina "behtar" ki koi definition nahi, to optimise karne ko kuch nahi.

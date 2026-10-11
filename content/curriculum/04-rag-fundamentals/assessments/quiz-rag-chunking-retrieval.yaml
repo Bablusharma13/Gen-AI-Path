@@ -1,0 +1,117 @@
+id: quiz-rag-chunking-retrieval
+version: 1
+status: published
+courseId: rag-fundamentals
+lessonId: rag-chunking-retrieval
+passingPercent: 70
+title:
+  en: 'Check: chunking and retrieval'
+  hinglish: 'Check: chunking aur retrieval'
+objectives:
+  en:
+    - Explain chunking trade-offs, hybrid retrieval and permission filtering
+  hinglish:
+    - Chunking trade-offs, hybrid retrieval aur permission filtering samjhana
+questions:
+  - id: same-model
+    type: single_choice
+    topics: [embeddings, rag]
+    prompt:
+      en: You switch the embedding model used for queries but not for stored chunks. What happens?
+      hinglish: Aap queries ka embedding model badal dete ho par stored chunks ka nahi. Kya hota hai?
+    options:
+      - id: a
+        text:
+          en: Nothing — all embedding models share the same vector space
+          hinglish: Kuch nahi — saare embedding models ek hi vector space share karte hain
+      - id: b
+        text:
+          en: Similarity scores become meaningless until the chunks are re-embedded
+          hinglish: Chunks dobara embed hone tak similarity scores bekaar ho jaate hain
+      - id: c
+        text:
+          en: Retrieval becomes faster
+          hinglish: Retrieval tez ho jaata hai
+    correctOptionIds: [b]
+    explanation:
+      en: Each model has its own vector space; queries and chunks must come from the same model.
+      hinglish: Har model ka apna vector space hota hai; queries aur chunks ek hi model se aane chahiye.
+  - id: hybrid-why
+    type: single_choice
+    topics: [hybrid-search]
+    prompt:
+      en: A user searches for the error code "E-4021". Which retrieval method is most likely to find the exact match?
+      hinglish: User error code "E-4021" search karta hai. Kaunsa retrieval method exact match dhoondhne ki sabse zyada sambhavna rakhta hai?
+    options:
+      - id: a
+        text:
+          en: Keyword search (or the keyword part of hybrid search)
+          hinglish: Keyword search (ya hybrid search ka keyword hissa)
+      - id: b
+        text:
+          en: Vector search alone
+          hinglish: Akela vector search
+      - id: c
+        text:
+          en: Asking the LLM without retrieval
+          hinglish: Bina retrieval ke LLM se poochna
+    correctOptionIds: [a]
+    explanation:
+      en: Embeddings blur exact strings such as codes and names; keyword matching finds them reliably.
+      hinglish: Embeddings codes aur names jaise exact strings ko dhundhla kar dete hain; keyword matching unhe reliably dhoondhta hai.
+  - id: permissions
+    type: single_choice
+    topics: [rag]
+    prompt:
+      en: Where should a multi-tenant RAG app apply the "which documents can this user see" rule?
+      hinglish: Multi-tenant RAG app ko "yeh user kaunse documents dekh sakta hai" rule kahan lagana chahiye?
+    options:
+      - id: a
+        text:
+          en: In the system prompt ("do not reveal other companies' data")
+          hinglish: System prompt mein ("doosri companies ka data mat batao")
+      - id: b
+        text:
+          en: Inside the retrieval query, before ranking
+          hinglish: Retrieval query ke andar, ranking se pehle
+      - id: c
+        text:
+          en: After the model answers, by scanning the text
+          hinglish: Model ke answer ke baad, text scan karke
+    correctOptionIds: [b]
+    explanation:
+      en: Once text is in the prompt no instruction reliably hides it; unauthorised chunks must never be retrieved.
+      hinglish: Text prompt mein aa gaya to koi instruction use reliably nahi chhupa sakta; unauthorised chunks kabhi retrieve nahi hone chahiye.
+  - id: overlap
+    explanation:
+      en: Overlap keeps information that crosses a boundary together in at least one chunk.
+      hinglish: Overlap boundary paar karti information ko kam se kam ek chunk mein saath rakhta hai.
+    type: short_text
+    topics: [chunking]
+    prompt:
+      en: Why do chunkers usually add a small overlap between neighbouring chunks?
+      hinglish: Chunkers aamtaur par padosi chunks ke beech thoda overlap kyun rakhte hain?
+    rubric:
+      - id: boundary
+        idea:
+          en: So information that spans a boundary is not split and lost from both chunks
+          hinglish: Taaki boundary ke aar-paar wali information toot kar dono chunks se kho na jaaye
+        anyOf:
+          [
+            boundary,
+            boundaries,
+            split,
+            cut,
+            half,
+            context,
+            sentence,
+            edge,
+            across,
+            spans,
+            beech,
+            kate,
+            toot,
+          ]
+    sampleAnswer:
+      en: An answer can fall across a chunk boundary; overlapping keeps that sentence or context together in at least one chunk.
+      hinglish: Answer chunk boundary ke aar-paar pad sakta hai; overlap se woh sentence ya context kam se kam ek chunk mein saath rehta hai.

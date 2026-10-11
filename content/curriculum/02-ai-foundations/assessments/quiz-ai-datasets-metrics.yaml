@@ -1,0 +1,97 @@
+id: quiz-ai-datasets-metrics
+version: 1
+status: published
+courseId: ai-foundations
+lessonId: ai-datasets-metrics
+passingPercent: 70
+title:
+  en: 'Check: datasets and metrics'
+  hinglish: 'Check: datasets aur metrics'
+objectives:
+  en:
+    - Use data splits correctly
+    - Choose metrics by error cost
+  hinglish:
+    - Data splits sahi use karna
+    - Error cost ke hisaab se metrics chunna
+questions:
+  - id: test-set-use
+    type: single_choice
+    topics: [datasets]
+    prompt:
+      en: What is the test set for?
+      hinglish: Test set kis liye hota hai?
+    options:
+      - id: a
+        text:
+          {
+            en: Tuning hyperparameters until the score is high,
+            hinglish: Score high hone tak hyperparameters tune karna,
+          }
+      - id: b
+        text:
+          {
+            en: A final,
+            honest estimate on data you did not tune on,
+            hinglish: 'Jis data par tuning nahi ki, us par final, honest estimate',
+          }
+      - id: c
+        text: { en: Training the model faster, hinglish: Model ko tez train karna }
+    correctOptionIds: [b]
+    explanation:
+      en: Use the validation set for choices; keep the test set untouched until the end.
+      hinglish: Choices ke liye validation set; test set ko end tak mat chhuo.
+  - id: imbalanced-accuracy
+    type: single_choice
+    topics: [evaluation-metrics]
+    prompt:
+      en: 1% of transactions are fraud. A model predicts "not fraud" for everything. Its accuracy is…
+      hinglish: 1% transactions fraud hain. Model har cheez ko "not fraud" bolta hai. Uski accuracy…
+    options:
+      - id: a
+        text: { en: 1%, hinglish: 1% }
+      - id: b
+        text: { en: 50%, hinglish: 50% }
+      - id: c
+        text: { en: 99% — yet its recall is 0, hinglish: '99% — phir bhi recall 0 hai' }
+    correctOptionIds: [c]
+    explanation:
+      en: Accuracy rewards the majority class. Recall reveals that no fraud was caught.
+      hinglish: Accuracy majority class ko inaam deti hai. Recall dikhata hai ki ek bhi fraud nahi pakda gaya.
+  - id: leakage
+    type: short_text
+    topics: [datasets, overfitting]
+    prompt:
+      en: What is data leakage, and why is it dangerous?
+      hinglish: Data leakage kya hai, aur yeh khatarnak kyun hai?
+    rubric:
+      - id: definition
+        idea:
+          en: Information from the test set or the future gets into training
+          hinglish: Test set ya future ki information training mein aa jaati hai
+        anyOf:
+          [test, future, leak, leaks, training, sneaks, information, duplicate, duplicates, ghus]
+      - id: danger
+        idea:
+          en: Scores look better than reality and fail in production
+          hinglish: Scores asliyat se behtar dikhte hain aur production mein fail hote hain
+        anyOf:
+          [
+            inflated,
+            misleading,
+            optimistic,
+            too good,
+            production,
+            real world,
+            fail,
+            fails,
+            fake,
+            jhootha,
+            galat,
+          ]
+    sampleAnswer:
+      en: Leakage is when information from the test set (or the future) reaches training, so evaluation scores look great but the model fails on real data.
+      hinglish: Leakage tab hota hai jab test set (ya future) ki information training tak pahunch jaati hai, jisse evaluation scores shaandaar dikhte hain par model real data par fail hota hai.
+    explanation:
+      en: Leakage makes evaluation meaningless; keep splits strictly separate and time-ordered when needed.
+      hinglish: Leakage evaluation ko bematlab bana deta hai; splits ko strictly alag rakho aur zaroorat ho to time-ordered.

@@ -1,0 +1,76 @@
+id: quiz-py-control-flow
+version: 1
+status: published
+courseId: python-foundations
+lessonId: py-control-flow
+passingPercent: 70
+title:
+  en: 'Check: conditions and loops'
+  hinglish: 'Check: conditions aur loops'
+objectives:
+  en:
+    - Trace if/elif/else execution
+    - Recognise unsafe loops
+  hinglish:
+    - if/elif/else ka execution trace karna
+    - Unsafe loops pehchanna
+questions:
+  - id: elif-order
+    type: single_choice
+    topics: [control-flow]
+    prompt:
+      en: 'With `x = 5`, what does this print? `if x > 1: print("A")` / `elif x > 3: print("B")` / `else: print("C")`'
+      hinglish: '`x = 5` ke saath yeh kya print karega? `if x > 1: print("A")` / `elif x > 3: print("B")` / `else: print("C")`'
+    options:
+      - id: a
+        text: { en: A, hinglish: A }
+      - id: b
+        text: { en: B, hinglish: B }
+      - id: c
+        text: { en: A and B, hinglish: A aur B }
+      - id: d
+        text: { en: C, hinglish: C }
+    correctOptionIds: [a]
+    explanation:
+      en: Only the first true branch runs. `x > 1` is already true, so `elif` is never checked.
+      hinglish: Sirf pehli true branch chalti hai. `x > 1` pehle hi true hai, isliye `elif` check hi nahi hota.
+  - id: range-values
+    type: single_choice
+    topics: [control-flow]
+    prompt:
+      en: Which numbers does `for i in range(3):` produce?
+      hinglish: '`for i in range(3):` kaunse numbers deta hai?'
+    options:
+      - id: a
+        text: { en: '1, 2, 3', hinglish: '1, 2, 3' }
+      - id: b
+        text: { en: '0, 1, 2', hinglish: '0, 1, 2' }
+      - id: c
+        text: { en: '0, 1, 2, 3', hinglish: '0, 1, 2, 3' }
+    correctOptionIds: [b]
+    explanation:
+      en: range(n) starts at 0 and stops before n.
+      hinglish: range(n) 0 se shuru hota hai aur n se pehle ruk jaata hai.
+  - id: while-exit
+    type: short_text
+    topics: [control-flow]
+    prompt:
+      en: What must every `while` loop that retries an API call have, and why?
+      hinglish: API call retry karne wale har `while` loop mein kya hona zaroori hai, aur kyun?
+    rubric:
+      - id: limit
+        idea:
+          en: A maximum number of attempts (or another guaranteed exit condition)
+          hinglish: Maximum attempts ki limit (ya koi pakki exit condition)
+        anyOf: [max, maximum, limit, attempts, counter, exit, stop, break, condition, rukna, seema]
+      - id: why
+        idea:
+          en: Otherwise it could loop forever (infinite loop, wasted cost)
+          hinglish: Warna woh hamesha chalta rahega (infinite loop, cost waste)
+        anyOf: [forever, infinite, endless, hang, cost, never ends, hamesha, kabhi nahi, ruk nahi]
+    sampleAnswer:
+      en: A maximum attempt count (or other guaranteed exit); otherwise a persistent failure makes it loop forever and waste money.
+      hinglish: Maximum attempt count (ya koi pakka exit); warna lagataar failure par woh hamesha chalta rahega aur paise waste karega.
+    explanation:
+      en: Retry loops must be bounded. Production code also adds backoff delays between attempts.
+      hinglish: Retry loops bounded hone chahiye. Production code attempts ke beech backoff delay bhi add karta hai.

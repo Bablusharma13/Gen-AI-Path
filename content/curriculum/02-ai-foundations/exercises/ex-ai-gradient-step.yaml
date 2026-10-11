@@ -1,0 +1,92 @@
+id: ex-ai-gradient-step
+version: 1
+status: published
+lessonId: ai-gradient-descent
+language: python
+topics: [gradient-descent, loss-functions]
+title:
+  en: Implement one gradient-descent step
+  hinglish: Ek gradient-descent step implement karo
+prompt:
+  en: |
+    For the model `prediction = w * x + b` with mean squared error loss, implement:
+
+    1. `mse(w, b, xs, ys)` → the average of `(w*x + b - y) ** 2`.
+    2. `gradient_step(w, b, xs, ys, lr)` → the new `(w, b)` after one step, where
+       - `grad_w = 2/n * Σ (w*x + b - y) * x`
+       - `grad_b = 2/n * Σ (w*x + b - y)`
+       - `w_new = w - lr * grad_w`, `b_new = b - lr * grad_b`
+
+    Raise `ValueError` if `xs` and `ys` have different lengths or are empty.
+  hinglish: |
+    Model `prediction = w * x + b` aur mean squared error loss ke liye implement karo:
+
+    1. `mse(w, b, xs, ys)` → `(w*x + b - y) ** 2` ka average.
+    2. `gradient_step(w, b, xs, ys, lr)` → ek step ke baad naya `(w, b)`, jahan
+       - `grad_w = 2/n * Σ (w*x + b - y) * x`
+       - `grad_b = 2/n * Σ (w*x + b - y)`
+       - `w_new = w - lr * grad_w`, `b_new = b - lr * grad_b`
+
+    `xs` aur `ys` ki lengths alag hon ya khaali hon to `ValueError` raise karo.
+starterCode: |
+  def mse(w, b, xs, ys):
+      pass
+
+
+  def gradient_step(w, b, xs, ys, lr):
+      pass
+tests:
+  - id: mse-zero
+    name: perfect fit has zero loss
+    code: |
+      assert mse(2, 1, [0, 1, 2], [1, 3, 5]) == 0
+  - id: mse-value
+    name: computes the average squared error
+    code: |
+      assert abs(mse(0, 0, [0, 1, 2, 3], [1, 3, 5, 7]) - 21.0) < 1e-9
+  - id: one-step
+    name: one step from zero matches the formula
+    code: |
+      w, b = gradient_step(0.0, 0.0, [0, 1, 2, 3], [1, 3, 5, 7], 0.05)
+      assert abs(w - 0.85) < 1e-9 and abs(b - 0.4) < 1e-9, (w, b)
+  - id: converges
+    name: repeated steps reduce the loss
+    code: |
+      xs, ys = [0, 1, 2, 3], [1, 3, 5, 7]
+      w, b = 0.0, 0.0
+      start = mse(w, b, xs, ys)
+      for _ in range(200):
+          w, b = gradient_step(w, b, xs, ys, 0.05)
+      assert mse(w, b, xs, ys) < start / 1000
+      assert abs(w - 2) < 0.05 and abs(b - 1) < 0.05
+  - id: validation
+    name: rejects mismatched data
+    code: |
+      for xs, ys in [([1, 2], [1]), ([], [])]:
+          try:
+              gradient_step(0, 0, xs, ys, 0.1)
+          except ValueError:
+              continue
+          raise AssertionError("expected ValueError")
+hints:
+  en:
+    - Compute the list of errors once — errors = [w * x + b - y for x, y in zip(xs, ys)]
+    - grad_w uses each error multiplied by its x; grad_b uses the plain errors
+    - Return a tuple (w_new, b_new)
+  hinglish:
+    - Errors ki list ek baar nikaalo — errors = [w * x + b - y for x, y in zip(xs, ys)]
+    - grad_w har error ko uske x se multiply karta hai; grad_b seedhe errors use karta hai
+    - Tuple (w_new, b_new) return karo
+solution: |
+  def mse(w, b, xs, ys):
+      return sum((w * x + b - y) ** 2 for x, y in zip(xs, ys)) / len(xs)
+
+
+  def gradient_step(w, b, xs, ys, lr):
+      if len(xs) != len(ys) or len(xs) == 0:
+          raise ValueError("xs and ys must be non-empty and the same length")
+      n = len(xs)
+      errors = [w * x + b - y for x, y in zip(xs, ys)]
+      grad_w = 2 / n * sum(e * x for e, x in zip(errors, xs))
+      grad_b = 2 / n * sum(errors)
+      return w - lr * grad_w, b - lr * grad_b

@@ -1,0 +1,180 @@
+id: ai-landscape
+slug: ai-ml-deep-learning-genai
+version: 1
+status: published
+estimatedMinutes: 20
+prerequisites: []
+topics: [ai-overview, training-inference]
+title:
+  en: AI, ML, deep learning and Generative AI
+  hinglish: AI, ML, deep learning aur Generative AI
+summary:
+  en: The nested relationship between AI, ML, deep learning and GenAI, and the difference between training a model and using it.
+  hinglish: AI, ML, deep learning aur GenAI ka nested rishta, aur model train karne aur use karne mein farq.
+objectives:
+  en:
+    - Place AI, ML, deep learning and GenAI in the right relationship
+    - Explain training versus inference
+    - Distinguish parameters from hyperparameters
+    - Describe what an AI application engineer does differently from a model researcher
+  hinglish:
+    - AI, ML, deep learning aur GenAI ko sahi rishte mein rakhna
+    - Training versus inference samjhana
+    - Parameters aur hyperparameters mein farq karna
+    - Batana ki AI application engineer model researcher se alag kya karta hai
+sections:
+  explanation:
+    en: |
+      These terms are **nested**, not competing:
+
+      - **Artificial Intelligence (AI)** — any technique that makes computers do tasks that seem to
+        need intelligence. Includes hand-written rules ("if the email contains 'lottery', mark spam").
+      - **Machine Learning (ML)** — instead of writing rules, we show examples and let an algorithm
+        **learn** the rules (a spam filter trained on labelled emails).
+      - **Deep Learning (DL)** — ML with **neural networks** that have many layers. Excellent at
+        images, audio and language.
+      - **Generative AI (GenAI)** — models that **generate** new content: text, images, code, audio.
+        Large Language Models (LLMs) are deep learning models trained to predict the next token.
+
+      Two phases matter for every model:
+
+      - **Training** — adjusting the model's **parameters** (millions or billions of numbers) so its
+        predictions improve on example data. Expensive, done rarely, usually by model providers.
+      - **Inference** — *using* the trained model: input in, prediction out. This is what happens on
+        every API call you make.
+
+      **Parameters** are learned (weights). **Hyperparameters** are choices you make *about*
+      learning or generation — learning rate, number of layers, or at inference time temperature
+      and max tokens.
+
+      As a **GenAI application engineer** you mostly work at inference time: choosing models,
+      writing prompts, retrieving data, calling tools, evaluating outputs and shipping reliable
+      systems. Knowing how training works helps you reason about what models can and cannot do.
+    hinglish: |
+      Ye terms **nested** hain, ek-doosre ke competitor nahi:
+
+      - **Artificial Intelligence (AI)** — koi bhi technique jo computers se aise kaam karwaye jinke
+        liye intelligence lagti hai. Hand-written rules bhi isme aate hain ("email mein 'lottery' ho
+        to spam").
+      - **Machine Learning (ML)** — rules likhne ki jagah examples dikhao aur algorithm ko rules
+        **seekhne** do (labelled emails par train hua spam filter).
+      - **Deep Learning (DL)** — kai layers wale **neural networks** ke saath ML. Images, audio aur
+        language mein bahut achha.
+      - **Generative AI (GenAI)** — models jo naya content **generate** karte hain: text, images,
+        code, audio. Large Language Models (LLMs) deep learning models hain jo agla token predict
+        karne ke liye train hote hain.
+
+      Har model ke do phase hote hain:
+
+      - **Training** — model ke **parameters** (millions ya billions numbers) ko adjust karna taaki
+        example data par predictions behtar hon. Mehenga, kabhi-kabhi, aksar model providers karte hain.
+      - **Inference** — trained model ko *use* karna: input andar, prediction bahar. Aapki har API
+        call par yahi hota hai.
+
+      **Parameters** seekhe jaate hain (weights). **Hyperparameters** woh choices hain jo aap
+      learning ya generation *ke baare mein* karte ho — learning rate, layers ki ginti, ya inference
+      ke time temperature aur max tokens.
+
+      **GenAI application engineer** ke roop mein aap zyada tar inference time par kaam karte ho:
+      models chunna, prompts likhna, data retrieve karna, tools call karna, outputs evaluate karna
+      aur reliable systems ship karna. Training kaise hoti hai yeh jaanna aapko samajhne mein madad
+      karta hai ki models kya kar sakte hain aur kya nahi.
+  analogy:
+    en: |
+      **Training** is a student studying for years; **inference** is the same student answering a
+      question in an exam in seconds. **Parameters** are what is stored in the student's memory;
+      **hyperparameters** are the study plan (hours per day, revision schedule) — chosen, not learned.
+    hinglish: |
+      **Training** saalon tak padhai karta student hai; **inference** wahi student exam mein seconds
+      mein sawaal ka jawab deta hai. **Parameters** student ki memory mein jo store hai; **hyper-
+      parameters** study plan hai (roz kitne ghante, revision schedule) — chuna jaata hai, seekha nahi.
+  visual:
+    en: |
+      Picture four nested circles: AI (largest) ⊃ ML ⊃ Deep Learning ⊃ Generative AI. Then a
+      timeline: training (once, expensive, on huge data) → model file (parameters) → inference
+      (every request, fast, cheap per call).
+    hinglish: |
+      Chaar nested circles socho: AI (sabse bada) ⊃ ML ⊃ Deep Learning ⊃ Generative AI. Phir ek
+      timeline: training (ek baar, mehenga, bade data par) → model file (parameters) → inference
+      (har request par, tez, per call sasta).
+  guidedExercise:
+    en: |
+      Classify each system as rule-based AI, classic ML, deep learning or GenAI, and say whether
+      the described moment is training or inference:
+
+      1. A spell-checker using a dictionary lookup.
+      2. A bank fitting a fraud-detection model on last year's transactions.
+      3. A chatbot writing a reply to your question.
+      4. A photo app recognising faces using a neural network on your phone.
+    hinglish: |
+      Har system ko rule-based AI, classic ML, deep learning ya GenAI mein classify karo, aur batao
+      bataya gaya moment training hai ya inference:
+
+      1. Dictionary lookup use karne wala spell-checker.
+      2. Bank pichle saal ke transactions par fraud-detection model fit kar raha hai.
+      3. Chatbot aapke sawaal ka reply likh raha hai.
+      4. Photo app aapke phone par neural network se faces pehchaan raha hai.
+  challenge:
+    en: |
+      Pick an app you use daily. Write three sentences: which parts are likely rule-based, which
+      likely use ML, and which (if any) use GenAI — and how you could tell.
+    hinglish: |
+      Roz use hone wala koi app chuno. Teen sentences likho: kaunse parts shayad rule-based hain,
+      kaunse ML use karte hain, aur kaunse (agar koi) GenAI — aur aap kaise pehchaan sakte ho.
+  commonMistakes:
+    en:
+      - Treating AI, ML and GenAI as separate, competing technologies
+      - Thinking an API call "trains" the model on your data (normally it is inference only)
+      - Confusing parameters (learned) with hyperparameters (chosen)
+      - Believing bigger is always better — cost, latency and task fit matter
+    hinglish:
+      - AI, ML aur GenAI ko alag, competing technologies samajhna
+      - Sochna ki API call aapke data par model ko "train" karti hai (aam taur par sirf inference hota hai)
+      - Parameters (seekhe hue) aur hyperparameters (chune hue) ko mix karna
+      - Maanna ki bada model hamesha behtar — cost, latency aur task fit bhi matter karte hain
+  projectApplication:
+    en: |
+      In every project you will choose a model for inference and justify it: capability, cost,
+      latency and data-privacy terms. That justification belongs in your project README.
+    hinglish: |
+      Har project mein aap inference ke liye ek model chunoge aur use justify karoge: capability,
+      cost, latency aur data-privacy terms. Yeh justification aapke project README mein jaati hai.
+  summary:
+    en:
+      - GenAI ⊂ deep learning ⊂ machine learning ⊂ AI
+      - Training changes parameters; inference uses them
+      - Hyperparameters are settings you choose, not values the model learns
+      - Application engineers mostly work at inference time
+    hinglish:
+      - GenAI ⊂ deep learning ⊂ machine learning ⊂ AI
+      - Training parameters badalti hai; inference unhe use karta hai
+      - Hyperparameters aapki chuni settings hain, model ki seekhi values nahi
+      - Application engineers zyada tar inference time par kaam karte hain
+codeExamples:
+  - id: rules-vs-learning
+    title:
+      en: Rules versus learning, in miniature
+      hinglish: Rules versus learning, chhote roop mein
+    variants:
+      python: |
+        # Rule-based "AI": a human wrote the rule.
+        def is_spam_rule(subject: str) -> bool:
+            return "lottery" in subject.lower()
+
+        # "Learning": derive a threshold from labelled examples instead.
+        examples = [("WIN the lottery now", 1), ("Team meeting at 4", 0), ("Free lottery tickets", 1), ("Invoice attached", 0)]
+        spam_words = {w for text, label in examples if label == 1 for w in text.lower().split()}
+        ham_words = {w for text, label in examples if label == 0 for w in text.lower().split()}
+        learned = spam_words - ham_words  # words seen only in spam
+
+        def is_spam_learned(subject: str) -> bool:
+            return any(word in learned for word in subject.lower().split())
+
+        print(is_spam_rule("Lottery results"), is_spam_learned("free tickets inside"))
+        print(sorted(learned))
+    expectedOutput: |
+      True True
+      ['free', 'lottery', 'now', 'the', 'tickets', 'win']
+exerciseIds: []
+assessmentId: quiz-ai-landscape
+relatedLessonIds: [ai-gradient-descent]

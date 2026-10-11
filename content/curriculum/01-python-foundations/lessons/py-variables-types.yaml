@@ -1,0 +1,176 @@
+id: py-variables-types
+slug: variables-and-data-types
+version: 1
+status: published
+estimatedMinutes: 25
+prerequisites: []
+topics: [python-basics, data-types, strings]
+title:
+  en: Variables, data types and strings
+  hinglish: Variables, data types aur strings
+summary:
+  en: Store values in variables, pick the right type, convert between types and build prompts with f-strings.
+  hinglish: Values ko variables mein store karo, sahi type chuno, types convert karo aur f-strings se prompts banao.
+objectives:
+  en:
+    - Create variables and explain what a type is
+    - Use int, float, str, bool and None correctly
+    - Convert between types and avoid common conversion errors
+    - Build readable prompt strings with f-strings
+  hinglish:
+    - Variables banana aur samajhna ki type kya hota hai
+    - int, float, str, bool aur None ka sahi use
+    - Types convert karna aur common conversion errors se bachna
+    - f-strings se readable prompt strings banana
+sections:
+  explanation:
+    en: |
+      A **variable** is a name that points to a value. When you write `temperature = 0.7`, Python
+      creates the value `0.7` and attaches the label `temperature` to it.
+
+      Every value has a **type**, which decides what you can do with it:
+
+      | Type | Example | Typical AI use |
+      | --- | --- | --- |
+      | `int` | `max_tokens = 500` | token limits, counts |
+      | `float` | `temperature = 0.7` | probabilities, scores |
+      | `str` | `model = "my-model"` | prompts, model names |
+      | `bool` | `stream = True` | feature flags |
+      | `None` | `api_key = None` | "no value yet" |
+
+      Check a type with `type(x)`. Convert with `int("42")`, `float("0.7")`, `str(500)`.
+      Conversion can fail: `int("4.5")` raises a `ValueError` — Python refuses to guess.
+
+      **f-strings** put values inside text: `f"Summarize in {max_words} words: {text}"`.
+      You will build almost every prompt this way.
+
+      Python is **dynamically typed** (a variable can point to any type), but you can add
+      **type hints** like `max_tokens: int = 500`. Hints do not change how code runs; they help
+      editors and tools catch mistakes early.
+    hinglish: |
+      **Variable** ek naam hai jo kisi value ko point karta hai. Jab aap `temperature = 0.7`
+      likhte ho, Python value `0.7` banata hai aur us par `temperature` ka label laga deta hai.
+
+      Har value ka ek **type** hota hai, jo decide karta hai ki us value ke saath kya kar sakte ho:
+
+      | Type | Example | AI mein typical use |
+      | --- | --- | --- |
+      | `int` | `max_tokens = 500` | token limits, counts |
+      | `float` | `temperature = 0.7` | probabilities, scores |
+      | `str` | `model = "my-model"` | prompts, model names |
+      | `bool` | `stream = True` | feature flags |
+      | `None` | `api_key = None` | "abhi koi value nahi" |
+
+      Type check karne ke liye `type(x)`. Convert karne ke liye `int("42")`, `float("0.7")`,
+      `str(500)`. Conversion fail bhi ho sakta hai: `int("4.5")` `ValueError` deta hai — Python
+      guess nahi karta.
+
+      **f-strings** text ke andar values daalte hain: `f"Summarize in {max_words} words: {text}"`.
+      Lagbhag har prompt aap aise hi banaoge.
+
+      Python **dynamically typed** hai (variable kisi bhi type ko point kar sakta hai), lekin aap
+      **type hints** laga sakte ho jaise `max_tokens: int = 500`. Hints code ka behaviour nahi
+      badalte; ye editors aur tools ko galtiyan jaldi pakadne mein help karte hain.
+  analogy:
+    en: |
+      Think of variables as **labelled jars** in a kitchen. The label (`sugar`) is the variable
+      name; what is inside is the value; and the type is what kind of thing the jar holds — you
+      can stir a liquid but not a stone. Pouring "4.5 kg" into a jar labelled "whole eggs only"
+      (`int("4.5")`) fails, and that is a good thing.
+    hinglish: |
+      Variables ko kitchen ke **label lage dabbe** samjho. Label (`sugar`) variable ka naam hai,
+      andar jo hai woh value hai, aur type batata hai dabbe mein kis tarah ki cheez hai — liquid ko
+      stir kar sakte ho, pathar ko nahi. "Sirf poore ande" wale dabbe mein "4.5 kg" daalna
+      (`int("4.5")`) fail hota hai — aur yeh achhi baat hai.
+  guidedExercise:
+    en: |
+      1. Create `model_name = "my-model"`, `temperature = 0.2` and `max_tokens = 300`.
+      2. Print `type()` of each and confirm `str`, `float` and `int`.
+      3. Build `prompt = f"Explain embeddings in {max_tokens // 10} words."` and print it.
+      4. Try `int("300")` (works) and `int("3.5")` (fails). Read the error message carefully.
+    hinglish: |
+      1. `model_name = "my-model"`, `temperature = 0.2` aur `max_tokens = 300` banao.
+      2. Har ek ka `type()` print karo aur confirm karo: `str`, `float`, `int`.
+      3. `prompt = f"Explain embeddings in {max_tokens // 10} words."` banao aur print karo.
+      4. `int("300")` (chalega) aur `int("3.5")` (fail hoga) try karo. Error message dhyan se padho.
+  challenge:
+    en: |
+      Write a function `describe(value)` that returns strings like `"0.7 is a float"` for any
+      value. Then make it say `"nothing"` for `None`.
+    hinglish: |
+      Ek function `describe(value)` likho jo kisi bhi value ke liye `"0.7 is a float"` jaisa string
+      return kare. Phir `None` ke liye `"nothing"` return karwao.
+  commonMistakes:
+    en:
+      - Using `=` (assignment) when you meant `==` (comparison)
+      - Assuming `input()` or values from files are numbers — they arrive as strings
+      - Writing `"Hello " + 5` — convert first with `str(5)` or use an f-string
+      - Comparing floats with `==` after arithmetic (`0.1 + 0.2 == 0.3` is False)
+    hinglish:
+      - '`==` (comparison) ki jagah `=` (assignment) likh dena'
+      - Maan lena ki `input()` ya files se aayi values numbers hain — woh strings hoti hain
+      - '`"Hello " + 5` likhna — pehle `str(5)` karo ya f-string use karo'
+      - Arithmetic ke baad floats ko `==` se compare karna (`0.1 + 0.2 == 0.3` False hai)
+  projectApplication:
+    en: |
+      In the Python API Assistant project, configuration such as the model name, temperature and
+      token limit lives in typed variables loaded from the environment — never hard-coded in the
+      middle of your logic.
+    hinglish: |
+      Python API Assistant project mein model name, temperature aur token limit jaisi configuration
+      environment se load hokar typed variables mein rehti hai — logic ke beech mein hard-coded nahi.
+  summary:
+    en:
+      - A variable is a name that points to a value; the value has a type
+      - int, float, str, bool and None cover most everyday values
+      - Conversions can fail loudly — that protects you from silent bugs
+      - f-strings are the cleanest way to build prompts
+    hinglish:
+      - Variable ek naam hai jo value ko point karta hai; value ka ek type hota hai
+      - int, float, str, bool aur None se zyada tar values cover ho jaati hain
+      - Conversions loudly fail ho sakte hain — yeh silent bugs se bachata hai
+      - Prompts banane ka sabse clean tarika f-strings hain
+codeExamples:
+  - id: py-types-prompt
+    title:
+      en: Types and an f-string prompt
+      hinglish: Types aur f-string prompt
+    variants:
+      python: |
+        model_name: str = "my-model"
+        temperature: float = 0.2
+        max_tokens: int = 300
+        stream: bool = False
+
+        print(type(model_name), type(temperature), type(max_tokens), type(stream))
+
+        topic = "embeddings"
+        prompt = f"Explain {topic} to a beginner in under {max_tokens // 10} words."
+        print(prompt)
+
+        try:
+            int("3.5")
+        except ValueError as err:
+            print("Conversion failed:", err)
+      typescript: |
+        const modelName: string = "my-model";
+        const temperature: number = 0.2; // JS has one number type
+        const maxTokens: number = 300;
+        const stream: boolean = false;
+
+        console.log(typeof modelName, typeof temperature, typeof maxTokens, typeof stream);
+
+        const topic = "embeddings";
+        const prompt = `Explain ${topic} to a beginner in under ${Math.floor(maxTokens / 10)} words.`;
+        console.log(prompt);
+
+        // Number.parseInt does NOT throw — it silently truncates. Validate explicitly.
+        console.log(Number.parseInt("3.5", 10)); // 3
+        console.log(Number.isInteger(Number("3.5"))); // false
+    expectedOutput: |
+      <class 'str'> <class 'float'> <class 'int'> <class 'bool'>
+      Explain embeddings to a beginner in under 30 words.
+      Conversion failed: invalid literal for int() with base 10: '3.5'
+exerciseIds: [ex-py-build-prompt]
+assessmentId: quiz-py-variables-types
+relatedLessonIds: [py-collections]

@@ -1,0 +1,75 @@
+id: ex-py-classify-temperature
+version: 1
+status: published
+lessonId: py-control-flow
+language: python
+topics: [control-flow]
+title:
+  en: Classify a sampling temperature
+  hinglish: Sampling temperature classify karo
+prompt:
+  en: |
+    Write `classify_temperature(t)` that returns:
+
+    | Condition | Return |
+    | --- | --- |
+    | `0 <= t <= 0.3` | `"focused"` |
+    | `0.3 < t <= 1.0` | `"balanced"` |
+    | `1.0 < t <= 2.0` | `"creative"` |
+
+    Any value below 0 or above 2 is invalid: raise `ValueError`.
+  hinglish: |
+    `classify_temperature(t)` likho jo return kare:
+
+    | Condition | Return |
+    | --- | --- |
+    | `0 <= t <= 0.3` | `"focused"` |
+    | `0.3 < t <= 1.0` | `"balanced"` |
+    | `1.0 < t <= 2.0` | `"creative"` |
+
+    0 se kam ya 2 se zyada value invalid hai: `ValueError` raise karo.
+starterCode: |
+  def classify_temperature(t):
+      pass
+tests:
+  - id: focused
+    name: low temperatures are focused
+    code: |
+      assert classify_temperature(0) == "focused"
+      assert classify_temperature(0.3) == "focused"
+  - id: balanced
+    name: middle temperatures are balanced
+    code: |
+      assert classify_temperature(0.31) == "balanced"
+      assert classify_temperature(1.0) == "balanced"
+  - id: creative
+    name: high temperatures are creative
+    code: |
+      assert classify_temperature(1.5) == "creative"
+      assert classify_temperature(2) == "creative"
+  - id: invalid
+    name: out-of-range values raise ValueError
+    code: |
+      for bad in (-0.1, 2.01):
+          try:
+              classify_temperature(bad)
+          except ValueError:
+              continue
+          raise AssertionError(f"expected ValueError for {bad}")
+hints:
+  en:
+    - Check the invalid range first, then the bands from low to high
+    - Chained comparisons work in Python, e.g. 0.3 < t <= 1.0
+  hinglish:
+    - Pehle invalid range check karo, phir low se high bands
+    - Python mein chained comparisons chalte hain, jaise 0.3 < t <= 1.0
+solution: |
+  def classify_temperature(t):
+      if t < 0 or t > 2:
+          raise ValueError("temperature must be between 0 and 2")
+      if t <= 0.3:
+          return "focused"
+      elif t <= 1.0:
+          return "balanced"
+      else:
+          return "creative"
