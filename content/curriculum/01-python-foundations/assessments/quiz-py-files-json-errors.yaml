@@ -1,0 +1,100 @@
+id: quiz-py-files-json-errors
+version: 1
+status: published
+courseId: python-foundations
+lessonId: py-files-json-errors
+passingPercent: 70
+title:
+  en: 'Check: files, JSON and errors'
+  hinglish: 'Check: files, JSON aur errors'
+objectives:
+  en:
+    - Handle files and JSON safely
+    - Treat model output as untrusted
+  hinglish:
+    - Files aur JSON safely handle karna
+    - Model output ko untrusted maanna
+questions:
+  - id: with-block
+    type: single_choice
+    topics: [python-basics]
+    prompt:
+      en: What is the main benefit of `with open(...) as f:`?
+      hinglish: '`with open(...) as f:` ka main fayda kya hai?'
+    options:
+      - id: a
+        text: { en: It reads files faster, hinglish: Files tez padhta hai }
+      - id: b
+        text:
+          {
+            en: It closes the file automatically,
+            even if an error happens,
+            hinglish: 'Error aaye tab bhi file automatically band karta hai',
+          }
+      - id: c
+        text: { en: It converts the file to JSON, hinglish: File ko JSON mein convert karta hai }
+    correctOptionIds: [b]
+    explanation:
+      en: The with block guarantees cleanup (closing the file) when the block exits for any reason.
+      hinglish: with block guarantee karta hai ki block kisi bhi wajah se khatam ho, cleanup (file band) ho jaaye.
+  - id: bare-except
+    type: single_choice
+    topics: [error-handling]
+    prompt:
+      en: Why is `except:` with no exception type usually a bad idea?
+      hinglish: Bina exception type wala `except:` aksar bura idea kyun hai?
+    options:
+      - id: a
+        text: { en: It is slower, hinglish: Yeh slow hai }
+      - id: b
+        text:
+          {
+            en: It hides every error,
+            including real bugs you did not expect,
+            hinglish: 'Yeh har error chhupa deta hai, un asli bugs ko bhi jinki ummeed nahi thi',
+          }
+      - id: c
+        text: { en: Python does not allow it, hinglish: Python iski permission nahi deta }
+    correctOptionIds: [b]
+    explanation:
+      en: Catch only the errors you can handle (for example json.JSONDecodeError) so unexpected bugs still surface.
+      hinglish: Sirf woh errors catch karo jo handle kar sakte ho (jaise json.JSONDecodeError) taaki unexpected bugs saamne aayein.
+  - id: model-json-trust
+    type: short_text
+    topics: [structured-output]
+    prompt:
+      en: A model was told to return JSON. Name two things that can still go wrong and what your code should do.
+      hinglish: Model ko JSON return karne ko kaha gaya tha. Do cheezein batao jo phir bhi galat ho sakti hain aur aapka code kya kare.
+    rubric:
+      - id: failure-modes
+        idea:
+          en: Output may be invalid JSON, wrapped in text/fences, or missing/wrong fields
+          hinglish: Output invalid JSON, text/fences mein lipta, ya missing/galat fields wala ho sakta hai
+        anyOf:
+          [
+            invalid,
+            malformed,
+            fence,
+            fences,
+            markdown,
+            prose,
+            text around,
+            missing,
+            wrong type,
+            extra,
+            field,
+            fields,
+            key,
+            keys,
+          ]
+      - id: validate
+        idea:
+          en: Parse defensively and validate fields (and retry or fail clearly)
+          hinglish: Defensively parse karke fields validate karo (aur retry ya clearly fail)
+        anyOf: [validate, validation, check, schema, retry, reject, raise, error, verify, jaanch]
+    sampleAnswer:
+      en: It may be wrapped in Markdown fences or have missing/wrongly typed fields; extract the JSON, validate every field against a schema, and retry or raise a clear error.
+      hinglish: Woh Markdown fences mein ho sakta hai ya fields missing/galat type ki ho sakti hain; JSON extract karo, har field schema se validate karo, aur retry karo ya clear error raise karo.
+    explanation:
+      en: Structured output from models is a request, not a guarantee. Validation is mandatory.
+      hinglish: Models se structured output ek request hai, guarantee nahi. Validation zaroori hai.

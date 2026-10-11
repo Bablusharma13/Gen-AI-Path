@@ -1,0 +1,190 @@
+id: py-files-json-errors
+slug: files-json-and-errors
+version: 2
+status: published
+estimatedMinutes: 35
+prerequisites: [py-functions]
+topics: [python-basics, json, error-handling, structured-output]
+title:
+  en: Files, JSON and error handling
+  hinglish: Files, JSON aur error handling
+summary:
+  en: Read and write files safely, convert data to and from JSON, and handle the errors that real AI output will throw at you.
+  hinglish: Files safely read/write karo, data ko JSON mein aur JSON se convert karo, aur un errors ko handle karo jo real AI output aap par phenkega.
+objectives:
+  en:
+    - Read and write text files with with-blocks
+    - Convert between Python objects and JSON
+    - Catch specific exceptions and raise meaningful ones
+    - Validate untrusted data such as model output before using it
+  hinglish:
+    - with-blocks se text files read aur write karna
+    - Python objects aur JSON ke beech convert karna
+    - Specific exceptions catch karna aur meaningful exceptions raise karna
+    - Model output jaise untrusted data ko use se pehle validate karna
+sections:
+  explanation:
+    en: |
+      **Files.** Always open files with a `with` block — it closes the file even if an error
+      happens:
+
+      ```python
+      with open("notes.txt", "r", encoding="utf-8") as f:
+          text = f.read()
+      ```
+
+      Pass `encoding="utf-8"` explicitly; otherwise Windows may use a different default and break
+      Hindi or emoji text.
+
+      **JSON** is the lingua franca of APIs. `json.loads(s)` turns a JSON string into Python
+      objects (dicts, lists, strings, numbers, `True`/`False`, `None`); `json.dumps(obj)` goes the
+      other way. LLMs are often asked to "answer in JSON" — but **model output is untrusted text**.
+      It may be wrapped in Markdown fences, have a sentence before it, miss a field, or not be
+      valid JSON at all.
+
+      **Exceptions** are Python's way of reporting problems. Catch the *specific* error you expect
+      and decide what to do:
+
+      ```python
+      try:
+          data = json.loads(raw)
+      except json.JSONDecodeError as err:
+          raise ValueError(f"Model did not return valid JSON: {err}") from err
+      ```
+
+      Never write a bare `except:` that hides every error — including bugs you did not expect.
+      Validate structure (required keys, types, ranges) after parsing; parsing alone does not mean
+      the data is correct.
+    hinglish: |
+      **Files.** Files hamesha `with` block se kholo — error aaye tab bhi file band ho jaati hai:
+
+      ```python
+      with open("notes.txt", "r", encoding="utf-8") as f:
+          text = f.read()
+      ```
+
+      `encoding="utf-8"` explicitly do; warna Windows alag default use kar sakta hai aur Hindi ya
+      emoji text toot sakta hai.
+
+      **JSON** APIs ki common bhasha hai. `json.loads(s)` JSON string ko Python objects (dicts,
+      lists, strings, numbers, `True`/`False`, `None`) mein badalta hai; `json.dumps(obj)` ulta
+      karta hai. LLMs se aksar "JSON mein answer do" kaha jaata hai — lekin **model output
+      untrusted text hai**. Woh Markdown fences mein lipta ho sakta hai, usse pehle ek sentence ho
+      sakta hai, koi field missing ho sakti hai, ya woh valid JSON hi na ho.
+
+      **Exceptions** Python ka problems report karne ka tarika hain. Jis *specific* error ki ummeed
+      hai use catch karo aur decide karo kya karna hai:
+
+      ```python
+      try:
+          data = json.loads(raw)
+      except json.JSONDecodeError as err:
+          raise ValueError(f"Model did not return valid JSON: {err}") from err
+      ```
+
+      Kabhi bare `except:` mat likho jo har error chhupa de — un bugs ko bhi jinki aapko ummeed nahi
+      thi. Parse karne ke baad structure (required keys, types, ranges) validate karo; parse ho
+      jaana yeh nahi batata ki data sahi hai.
+  analogy:
+    en: |
+      Treat model output like a **courier parcel**: the label says "JSON inside", but you still open
+      it carefully, check every item against the order list, and refuse the delivery if something
+      is missing — instead of assuming the label is true.
+    hinglish: |
+      Model output ko **courier parcel** ki tarah treat karo: label par likha hai "andar JSON hai",
+      phir bhi aap dhyan se kholte ho, har item order list se milaate ho, aur kuch missing ho to
+      delivery refuse karte ho — label ko sach maan lene ki jagah.
+  guidedExercise:
+    en: |
+      1. Write a dict with keys `answer` and `confidence` to `out.json` using `json.dump`.
+      2. Read it back with `json.load` and print the type of each value.
+      3. Call `json.loads("{oops}")` inside try/except and print the error message.
+      4. Write a check that raises `ValueError` if `confidence` is not between 0 and 1.
+    hinglish: |
+      1. `answer` aur `confidence` keys wala dict `json.dump` se `out.json` mein likho.
+      2. `json.load` se wapas padho aur har value ka type print karo.
+      3. try/except ke andar `json.loads("{oops}")` call karo aur error message print karo.
+      4. Ek check likho jo `confidence` 0 aur 1 ke beech na ho to `ValueError` raise kare.
+  challenge:
+    en: |
+      Process a folder of `.txt` files: for each file, write a line to `summary.jsonl` (JSON Lines)
+      with the filename and word count. Skip files that cannot be decoded and log which ones failed.
+    hinglish: |
+      `.txt` files ka ek folder process karo: har file ke liye `summary.jsonl` (JSON Lines) mein
+      filename aur word count ki ek line likho. Jo files decode na ho sakein unhe skip karo aur
+      log karo kaunsi fail hui.
+  commonMistakes:
+    en:
+      - Opening files without with, leaving them open on errors
+      - Forgetting encoding="utf-8" and corrupting non-English text
+      - Using a bare except that hides real bugs
+      - Assuming parsed JSON has the right keys and types without checking
+    hinglish:
+      - Bina with ke files kholna, jisse error par file khuli reh jaati hai
+      - encoding="utf-8" bhoolna aur non-English text corrupt karna
+      - Bare except use karna jo asli bugs chhupa deta hai
+      - Bina check kiye maan lena ki parsed JSON mein sahi keys aur types hain
+  projectApplication:
+    en: |
+      The Resume Analyzer asks the model for a JSON report, extracts it defensively, validates
+      every field, and retries once with the validation errors if the output is invalid — the
+      exact skill you practise in this lesson's exercise.
+    hinglish: |
+      Resume Analyzer model se JSON report maangta hai, use defensively extract karta hai, har
+      field validate karta hai, aur output invalid ho to validation errors ke saath ek baar retry
+      karta hai — wahi skill jo aap is lesson ki exercise mein practise karte ho.
+  summary:
+    en:
+      - Use with open(..., encoding="utf-8") for files
+      - json.loads and json.dumps convert between JSON text and Python objects
+      - Catch specific exceptions; re-raise with a clear message
+      - Model output is untrusted until parsed and validated
+    hinglish:
+      - Files ke liye with open(..., encoding="utf-8") use karo
+      - json.loads aur json.dumps JSON text aur Python objects ke beech convert karte hain
+      - Specific exceptions catch karo; clear message ke saath re-raise karo
+      - Model output tab tak untrusted hai jab tak parse aur validate na ho
+codeExamples:
+  - id: py-json-roundtrip
+    title:
+      en: JSON round trip with validation
+      hinglish: Validation ke saath JSON round trip
+    variants:
+      python: |
+        import json
+
+        report = {"answer": "RAG retrieves documents first.", "confidence": 0.82}
+        text = json.dumps(report)
+        print(text)
+
+        parsed = json.loads(text)
+        if not 0 <= parsed["confidence"] <= 1:
+            raise ValueError("confidence out of range")
+        print(parsed["answer"])
+
+        try:
+            json.loads("{oops}")
+        except json.JSONDecodeError as err:
+            print("Invalid JSON:", err.msg)
+      typescript: |
+        const report = { answer: "RAG retrieves documents first.", confidence: 0.82 };
+        const text = JSON.stringify(report);
+        console.log(text);
+
+        const parsed = JSON.parse(text) as { answer: string; confidence: number };
+        if (!(parsed.confidence >= 0 && parsed.confidence <= 1)) throw new RangeError("confidence out of range");
+        console.log(parsed.answer);
+
+        try {
+          JSON.parse("{oops}");
+        } catch (err) {
+          console.log("Invalid JSON:", (err as Error).message);
+        }
+    expectedOutput: |
+      {"answer": "RAG retrieves documents first.", "confidence": 0.82}
+      RAG retrieves documents first.
+      Invalid JSON: Expecting property name enclosed in double quotes
+exerciseIds: [ex-py-parse-model-json]
+assessmentId: quiz-py-files-json-errors
+projectIds: [resume-analyzer]
+relatedLessonIds: [py-http-apis]

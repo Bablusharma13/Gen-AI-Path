@@ -1,0 +1,58 @@
+id: rag-fundamentals
+slug: rag-fundamentals
+version: 2
+status: published
+level: 8
+order: 0
+tracks: [A, B, D]
+requiredForTracks: [A, B]
+likelyKnownBy: []
+estimatedHours: 3
+prerequisites: [llm-fundamentals]
+title:
+  en: RAG Fundamentals — Retrieval, Grounding and Citations
+  hinglish: RAG Fundamentals — Retrieval, Grounding aur Citations
+summary:
+  en: Build the retrieval half of a RAG system — chunking, hybrid ranking, permission filters — then generate grounded answers whose citations are checked in code and measured with real metrics.
+  hinglish: RAG system ka retrieval hissa banao — chunking, hybrid ranking, permission filters — phir aise grounded answers generate karo jinke citations code mein check hon aur asli metrics se naape jaayein.
+description:
+  en: |
+    Retrieval-augmented generation is the most common GenAI architecture in industry because it lets
+    a model answer from your documents instead of its memory. It is also easy to build badly. This
+    course walks through the pipeline in the RAG Pipeline lab, then covers the parts that make it
+    trustworthy: retrieval quality you can measure, a "not found" path, and citations that are
+    validated rather than believed.
+  hinglish: |
+    Retrieval-augmented generation industry mein sabse common GenAI architecture hai kyunki isse model
+    apni yaaddasht ke bajaye aapke documents se answer deta hai. Ise kharab tareeke se banana bhi
+    aasaan hai. Yeh course RAG Pipeline lab mein pipeline dikhata hai, phir woh hisse cover karta hai
+    jo ise bharosemand banate hain: naapne layak retrieval quality, ek "not found" path, aur aise
+    citations jo maane nahi, validate kiye jaate hain.
+outcomes:
+  en:
+    - Explain each stage of a RAG pipeline and where it can fail
+    - Combine keyword and vector scores into a hybrid ranking
+    - Validate citations in code and add a not-found path
+    - Measure retrieval with hit rate at k and MRR
+  hinglish:
+    - RAG pipeline ka har stage aur woh kahan fail ho sakta hai, samjhana
+    - Keyword aur vector scores ko hybrid ranking mein jodna
+    - Citations ko code mein validate karna aur not-found path jodna
+    - Hit rate at k aur MRR se retrieval naapna
+modules:
+  - id: rag-retrieval
+    title:
+      en: Retrieval
+      hinglish: Retrieval
+    summary:
+      en: Chunking, hybrid search and permission-aware ranking.
+      hinglish: Chunking, hybrid search aur permission-aware ranking.
+    lessonIds: [rag-chunking-retrieval]
+  - id: rag-grounding
+    title:
+      en: Grounded answers
+      hinglish: Grounded answers
+    summary:
+      en: Citations you can verify, refusing when the sources are silent, and measuring quality.
+      hinglish: Verify hone layak citations, sources chup hon to mana karna, aur quality naapna.
+    lessonIds: [rag-grounded-citations]

@@ -1,0 +1,99 @@
+id: ex-llm-softmax-temperature
+version: 1
+status: published
+lessonId: llm-next-token
+language: python
+topics: [sampling-temperature, next-token-prediction]
+title:
+  en: Softmax with temperature, and greedy decoding
+  hinglish: Temperature ke saath softmax, aur greedy decoding
+prompt:
+  en: |
+    Implement two functions without NumPy:
+
+    1. `softmax(logits, temperature=1.0)` — returns a list of probabilities that sum to 1. Divide
+       every logit by `temperature` first. It must not overflow for large logits such as
+       `[1000, 1001]` (subtract the maximum before `math.exp`). Raise `ValueError` for an empty list
+       or a temperature that is not greater than 0.
+    2. `greedy(logits)` — returns the **index** of the largest logit; on a tie, the first one.
+  hinglish: |
+    NumPy ke bina do functions implement karo:
+
+    1. `softmax(logits, temperature=1.0)` — probabilities ki list return kare jinka total 1 ho. Pehle
+       har logit ko `temperature` se divide karo. `[1000, 1001]` jaise bade logits par overflow nahi
+       hona chahiye (`math.exp` se pehle maximum subtract karo). Khaali list ya 0 se bada na hone wale
+       temperature par `ValueError` raise karo.
+    2. `greedy(logits)` — sabse bade logit ka **index** return kare; tie par pehla wala.
+starterCode: |
+  import math
+
+
+  def softmax(logits, temperature=1.0):
+      pass
+
+
+  def greedy(logits):
+      pass
+tests:
+  - id: sums-to-one
+    name: probabilities sum to 1 and equal logits are uniform
+    code: |
+      p = softmax([2.0, 1.0, 0.1])
+      assert abs(sum(p) - 1.0) < 1e-9
+      assert all(abs(x - 0.25) < 1e-9 for x in softmax([3, 3, 3, 3]))
+  - id: known-values
+    name: matches known values
+    code: |
+      p = softmax([1.0, 2.0])
+      assert abs(p[0] - 0.268941) < 1e-5 and abs(p[1] - 0.731059) < 1e-5
+  - id: stable
+    name: does not overflow for large logits
+    code: |
+      p = softmax([1000.0, 1001.0])
+      assert abs(p[1] - 0.731059) < 1e-5
+  - id: temperature
+    name: low temperature sharpens, high temperature flattens
+    code: |
+      logits = [4.0, 2.5, 1.0]
+      assert softmax(logits, 0.5)[0] > softmax(logits, 1.0)[0] > softmax(logits, 2.0)[0]
+  - id: errors
+    name: rejects bad input
+    code: |
+      for args in [([],), ([1.0], 0), ([1.0], -1.0)]:
+          try:
+              softmax(*args)
+          except ValueError:
+              continue
+          raise AssertionError(f"expected ValueError for {args}")
+  - id: greedy
+    name: greedy returns the first index of the maximum
+    code: |
+      assert greedy([0.1, 3.0, 2.0]) == 1
+      assert greedy([5, 1, 5]) == 0
+hints:
+  en:
+    - Check for an empty list and temperature <= 0 before anything else
+    - Scale first (x / temperature), then subtract max(scaled) before calling math.exp
+    - For greedy, logits.index(max(logits)) already returns the first maximum
+  hinglish:
+    - Sabse pehle khaali list aur temperature <= 0 check karo
+    - Pehle scale karo (x / temperature), phir math.exp se pehle max(scaled) subtract karo
+    - Greedy ke liye logits.index(max(logits)) pehle hi pehla maximum deta hai
+solution: |
+  import math
+
+
+  def softmax(logits, temperature=1.0):
+      if not logits:
+          raise ValueError("logits must not be empty")
+      if temperature <= 0:
+          raise ValueError("temperature must be greater than 0")
+      scaled = [x / temperature for x in logits]
+      top = max(scaled)
+      exps = [math.exp(x - top) for x in scaled]
+      total = sum(exps)
+      return [e / total for e in exps]
+
+
+  def greedy(logits):
+      return logits.index(max(logits))

@@ -1,0 +1,102 @@
+id: ex-rag-hybrid-rank
+version: 1
+status: published
+lessonId: rag-chunking-retrieval
+language: python
+topics: [hybrid-search, rag]
+title:
+  en: Hybrid ranking with normalised scores
+  hinglish: Normalised scores ke saath hybrid ranking
+prompt:
+  en: |
+    Keyword scores (such as BM25) and vector similarities live on different scales, so they must be
+    normalised before they are combined. Implement:
+
+    1. `normalize(scores)` — min-max normalise a dict `{chunk_id: score}` to the range 0–1. If all
+       scores are equal, every chunk gets `1.0`. An empty dict returns `{}`.
+    2. `hybrid_rank(vector_scores, keyword_scores, alpha=0.3, top_k=3)` — normalise each dict
+       separately; a chunk missing from one dict gets `0` for that part. The combined score is
+       `alpha * keyword + (1 - alpha) * vector`. Return the ids of the `top_k` chunks, best first;
+       break ties by chunk id (alphabetical). Raise `ValueError` if `alpha` is outside 0–1.
+  hinglish: |
+    Keyword scores (jaise BM25) aur vector similarities alag scales par hote hain, isliye jodne se
+    pehle unhe normalise karna padta hai. Implement karo:
+
+    1. `normalize(scores)` — dict `{chunk_id: score}` ko 0–1 range mein min-max normalise karo. Saare
+       scores barabar hon to har chunk ko `1.0`. Khaali dict par `{}`.
+    2. `hybrid_rank(vector_scores, keyword_scores, alpha=0.3, top_k=3)` — har dict ko alag normalise
+       karo; jo chunk ek dict mein na ho use us hisse ke liye `0`. Combined score
+       `alpha * keyword + (1 - alpha) * vector` hai. `top_k` chunks ke ids best pehle return karo; tie
+       ho to chunk id (alphabetical) se. `alpha` 0–1 ke bahar ho to `ValueError`.
+starterCode: |
+  def normalize(scores):
+      pass
+
+
+  def hybrid_rank(vector_scores, keyword_scores, alpha=0.3, top_k=3):
+      pass
+tests:
+  - id: normalize
+    name: min-max normalisation and edge cases
+    code: |
+      assert normalize({"a": 2.0, "b": 4.0, "c": 3.0}) == {"a": 0.0, "b": 1.0, "c": 0.5}
+      assert normalize({"a": 7.0, "b": 7.0}) == {"a": 1.0, "b": 1.0}
+      assert normalize({}) == {}
+  - id: vector-only
+    name: alpha 0 ranks by vector score
+    code: |
+      vec = {"a": 0.9, "b": 0.2, "c": 0.5}
+      kw = {"b": 12.0}
+      assert hybrid_rank(vec, kw, alpha=0.0, top_k=3) == ["a", "c", "b"]
+  - id: keyword-only
+    name: alpha 1 ranks by keyword score
+    code: |
+      vec = {"a": 0.9, "b": 0.2, "c": 0.5}
+      kw = {"b": 12.0, "c": 3.0, "a": 1.0}
+      assert hybrid_rank(vec, kw, alpha=1.0, top_k=2) == ["b", "c"]
+  - id: blend
+    name: blends normalised scores and handles missing chunks
+    code: |
+      vec = {"a": 0.80, "b": 0.78, "c": 0.10}
+      kw = {"b": 9.0, "c": 1.0}
+      # Normalised: vector a=1, b=0.971, c=0; keyword b=1, c=0, a missing so 0.
+      assert hybrid_rank(vec, kw, alpha=0.3, top_k=3) == ["b", "a", "c"]
+  - id: ties-and-errors
+    name: breaks ties by id and validates alpha
+    code: |
+      assert hybrid_rank({"b": 1.0, "a": 1.0}, {}, alpha=0.5, top_k=2) == ["a", "b"]
+      for bad in (-0.1, 1.5):
+          try:
+              hybrid_rank({"a": 1.0}, {}, alpha=bad)
+          except ValueError:
+              continue
+          raise AssertionError("expected ValueError")
+hints:
+  en:
+    - In normalize, compute lo = min(values) and hi = max(values); handle hi == lo separately
+    - Collect all ids with set(vector_scores) | set(keyword_scores)
+    - Use .get(chunk_id, 0.0) on the normalised dicts for missing chunks
+    - 'Sort with key=lambda cid: (-combined[cid], cid)'
+  hinglish:
+    - normalize mein lo = min(values) aur hi = max(values) nikaalo; hi == lo ko alag sambhalo
+    - Saare ids set(vector_scores) | set(keyword_scores) se ikattha karo
+    - Missing chunks ke liye normalised dicts par .get(chunk_id, 0.0) use karo
+    - 'key=lambda cid: (-combined[cid], cid) se sort karo'
+solution: |
+  def normalize(scores):
+      if not scores:
+          return {}
+      lo, hi = min(scores.values()), max(scores.values())
+      if hi == lo:
+          return {k: 1.0 for k in scores}
+      return {k: (v - lo) / (hi - lo) for k, v in scores.items()}
+
+
+  def hybrid_rank(vector_scores, keyword_scores, alpha=0.3, top_k=3):
+      if not 0 <= alpha <= 1:
+          raise ValueError("alpha must be between 0 and 1")
+      vec = normalize(vector_scores)
+      kw = normalize(keyword_scores)
+      ids = set(vector_scores) | set(keyword_scores)
+      combined = {cid: alpha * kw.get(cid, 0.0) + (1 - alpha) * vec.get(cid, 0.0) for cid in ids}
+      return sorted(ids, key=lambda cid: (-combined[cid], cid))[:top_k]

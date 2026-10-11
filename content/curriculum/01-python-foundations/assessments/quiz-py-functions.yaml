@@ -1,0 +1,87 @@
+id: quiz-py-functions
+version: 1
+status: published
+courseId: python-foundations
+lessonId: py-functions
+passingPercent: 70
+title:
+  en: 'Check: functions'
+  hinglish: 'Check: functions'
+objectives:
+  en:
+    - Explain return vs print
+    - Spot the mutable-default trap
+  hinglish:
+    - return vs print samjhana
+    - Mutable-default trap pehchanna
+questions:
+  - id: return-vs-print
+    type: single_choice
+    topics: [functions]
+    prompt:
+      en: '`def f(): print(5)`. What is the value of `x` after `x = f()`?'
+      hinglish: '`def f(): print(5)`. `x = f()` ke baad `x` ki value kya hai?'
+    options:
+      - id: a
+        text: { en: '5', hinglish: '5' }
+      - id: b
+        text: { en: None, hinglish: None }
+      - id: c
+        text: { en: '"5"', hinglish: '"5"' }
+    correctOptionIds: [b]
+    explanation:
+      en: The function prints 5 but returns nothing, so the result is None.
+      hinglish: Function 5 print karta hai par kuch return nahi karta, isliye result None hai.
+  - id: mutable-default
+    type: single_choice
+    topics: [functions]
+    prompt:
+      en: '`def add(x, items=[]): items.append(x); return items`. What does the second call `add(2)` return after `add(1)`?'
+      hinglish: '`def add(x, items=[]): items.append(x); return items`. `add(1)` ke baad doosra call `add(2)` kya return karega?'
+    options:
+      - id: a
+        text: { en: '[2]', hinglish: '[2]' }
+      - id: b
+        text: { en: '[1, 2]', hinglish: '[1, 2]' }
+      - id: c
+        text: { en: It raises an error, hinglish: Error aayega }
+    correctOptionIds: [b]
+    explanation:
+      en: The default list is created once and shared between calls. Use items=None and create a list inside.
+      hinglish: Default list ek hi baar banti hai aur calls ke beech share hoti hai. items=None use karke andar list banao.
+  - id: validate-early
+    type: short_text
+    topics: [functions, chunking]
+    prompt:
+      en: Why should `chunk_words` raise an error when overlap is greater than or equal to size?
+      hinglish: Jab overlap size ke barabar ya usse zyada ho, to `chunk_words` ko error kyun raise karna chahiye?
+    rubric:
+      - id: no-progress
+        idea:
+          en: The window would never move forward (step ≤ 0), causing an infinite loop or nonsense
+          hinglish: Window kabhi aage nahi badhegi (step ≤ 0), jisse infinite loop ya galat result
+        anyOf:
+          [
+            infinite,
+            forever,
+            never move,
+            never advance,
+            step,
+            zero,
+            negative,
+            loop,
+            aage nahi,
+            hamesha,
+          ]
+      - id: fail-early
+        idea:
+          en: Failing early with a clear error is easier to debug than a silent bug later
+          hinglish: Clear error ke saath jaldi fail karna baad ke silent bug se debug karna aasaan hai
+        anyOf: [early, clear, debug, obvious, silent, invalid, jaldi, galti, bug]
+    requiredGroups: 1
+    sampleAnswer:
+      en: Because the step (size - overlap) would be zero or negative, so the window never advances and the loop never ends — failing early with a clear error is easier to debug.
+      hinglish: Kyunki step (size - overlap) zero ya negative ho jaayega, window aage nahi badhegi aur loop khatam nahi hoga — clear error ke saath jaldi fail karna debug karne mein aasaan hai.
+    explanation:
+      en: Invalid parameters should be rejected at the boundary instead of producing hidden failures.
+      hinglish: Invalid parameters ko boundary par hi reject karna chahiye, chhupe failures banne se pehle.

@@ -1,0 +1,123 @@
+id: ex-agent-validate-tool-call
+version: 1
+status: published
+lessonId: agent-tool-calling
+language: python
+topics: [tool-calling, structured-output]
+title:
+  en: Validate a tool call before running it
+  hinglish: Tool call ko chalane se pehle validate karo
+prompt:
+  en: |
+    Implement `validate_tool_call(call, tools)`.
+
+    - `tools` maps a tool name to its parameters, e.g.
+      `{"get_weather": {"city": "string", "days": "integer"}}`. Types are `"string"`, `"integer"`,
+      `"number"` and `"boolean"`. Every listed parameter is required.
+    - `call` is what the model returned: `{"name": "...", "arguments": "<JSON text>"}`.
+    - Return `(args, None)` when the call is valid, where `args` is the parsed dict.
+    - Otherwise return `(None, message)` with a short message. Reject: an unknown tool; arguments
+      that are not valid JSON or not a JSON object; missing parameters; unexpected parameters; and
+      wrong types.
+    - Careful: in Python `True` is an `int`. A boolean is **not** a valid `"integer"` or `"number"`,
+      and an integer **is** a valid `"number"`.
+  hinglish: |
+    `validate_tool_call(call, tools)` implement karo.
+
+    - `tools` har tool ke naam ko uske parameters se map karta hai, jaise
+      `{"get_weather": {"city": "string", "days": "integer"}}`. Types hain `"string"`, `"integer"`,
+      `"number"` aur `"boolean"`. Har listed parameter zaroori hai.
+    - `call` woh hai jo model ne return kiya: `{"name": "...", "arguments": "<JSON text>"}`.
+    - Call valid ho to `(args, None)` return karo, jahan `args` parsed dict hai.
+    - Warna chhote message ke saath `(None, message)` return karo. Reject karo: unknown tool; arguments
+      jo valid JSON ya JSON object nahi hain; missing parameters; unexpected parameters; aur galat types.
+    - Dhyan do: Python mein `True` ek `int` hai. Boolean `"integer"` ya `"number"` ke liye valid **nahi**
+      hai, aur integer `"number"` ke liye valid **hai**.
+starterCode: |
+  import json
+
+
+  def validate_tool_call(call, tools):
+      pass
+tests:
+  - id: valid
+    name: accepts a valid call
+    code: |
+      tools = {"get_weather": {"city": "string", "days": "integer"}}
+      args, error = validate_tool_call({"name": "get_weather", "arguments": '{"city": "Pune", "days": 3}'}, tools)
+      assert error is None and args == {"city": "Pune", "days": 3}, (args, error)
+  - id: unknown-tool
+    name: rejects unknown tools
+    code: |
+      args, error = validate_tool_call({"name": "rm_rf", "arguments": "{}"}, {"get_weather": {"city": "string"}})
+      assert args is None and error
+  - id: bad-json
+    name: rejects invalid JSON and non-objects
+    code: |
+      tools = {"t": {"x": "string"}}
+      for raw in ['{"x": ', '["x"]', '"x"']:
+          args, error = validate_tool_call({"name": "t", "arguments": raw}, tools)
+          assert args is None and error, raw
+  - id: fields
+    name: rejects missing and unexpected parameters
+    code: |
+      tools = {"t": {"x": "string", "y": "integer"}}
+      for raw in ['{"x": "a"}', '{"x": "a", "y": 1, "z": 2}']:
+          args, error = validate_tool_call({"name": "t", "arguments": raw}, tools)
+          assert args is None and error, raw
+  - id: types
+    name: checks types, including the bool-is-int trap
+    code: |
+      tools = {"t": {"n": "integer", "f": "number", "b": "boolean", "s": "string"}}
+      ok = '{"n": 2, "f": 3, "b": false, "s": "hi"}'
+      assert validate_tool_call({"name": "t", "arguments": ok}, tools)[1] is None
+      for raw in [
+          '{"n": true, "f": 1.5, "b": false, "s": "x"}',
+          '{"n": 1, "f": true, "b": false, "s": "x"}',
+          '{"n": 1.5, "f": 1, "b": false, "s": "x"}',
+          '{"n": 1, "f": 1, "b": 0, "s": "x"}',
+          '{"n": 1, "f": 1, "b": true, "s": 5}',
+      ]:
+          args, error = validate_tool_call({"name": "t", "arguments": raw}, tools)
+          assert args is None and error, raw
+hints:
+  en:
+    - Check the tool name first, then json.loads inside try/except json.JSONDecodeError
+    - Compare set(args) with set(params) to find missing and unexpected keys
+    - 'For "integer", require isinstance(v, int) and not isinstance(v, bool)'
+  hinglish:
+    - Pehle tool ka naam check karo, phir try/except json.JSONDecodeError ke andar json.loads
+    - Missing aur unexpected keys dhoondhne ke liye set(args) ko set(params) se compare karo
+    - '"integer" ke liye isinstance(v, int) and not isinstance(v, bool) zaroori karo'
+solution: |
+  import json
+
+  CHECKS = {
+      "string": lambda v: isinstance(v, str),
+      "integer": lambda v: isinstance(v, int) and not isinstance(v, bool),
+      "number": lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
+      "boolean": lambda v: isinstance(v, bool),
+  }
+
+
+  def validate_tool_call(call, tools):
+      name = call.get("name")
+      if name not in tools:
+          return None, f"unknown tool {name!r}"
+      try:
+          args = json.loads(call.get("arguments", ""))
+      except json.JSONDecodeError:
+          return None, "arguments are not valid JSON"
+      if not isinstance(args, dict):
+          return None, "arguments must be a JSON object"
+      params = tools[name]
+      missing = set(params) - set(args)
+      extra = set(args) - set(params)
+      if missing:
+          return None, f"missing: {sorted(missing)}"
+      if extra:
+          return None, f"unexpected: {sorted(extra)}"
+      for key, type_name in params.items():
+          if not CHECKS[type_name](args[key]):
+              return None, f"{key} must be {type_name}"
+      return args, None

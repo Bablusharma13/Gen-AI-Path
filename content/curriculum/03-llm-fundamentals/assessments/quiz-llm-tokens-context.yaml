@@ -1,0 +1,120 @@
+id: quiz-llm-tokens-context
+version: 1
+status: published
+courseId: llm-fundamentals
+lessonId: llm-tokens-context
+passingPercent: 70
+title:
+  en: 'Check: tokens, context windows and cost'
+  hinglish: 'Check: tokens, context windows aur cost'
+objectives:
+  en:
+    - Explain tokens and the context window and estimate request cost
+  hinglish:
+    - Tokens aur context window samjhana aur request ki cost estimate karna
+questions:
+  - id: shared-window
+    type: single_choice
+    topics: [context-window]
+    prompt:
+      en: A model has a 10,000-token context window. Your prompt is 9,500 tokens. What is the main risk?
+      hinglish: Model ki context window 10,000 tokens ki hai. Aapka prompt 9,500 tokens ka hai. Sabse bada risk kya hai?
+    options:
+      - id: a
+        text:
+          en: None — the answer does not count towards the context window
+          hinglish: Kuch nahi — answer context window mein count nahi hota
+      - id: b
+        text:
+          en: The answer can use at most about 500 tokens, so it may be cut off
+          hinglish: Answer zyada se zyada lagbhag 500 tokens le sakta hai, isliye kat sakta hai
+      - id: c
+        text:
+          en: The model will automatically summarise the prompt for free
+          hinglish: Model apne aap prompt ka free mein summary bana dega
+    correctOptionIds: [b]
+    explanation:
+      en: Input and output share the context window, so a nearly full prompt leaves little room for the answer.
+      hinglish: Input aur output context window share karte hain, isliye lagbhag bhara prompt answer ke liye kam jagah chhodta hai.
+  - id: count-how
+    type: single_choice
+    topics: [tokens]
+    prompt:
+      en: What is the reliable way to know how many tokens a request will use?
+      hinglish: Request kitne tokens use karegi, yeh jaanne ka reliable tareeka kya hai?
+    options:
+      - id: a
+        text:
+          en: Divide the number of characters by 4
+          hinglish: Characters ki sankhya ko 4 se divide karo
+      - id: b
+        text:
+          en: Count the words
+          hinglish: Words gino
+      - id: c
+        text:
+          en: Use the provider's tokenizer or token-counting API
+          hinglish: Provider ka tokenizer ya token-counting API use karo
+    correctOptionIds: [c]
+    explanation:
+      en: Characters ÷ 4 is only a rough English rule of thumb; token counts depend on the tokenizer and the language.
+      hinglish: Characters ÷ 4 sirf English ka rough rule of thumb hai; token counts tokenizer aur language par depend karte hain.
+  - id: what-costs
+    type: multiple_choice
+    topics: [llm-cost, tokens]
+    prompt:
+      en: Which of these are usually measured in tokens? (Select all that apply.)
+      hinglish: Inmein se kaunsi cheezein aamtaur par tokens mein naapi jaati hain? (Sabhi sahi chuno.)
+    options:
+      - id: a
+        text:
+          en: The price of a request
+          hinglish: Request ki price
+      - id: b
+        text:
+          en: The context window size
+          hinglish: Context window ka size
+      - id: c
+        text:
+          en: Rate limits such as tokens per minute
+          hinglish: Tokens per minute jaisi rate limits
+      - id: d
+        text:
+          en: The size of the model's training data in gigabytes
+          hinglish: Model ke training data ka size gigabytes mein
+    correctOptionIds: [a, b, c]
+    explanation:
+      en: Price, context windows and many rate limits are expressed in tokens. Training-data size is not what you pay per request.
+      hinglish: Price, context windows aur kai rate limits tokens mein hoti hain. Training-data ka size per-request kharch nahi hai.
+  - id: languages
+    explanation:
+      en: Tokenizers are trained mostly on English, so other scripts are split into more pieces. Always measure with the real tokenizer.
+      hinglish: Tokenizers zyada tar English par train hote hain, isliye doosri scripts zyada tukdon mein toot-ti hain. Hamesha asli tokenizer se naapo.
+    type: short_text
+    topics: [tokens]
+    prompt:
+      en: Why can the same sentence cost more tokens in Hindi than in English?
+      hinglish: Wahi sentence Hindi mein English se zyada tokens kyun le sakta hai?
+    rubric:
+      - id: tokenizer-training
+        idea:
+          en: Tokenizers are built mostly from English text, so other scripts get split into more, smaller pieces
+          hinglish: Tokenizers zyada tar English text se bante hain, isliye doosri scripts zyada, chhote tukdon mein toot-ti hain
+        anyOf:
+          [
+            english,
+            training,
+            trained,
+            vocabulary,
+            vocab,
+            smaller pieces,
+            split,
+            bpe,
+            frequent,
+            tukde,
+            todta,
+            toot,
+          ]
+    sampleAnswer:
+      en: Tokenizers learn their vocabulary mostly from English text, so Devanagari words are split into more, smaller pieces — the same meaning needs more tokens.
+      hinglish: Tokenizers apni vocabulary zyada tar English text se seekhte hain, isliye Devanagari words zyada, chhote tukdon mein toot-te hain — usi matlab ke liye zyada tokens lagte hain.

@@ -1,0 +1,86 @@
+id: quiz-py-collections
+version: 1
+status: published
+courseId: python-foundations
+lessonId: py-collections
+passingPercent: 70
+title:
+  en: 'Check: collections'
+  hinglish: 'Check: collections'
+objectives:
+  en:
+    - Pick the right collection for a task
+    - Read and build chat message structures
+  hinglish:
+    - Task ke liye sahi collection chunna
+    - Chat message structures padhna aur banana
+questions:
+  - id: pick-collection
+    type: single_choice
+    topics: [collections]
+    prompt:
+      en: You need to look up a document's text quickly by its id. Which collection fits best?
+      hinglish: Aapko document ka text uske id se jaldi dhoondna hai. Kaunsa collection best hai?
+    options:
+      - id: a
+        text: { en: list, hinglish: list }
+      - id: b
+        text: { en: tuple, hinglish: tuple }
+      - id: c
+        text: { en: dict, hinglish: dict }
+      - id: d
+        text: { en: set, hinglish: set }
+    correctOptionIds: [c]
+    explanation:
+      en: A dict maps keys (ids) to values (text) with fast lookups.
+      hinglish: Dict keys (ids) ko values (text) se map karta hai aur lookup fast hota hai.
+  - id: get-default
+    type: single_choice
+    topics: [collections]
+    prompt:
+      en: '`counts = {"a": 1}`. What does `counts.get("b", 0)` return?'
+      hinglish: '`counts = {"a": 1}`. `counts.get("b", 0)` kya return karega?'
+    options:
+      - id: a
+        text: { en: It raises KeyError, hinglish: KeyError raise karega }
+      - id: b
+        text: { en: '0', hinglish: '0' }
+      - id: c
+        text: { en: None, hinglish: None }
+    correctOptionIds: [b]
+    explanation:
+      en: get returns the default (0) when the key is missing; only counts["b"] would raise KeyError.
+      hinglish: Key missing ho to get default (0) return karta hai; sirf counts["b"] KeyError deta.
+  - id: message-shape
+    type: multiple_choice
+    topics: [collections]
+    prompt:
+      en: Which statements about the typical chat `messages` structure are true?
+      hinglish: Typical chat `messages` structure ke baare mein kaunsi baatein sahi hain?
+    options:
+      - id: a
+        text:
+          {
+            en: It is a list,
+            so order is preserved,
+            hinglish: Yeh list hai,
+            isliye order bana rehta hai,
+          }
+      - id: b
+        text:
+          {
+            en: Each message is a dict with role and content,
+            hinglish: Har message role aur content wala dict hai,
+          }
+      - id: c
+        text:
+          {
+            en: It is a set,
+            so duplicates are removed,
+            hinglish: Yeh set hai,
+            isliye duplicates hat jaate hain,
+          }
+    correctOptionIds: [a, b]
+    explanation:
+      en: Conversation order matters, so it is a list; each message is a dict. A set would lose order.
+      hinglish: Conversation mein order matter karta hai, isliye list hai; har message dict hai. Set order kho deta.

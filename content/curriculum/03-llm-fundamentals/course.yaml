@@ -1,0 +1,66 @@
+id: llm-fundamentals
+slug: llm-fundamentals
+version: 2
+status: published
+level: 5
+order: 0
+tracks: [A, B, C, D, E]
+requiredForTracks: [A, B, C, D, E]
+likelyKnownBy: []
+estimatedHours: 5
+prerequisites: [ai-foundations]
+title:
+  en: How LLMs Work — Tokens, Generation, Attention and Prompts
+  hinglish: LLMs Kaise Kaam Karte Hain — Tokens, Generation, Attention aur Prompts
+summary:
+  en: What a large language model actually does with your text — tokens and context windows, next-token generation, self-attention — and how to write prompts whose output your code can trust.
+  hinglish: Large language model aapke text ke saath asal mein kya karta hai — tokens aur context windows, next-token generation, self-attention — aur aise prompts kaise likhein jinke output par aapka code bharosa kar sake.
+description:
+  en: |
+    Every GenAI application decision — what it costs, why it is slow, why it sometimes makes
+    things up, how to keep it safe — traces back to a few mechanics. This course builds them from
+    first principles with small runnable programs and three interactive labs: the tokenizer, the
+    next-token probability distribution, and self-attention. It ends with practical prompting:
+    separating instructions from untrusted data and validating structured output.
+  hinglish: |
+    Har GenAI application ka faisla — kitna kharch hoga, slow kyun hai, kabhi-kabhi baatein kyun
+    banata hai, safe kaise rakhein — kuch mechanics par tika hai. Yeh course unhe first principles se
+    chhote runnable programs aur interactive labs ke saath banata hai: tokenizer, next-token
+    probability distribution, aur self-attention. Aakhir mein practical prompting: instructions ko
+    untrusted data se alag rakhna aur structured output validate karna.
+outcomes:
+  en:
+    - Explain tokens and context windows and estimate the cost of a request
+    - Describe how a model picks the next token and what temperature changes
+    - Compute scaled dot-product attention for a small example
+    - Write prompts that delimit untrusted data and validate JSON output in code
+  hinglish:
+    - Tokens aur context windows samjhana aur request ki cost estimate karna
+    - Batana ki model agla token kaise chunta hai aur temperature kya badalta hai
+    - Chhote example ke liye scaled dot-product attention calculate karna
+    - Aise prompts likhna jo untrusted data ko delimit karein aur JSON output ko code mein validate karein
+modules:
+  - id: llm-text-and-generation
+    title:
+      en: Text in, text out
+      hinglish: Text andar, text bahar
+    summary:
+      en: Tokens, context windows and how generation picks one token at a time.
+      hinglish: Tokens, context windows aur generation ek-ek token kaise chunta hai.
+    lessonIds: [llm-tokens-context, llm-next-token]
+  - id: llm-transformer
+    title:
+      en: Inside the transformer
+      hinglish: Transformer ke andar
+    summary:
+      en: Self-attention — how each token decides which other tokens matter.
+      hinglish: Self-attention — har token kaise tay karta hai ki kaunse doosre tokens zaroori hain.
+    lessonIds: [llm-attention]
+  - id: llm-prompting
+    title:
+      en: Prompting you can rely on
+      hinglish: Aisi prompting jis par bharosa ho
+    summary:
+      en: Instructions vs data, prompt injection, and structured output with validation.
+      hinglish: Instructions vs data, prompt injection, aur validation ke saath structured output.
+    lessonIds: [llm-prompting-structured]

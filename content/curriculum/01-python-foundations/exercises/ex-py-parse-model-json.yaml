@@ -1,0 +1,109 @@
+id: ex-py-parse-model-json
+version: 1
+status: published
+lessonId: py-files-json-errors
+language: python
+topics: [json, error-handling, structured-output]
+title:
+  en: Parse model output defensively
+  hinglish: Model output defensively parse karo
+prompt:
+  en: |
+    An LLM was asked to reply with JSON like `{"answer": "...", "confidence": 0.8}`. Real replies
+    are messy. Write `parse_model_json(raw)` that:
+
+    1. Finds the JSON object in `raw` — the text from the first `{` to the last `}` (the model may
+       add prose or Markdown fences around it). If there is no such span, raise `ValueError`.
+    2. Parses it with `json.loads`; invalid JSON → `ValueError`.
+    3. Requires a dict with a non-empty string `answer` and a number `confidence` with
+       `0 <= confidence <= 1` (booleans are **not** numbers here). Otherwise → `ValueError`.
+    4. Returns a new dict with exactly those two keys.
+  hinglish: |
+    LLM se `{"answer": "...", "confidence": 0.8}` jaisa JSON reply maanga gaya tha. Asli replies
+    messy hote hain. `parse_model_json(raw)` likho jo:
+
+    1. `raw` mein JSON object dhoondhe — pehle `{` se aakhri `}` tak ka text (model aas-paas prose
+       ya Markdown fences daal sakta hai). Aisa span na mile to `ValueError`.
+    2. `json.loads` se parse kare; invalid JSON → `ValueError`.
+    3. Dict hona chahiye jismein non-empty string `answer` aur number `confidence` ho jahan
+       `0 <= confidence <= 1` (yahan booleans number **nahi** maane jaayenge). Warna → `ValueError`.
+    4. Sirf in do keys wala naya dict return kare.
+starterCode: |
+  import json
+
+
+  def parse_model_json(raw):
+      pass
+tests:
+  - id: plain
+    name: parses plain JSON
+    code: |
+      assert parse_model_json('{"answer": "Use RAG", "confidence": 0.9}') == {"answer": "Use RAG", "confidence": 0.9}
+  - id: fenced
+    name: extracts JSON from fences and prose
+    code: |
+      raw = 'Sure! Here you go:\n```json\n{"answer": "Chunk first", "confidence": 1}\n```'
+      assert parse_model_json(raw) == {"answer": "Chunk first", "confidence": 1}
+  - id: extra-keys
+    name: drops unexpected keys
+    code: |
+      assert parse_model_json('{"answer": "x", "confidence": 0, "notes": "ignore me"}') == {"answer": "x", "confidence": 0}
+  - id: invalid-json
+    name: invalid JSON raises ValueError
+    code: |
+      for raw in ["no json here", "{answer: maybe}", ""]:
+          try:
+              parse_model_json(raw)
+          except ValueError:
+              continue
+          raise AssertionError(f"expected ValueError for {raw!r}")
+  - id: bad-fields
+    name: missing or wrong fields raise ValueError
+    code: |
+      bad = [
+          '{"confidence": 0.5}',
+          '{"answer": "", "confidence": 0.5}',
+          '{"answer": "x", "confidence": 1.5}',
+          '{"answer": "x", "confidence": "high"}',
+          '{"answer": "x", "confidence": true}',
+          '["answer", 0.5]',
+      ]
+      for raw in bad:
+          try:
+              parse_model_json(raw)
+          except ValueError:
+              continue
+          raise AssertionError(f"expected ValueError for {raw}")
+hints:
+  en:
+    - raw.find("{") and raw.rfind("}") give the span; check both are found and in order
+    - json.JSONDecodeError is a subclass of ValueError, but re-raise with your own message
+    - isinstance(value, bool) must be checked before isinstance(value, (int, float)) because True is an int
+  hinglish:
+    - raw.find("{") aur raw.rfind("}") span dete hain; check karo dono mile aur sahi order mein hain
+    - json.JSONDecodeError ValueError ka subclass hai, phir bhi apne message ke saath re-raise karo
+    - isinstance(value, bool) ko isinstance(value, (int, float)) se pehle check karo kyunki True ek int hai
+solution: |
+  import json
+
+
+  def parse_model_json(raw):
+      start = raw.find("{")
+      end = raw.rfind("}")
+      if start == -1 or end == -1 or end < start:
+          raise ValueError("no JSON object found")
+      try:
+          data = json.loads(raw[start:end + 1])
+      except json.JSONDecodeError as err:
+          raise ValueError(f"invalid JSON: {err.msg}") from err
+      if not isinstance(data, dict):
+          raise ValueError("expected a JSON object")
+      answer = data.get("answer")
+      confidence = data.get("confidence")
+      if not isinstance(answer, str) or not answer.strip():
+          raise ValueError("answer must be a non-empty string")
+      if isinstance(confidence, bool) or not isinstance(confidence, (int, float)):
+          raise ValueError("confidence must be a number")
+      if not 0 <= confidence <= 1:
+          raise ValueError("confidence must be between 0 and 1")
+      return {"answer": answer, "confidence": confidence}

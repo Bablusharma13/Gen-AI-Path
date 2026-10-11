@@ -1,0 +1,243 @@
+id: python-api-assistant
+version: 1
+status: published
+order: 1
+level: beginner
+estimatedHours: 6
+tracks: [A, B, C, D, E]
+techStack: [Python, httpx, pytest, python-dotenv]
+lessonIds: [py-functions, py-files-json-errors, py-http-apis]
+title:
+  en: Python API Assistant (CLI)
+  hinglish: Python API Assistant (CLI)
+summary:
+  en: A command-line assistant that sends your question to an LLM API, handles failures properly and saves the conversation to a JSON file.
+  hinglish: Ek command-line assistant jo aapka sawaal LLM API ko bhejta hai, failures ko sahi tarah handle karta hai aur conversation ko JSON file mein save karta hai.
+problemStatement:
+  en: |
+    Every GenAI application starts with one well-behaved API call. Build a small CLI, `ask`, that
+    takes a question, calls an OpenAI-compatible chat endpoint (a local Ollama model works and is
+    free), prints the answer, and keeps a history file. The interesting part is not the happy path:
+    it is timeouts, rate limits, missing keys and bad responses — handled so a user always gets a
+    clear message instead of a stack trace.
+  hinglish: |
+    Har GenAI application ek achhe se behave karne wali API call se shuru hoti hai. Ek chhota CLI
+    `ask` banao jo sawaal le, OpenAI-compatible chat endpoint ko call kare (local Ollama model bhi
+    chalega aur free hai), answer print kare, aur ek history file rakhe. Asli challenge happy path
+    nahi hai: timeouts, rate limits, missing keys aur kharab responses hain — aise handle karo ki
+    user ko hamesha clear message mile, stack trace nahi.
+requirements:
+  en:
+    - 'Usage: python -m ask "your question" prints the model''s answer'
+    - Reads AI_BASE_URL, AI_API_KEY (optional for local servers) and AI_MODEL from the environment or a .env file
+    - Every request has a timeout; 408/429/5xx are retried up to 3 times with exponential backoff
+    - 400/401/404 are not retried and produce a specific, friendly error message
+    - The conversation (question, answer, model, timestamp, token usage if reported) is appended to history.json
+    - A --history flag prints the last 5 exchanges
+    - Exit code 0 on success, non-zero on failure
+  hinglish:
+    - 'Usage: python -m ask "aapka sawaal" model ka answer print kare'
+    - AI_BASE_URL, AI_API_KEY (local servers ke liye optional) aur AI_MODEL environment ya .env file se padhe
+    - Har request par timeout; 408/429/5xx ko exponential backoff ke saath 3 baar tak retry
+    - 400/401/404 retry nahi honge aur ek specific, friendly error message denge
+    - Conversation (sawaal, answer, model, timestamp, token usage agar mile) history.json mein append ho
+    - --history flag aakhri 5 exchanges print kare
+    - Success par exit code 0, failure par non-zero
+acceptanceCriteria:
+  en:
+    - Running without AI_MODEL prints a clear configuration error and exits non-zero
+    - A simulated 429 followed by success returns the answer after retrying
+    - A 401 fails immediately with a message about the API key — no retry
+    - history.json stays valid JSON after 10 runs, including a run that failed
+    - No API key appears in the repository, logs or history file
+    - pytest suite passes without network access (HTTP is mocked)
+  hinglish:
+    - AI_MODEL ke bina chalane par clear configuration error print ho aur non-zero exit ho
+    - Simulated 429 ke baad success hone par retry karke answer mile
+    - 401 turant fail ho aur API key ke baare mein message de — koi retry nahi
+    - 10 runs ke baad bhi history.json valid JSON rahe, ek failed run ke saath bhi
+    - Koi API key repository, logs ya history file mein na dikhe
+    - pytest suite bina network ke pass ho (HTTP mock kiya hua)
+architecture:
+  en: |
+    ```
+    ask/__main__.py   → parses arguments, prints results, sets exit code
+    ask/config.py     → loads and validates environment settings (fails fast)
+    ask/client.py     → one function chat(messages) with timeout + retry policy
+    ask/history.py    → append/read history.json safely (write temp file, then rename)
+    tests/            → pytest with mocked HTTP (respx or monkeypatch)
+    ```
+    Keep `client.py` free of printing: it returns data or raises typed exceptions
+    (`AuthError`, `RateLimitedError`, `ApiError`). Only `__main__.py` talks to the user.
+  hinglish: |
+    ```
+    ask/__main__.py   → arguments parse kare, results print kare, exit code set kare
+    ask/config.py     → environment settings load aur validate kare (jaldi fail)
+    ask/client.py     → ek function chat(messages), timeout + retry policy ke saath
+    ask/history.py    → history.json safely append/read kare (temp file likho, phir rename)
+    tests/            → mocked HTTP ke saath pytest (respx ya monkeypatch)
+    ```
+    `client.py` mein print mat karo: woh data return kare ya typed exceptions raise kare
+    (`AuthError`, `RateLimitedError`, `ApiError`). User se sirf `__main__.py` baat kare.
+dataModel:
+  en: |
+    `history.json` is a list of entries:
+    ```json
+    [{"at": "2026-10-09T10:00:00Z", "model": "llama3.2", "question": "…",
+      "answer": "…", "usage": {"prompt_tokens": 21, "completion_tokens": 64}, "ok": true}]
+    ```
+    Failed runs are recorded with `"ok": false` and an `"error"` code, never with partial answers.
+  hinglish: |
+    `history.json` entries ki ek list hai:
+    ```json
+    [{"at": "2026-10-09T10:00:00Z", "model": "llama3.2", "question": "…",
+      "answer": "…", "usage": {"prompt_tokens": 21, "completion_tokens": 64}, "ok": true}]
+    ```
+    Failed runs `"ok": false` aur ek `"error"` code ke saath record hote hain, partial answers ke saath kabhi nahi.
+milestones:
+  - id: config
+    title:
+      en: Configuration that fails fast
+      hinglish: Configuration jo jaldi fail ho
+    description:
+      en: Load settings from the environment and .env, validate them, and print a precise message when something is missing.
+      hinglish: Environment aur .env se settings load karo, validate karo, aur kuch missing ho to precise message print karo.
+    checklist:
+      en:
+        [
+          .env is in .gitignore,
+          Missing AI_MODEL produces a clear error,
+          Settings are typed (dataclass or similar),
+        ]
+      hinglish:
+        [
+          .env .gitignore mein hai,
+          Missing AI_MODEL par clear error aata hai,
+          Settings typed hain (dataclass ya waisa kuch),
+        ]
+  - id: client
+    title:
+      en: A careful API client
+      hinglish: Ek careful API client
+    description:
+      en: Implement chat(messages) with a timeout, a retry policy for retryable status codes and typed errors.
+      hinglish: chat(messages) implement karo — timeout, retryable status codes ke liye retry policy aur typed errors ke saath.
+    checklist:
+      en:
+        [Timeout on every request, Exponential backoff for 408/429/5xx, No retries for 400/401/404]
+      hinglish:
+        [
+          Har request par timeout,
+          408/429/5xx ke liye exponential backoff,
+          400/401/404 par retry nahi,
+        ]
+  - id: history
+    title:
+      en: Safe history file
+      hinglish: Safe history file
+    description:
+      en: Append each exchange to history.json without ever corrupting it, and add the --history flag.
+      hinglish: Har exchange history.json mein bina use corrupt kiye append karo, aur --history flag add karo.
+    checklist:
+      en:
+        [
+          Writes go to a temp file then rename,
+          Failed runs are recorded without partial answers,
+          --history prints the last 5,
+        ]
+      hinglish:
+        [
+          Writes pehle temp file mein phir rename,
+          Failed runs bina partial answers ke record hote hain,
+          --history aakhri 5 print karta hai,
+        ]
+  - id: tests
+    title:
+      en: Tests without the network
+      hinglish: Network ke bina tests
+    description:
+      en: Write pytest tests that mock HTTP and cover success, retry-then-success, auth failure and timeout.
+      hinglish: pytest tests likho jo HTTP mock karein aur success, retry-then-success, auth failure aur timeout cover karein.
+    checklist:
+      en: [At least 6 tests, Tests pass with networking disabled, A README explains how to run them]
+      hinglish:
+        [
+          Kam se kam 6 tests,
+          Networking band hone par bhi tests pass,
+          README batata hai inhe kaise chalayein,
+        ]
+testRequirements:
+  en:
+    - Unit tests for the retry decision and backoff schedule
+    - Client tests with mocked HTTP for 200, 429→200, 401, 500×3 and timeout
+    - A history test that simulates a crash mid-write and checks the file is still valid
+  hinglish:
+    - Retry decision aur backoff schedule ke unit tests
+    - Mocked HTTP ke saath client tests — 200, 429→200, 401, 500×3 aur timeout
+    - Ek history test jo mid-write crash simulate kare aur check kare ki file valid hai
+securityChecklist:
+  en:
+    - API keys only come from the environment; .env is never committed
+    - The key is never printed, logged or saved to history.json
+    - Error messages never echo raw response bodies that could contain secrets
+    - Dependencies are pinned in requirements.txt
+  hinglish:
+    - API keys sirf environment se aati hain; .env kabhi commit nahi hota
+    - Key kabhi print, log ya history.json mein save nahi hoti
+    - Error messages kabhi raw response bodies echo nahi karte jismein secrets ho sakte hain
+    - Dependencies requirements.txt mein pinned hain
+deployment:
+  en: |
+    Package it as a CLI (`pip install -e .` with a `pyproject.toml` entry point) so `ask` works from
+    any terminal. Optionally publish a GitHub release with installation instructions. No server is
+    needed.
+  hinglish: |
+    Ise CLI ke roop mein package karo (`pyproject.toml` entry point ke saath `pip install -e .`) taaki
+    `ask` kisi bhi terminal se chale. Chaaho to installation instructions ke saath GitHub release
+    publish karo. Koi server nahi chahiye.
+readmeRequirements:
+  en:
+    - What the tool does in two sentences
+    - Setup with a local Ollama model and with a hosted provider
+    - Configuration table (variable, required, example)
+    - How retries and errors behave
+    - How to run the tests
+  hinglish:
+    - Tool kya karta hai, do sentences mein
+    - Local Ollama model aur hosted provider dono ke saath setup
+    - Configuration table (variable, required, example)
+    - Retries aur errors kaise behave karte hain
+    - Tests kaise chalayein
+rubric:
+  - id: reliability
+    points: 30
+    criterion:
+      en: Reliability and error handling
+      hinglish: Reliability aur error handling
+    excellent:
+      en: Every failure mode in the acceptance criteria produces a clear message and correct exit code; retries are bounded with backoff.
+      hinglish: Acceptance criteria ka har failure mode clear message aur sahi exit code deta hai; retries backoff ke saath bounded hain.
+  - id: code-quality
+    points: 25
+    criterion:
+      en: Code structure and readability
+      hinglish: Code structure aur readability
+    excellent:
+      en: Clear module boundaries, typed functions, no printing outside the CLI layer.
+      hinglish: Clear module boundaries, typed functions, CLI layer ke bahar koi print nahi.
+  - id: tests
+    points: 25
+    criterion:
+      en: Tests
+      hinglish: Tests
+    excellent:
+      en: Meaningful tests for every acceptance criterion that run offline.
+      hinglish: Har acceptance criterion ke liye meaningful tests jo offline chalte hain.
+  - id: security-docs
+    points: 20
+    criterion:
+      en: Security and documentation
+      hinglish: Security aur documentation
+    excellent:
+      en: No secrets anywhere; a README a stranger can follow in five minutes.
+      hinglish: Kahin koi secret nahi; aisa README jise koi anjaan insaan paanch minute mein follow kar sake.

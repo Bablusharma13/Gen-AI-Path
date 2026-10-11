@@ -1,0 +1,98 @@
+id: quiz-ai-vectors-similarity
+version: 1
+status: published
+courseId: ai-foundations
+lessonId: ai-vectors-similarity
+passingPercent: 70
+title:
+  en: 'Check: vectors and similarity'
+  hinglish: 'Check: vectors aur similarity'
+objectives:
+  en:
+    - Compute and interpret similarity
+  hinglish:
+    - Similarity calculate aur interpret karna
+questions:
+  - id: dot-product
+    type: single_choice
+    topics: [vectors]
+    prompt:
+      en: What is `[1, 2] · [3, 4]`?
+      hinglish: '`[1, 2] · [3, 4]` kya hai?'
+    options:
+      - id: a
+        text: { en: '10', hinglish: '10' }
+      - id: b
+        text: { en: '11', hinglish: '11' }
+      - id: c
+        text: { en: '[3, 8]', hinglish: '[3, 8]' }
+      - id: d
+        text: { en: '24', hinglish: '24' }
+    correctOptionIds: [b]
+    explanation:
+      en: 1×3 + 2×4 = 3 + 8 = 11. The dot product is a single number, not a vector.
+      hinglish: 1×3 + 2×4 = 3 + 8 = 11. Dot product ek number hai, vector nahi.
+  - id: cosine-meaning
+    type: single_choice
+    topics: [vector-similarity]
+    prompt:
+      en: Two embeddings have cosine similarity 0.02. What does that suggest?
+      hinglish: Do embeddings ki cosine similarity 0.02 hai. Isse kya pata chalta hai?
+    options:
+      - id: a
+        text: { en: They are nearly identical in meaning, hinglish: Meaning mein lagbhag same hain }
+      - id: b
+        text: { en: They are roughly unrelated, hinglish: Lagbhag unrelated hain }
+      - id: c
+        text: { en: They are exact opposites, hinglish: Bilkul ulte hain }
+    correctOptionIds: [b]
+    explanation:
+      en: Values near 0 mean the vectors are close to perpendicular — little shared direction.
+      hinglish: 0 ke paas values ka matlab vectors lagbhag perpendicular hain — disha mein kam samaanta.
+  - id: scaling
+    type: single_choice
+    topics: [vector-similarity]
+    prompt:
+      en: If you multiply a vector by 10, what happens to its cosine similarity with other vectors?
+      hinglish: Agar vector ko 10 se multiply karo, to doosre vectors ke saath uski cosine similarity ka kya hoga?
+    options:
+      - id: a
+        text: { en: It is multiplied by 10, hinglish: 10 guna ho jaati hai }
+      - id: b
+        text: { en: It does not change, hinglish: Nahi badalti }
+      - id: c
+        text: { en: It becomes 1, hinglish: 1 ho jaati hai }
+    correctOptionIds: [b]
+    explanation:
+      en: Cosine similarity only depends on direction, and scaling by a positive number keeps the direction.
+      hinglish: Cosine similarity sirf disha par depend karti hai, aur positive number se scale karne par disha wahi rehti hai.
+  - id: different-models
+    type: short_text
+    topics: [embeddings]
+    prompt:
+      en: Why can't you compare an embedding from model A with an embedding from model B?
+      hinglish: Model A ki embedding ko model B ki embedding se compare kyun nahi kar sakte?
+    rubric:
+      - id: different-space
+        idea:
+          en: Each model learns its own vector space, so dimensions mean different things
+          hinglish: Har model apna vector space seekhta hai, isliye dimensions ka matlab alag hota hai
+        anyOf:
+          [
+            space,
+            spaces,
+            different meaning,
+            dimensions,
+            learned,
+            own,
+            unrelated,
+            incompatible,
+            alag,
+            matlab,
+          ]
+    sampleAnswer:
+      en: Each model learns its own vector space, so the same position means different things (and sizes may differ) — the numbers are not comparable.
+      hinglish: Har model apna vector space seekhta hai, isliye same position ka matlab alag hota hai (aur sizes bhi alag ho sakte hain) — numbers comparable nahi hote.
+    explanation:
+      en: Always embed queries and documents with the same model and version. Changing models means re-indexing.
+      hinglish: Queries aur documents ko hamesha same model aur version se embed karo. Model badla to re-index karna padega.

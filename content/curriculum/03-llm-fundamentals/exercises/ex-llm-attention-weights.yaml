@@ -1,0 +1,97 @@
+id: ex-llm-attention-weights
+version: 1
+status: published
+lessonId: llm-attention
+language: python
+topics: [attention, vectors]
+title:
+  en: Scaled dot-product attention for one query
+  hinglish: Ek query ke liye scaled dot-product attention
+prompt:
+  en: |
+    Implement `attention(query, keys, values)` without NumPy. It returns a tuple
+    `(weights, output)` where:
+
+    - `weights[i] = softmax(score)[i]` with `score[i] = dot(query, keys[i]) / sqrt(len(query))`
+    - `output` is the weighted sum of the value vectors: `output[j] = Σ weights[i] * values[i][j]`
+
+    Raise `ValueError` if `keys` is empty, if `keys` and `values` have different lengths, or if
+    any key has a different length from the query.
+  hinglish: |
+    NumPy ke bina `attention(query, keys, values)` implement karo. Yeh tuple `(weights, output)`
+    return kare jahan:
+
+    - `weights[i] = softmax(score)[i]`, aur `score[i] = dot(query, keys[i]) / sqrt(len(query))`
+    - `output` value vectors ka weighted sum hai: `output[j] = Σ weights[i] * values[i][j]`
+
+    `keys` khaali ho, `keys` aur `values` ki length alag ho, ya koi key query se alag length ki ho to
+    `ValueError` raise karo.
+starterCode: |
+  import math
+
+
+  def attention(query, keys, values):
+      pass
+tests:
+  - id: uniform
+    name: identical keys give equal weights
+    code: |
+      w, out = attention([1.0, 2.0], [[1.0, 0.0]] * 4, [[1, 0], [0, 1], [1, 1], [0, 0]])
+      assert all(abs(x - 0.25) < 1e-9 for x in w)
+      assert abs(out[0] - 0.5) < 1e-9 and abs(out[1] - 0.5) < 1e-9
+  - id: lesson-example
+    name: matches the lesson example
+    code: |
+      keys = [[1.0, 0.0], [0.0, 1.0], [0.5, 0.5]]
+      values = [[1.0, 0.0], [0.0, 1.0], [0.5, 0.5]]
+      w, out = attention([0.9, 0.1], keys, values)
+      expected = [0.431, 0.245, 0.325]
+      assert all(abs(a - b) < 1e-3 for a, b in zip(w, expected)), w
+      assert abs(out[0] - 0.593) < 1e-3 and abs(out[1] - 0.407) < 1e-3, out
+  - id: scaling
+    name: divides by the square root of the dimension
+    code: |
+      w, _ = attention([2.0, 0.0, 0.0, 0.0], [[1.0, 0, 0, 0], [0, 0, 0, 0]], [[1.0], [0.0]])
+      # The score difference is 2 / sqrt(4) = 1, so the weights equal softmax([1, 0]).
+      assert abs(w[0] - 0.731059) < 1e-5, w
+  - id: weights-sum
+    name: weights sum to 1
+    code: |
+      w, _ = attention([0.3, -1.2, 2.0], [[1, 2, 3], [-1, 0, 1], [0.5, 0.5, 0.5]], [[1], [2], [3]])
+      assert abs(sum(w) - 1.0) < 1e-9
+  - id: errors
+    name: rejects mismatched shapes
+    code: |
+      bad = [([1.0], [], []), ([1.0], [[1.0]], [[1.0], [2.0]]), ([1.0, 2.0], [[1.0]], [[1.0]])]
+      for args in bad:
+          try:
+              attention(*args)
+          except ValueError:
+              continue
+          raise AssertionError(f"expected ValueError for {args}")
+hints:
+  en:
+    - Validate shapes first, then compute one score per key
+    - Reuse the stable softmax from the previous lesson (subtract the max)
+    - 'For the output: for each dimension j, sum weights[i] * values[i][j] over i'
+  hinglish:
+    - Pehle shapes validate karo, phir har key ka ek score nikaalo
+    - Pichhle lesson ka stable softmax dobara use karo (max subtract karo)
+    - 'Output ke liye: har dimension j par, i ke upar weights[i] * values[i][j] jodo'
+solution: |
+  import math
+
+
+  def attention(query, keys, values):
+      if not keys or len(keys) != len(values):
+          raise ValueError("keys and values must be non-empty and the same length")
+      if any(len(k) != len(query) for k in keys):
+          raise ValueError("every key must have the same length as the query")
+      d = len(query)
+      scores = [sum(q * k for q, k in zip(query, key)) / math.sqrt(d) for key in keys]
+      top = max(scores)
+      exps = [math.exp(s - top) for s in scores]
+      total = sum(exps)
+      weights = [e / total for e in exps]
+      output = [sum(w * v[j] for w, v in zip(weights, values)) for j in range(len(values[0]))]
+      return weights, output

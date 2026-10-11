@@ -1,0 +1,89 @@
+id: ex-rag-retrieval-metrics
+version: 1
+status: published
+lessonId: rag-grounded-citations
+language: python
+topics: [rag-evaluation, rag]
+title:
+  en: Measure retrieval — hit rate at k and MRR
+  hinglish: Retrieval naapo — hit rate at k aur MRR
+prompt:
+  en: |
+    Each evaluation result is a pair `(ranked_ids, relevant_ids)`: the chunk ids your retriever
+    returned (best first) and the set of ids that actually answer the question. Implement:
+
+    1. `hit_rate_at_k(results, k)` — the fraction of results where at least one relevant id is in
+       the first `k` ranked ids.
+    2. `mrr(results)` — the mean of `1 / rank` of the **first** relevant id (rank starts at 1), or
+       `0` for a result with no relevant id retrieved.
+
+    Raise `ValueError` if `results` is empty or `k < 1`.
+  hinglish: |
+    Har evaluation result ek pair `(ranked_ids, relevant_ids)` hai: retriever ke diye chunk ids (best
+    pehle) aur un ids ka set jo sach mein sawaal ka answer dete hain. Implement karo:
+
+    1. `hit_rate_at_k(results, k)` — kitne results mein pehle `k` ranked ids mein kam se kam ek
+       relevant id hai, uska fraction.
+    2. `mrr(results)` — **pehle** relevant id ke `1 / rank` ka mean (rank 1 se shuru), ya jis result
+       mein koi relevant id retrieve na hua ho uske liye `0`.
+
+    `results` khaali ho ya `k < 1` ho to `ValueError` raise karo.
+starterCode: |
+  def hit_rate_at_k(results, k):
+      pass
+
+
+  def mrr(results):
+      pass
+tests:
+  - id: hit-rate
+    name: computes hit rate at different k
+    code: |
+      results = [(["a", "b", "c"], {"b"}), (["d", "e", "f"], {"x"}), (["g", "h"], {"g", "h"})]
+      assert abs(hit_rate_at_k(results, 1) - 1 / 3) < 1e-9
+      assert abs(hit_rate_at_k(results, 2) - 2 / 3) < 1e-9
+      assert abs(hit_rate_at_k(results, 10) - 2 / 3) < 1e-9
+  - id: mrr
+    name: uses the rank of the first relevant result
+    code: |
+      results = [(["a", "b", "c"], {"b", "c"}), (["d", "e"], {"x"}), (["g"], {"g"})]
+      assert abs(mrr(results) - (1 / 2 + 0 + 1) / 3) < 1e-9
+  - id: perfect
+    name: perfect retrieval scores 1
+    code: |
+      results = [(["a"], {"a"}), (["b", "c"], {"b"})]
+      assert hit_rate_at_k(results, 1) == 1.0 and mrr(results) == 1.0
+  - id: errors
+    name: rejects empty results and k below 1
+    code: |
+      for call in (lambda: hit_rate_at_k([], 3), lambda: mrr([]), lambda: hit_rate_at_k([(["a"], {"a"})], 0)):
+          try:
+              call()
+          except ValueError:
+              continue
+          raise AssertionError("expected ValueError")
+hints:
+  en:
+    - any(cid in relevant for cid in ranked[:k]) tells you whether one result is a hit
+    - For MRR, use enumerate(ranked, start=1) and stop at the first relevant id
+  hinglish:
+    - any(cid in relevant for cid in ranked[:k]) batata hai ki ek result hit hai ya nahi
+    - MRR ke liye enumerate(ranked, start=1) use karo aur pehle relevant id par ruk jao
+solution: |
+  def hit_rate_at_k(results, k):
+      if not results or k < 1:
+          raise ValueError("results must not be empty and k must be at least 1")
+      hits = sum(1 for ranked, relevant in results if any(cid in relevant for cid in ranked[:k]))
+      return hits / len(results)
+
+
+  def mrr(results):
+      if not results:
+          raise ValueError("results must not be empty")
+      total = 0.0
+      for ranked, relevant in results:
+          for rank, cid in enumerate(ranked, start=1):
+              if cid in relevant:
+                  total += 1 / rank
+                  break
+      return total / len(results)

@@ -1,0 +1,192 @@
+id: agent-safe-loop
+slug: safe-agent-loops
+version: 1
+status: published
+estimatedMinutes: 35
+prerequisites: [agent-tool-calling]
+topics: [agents, agent-safety, prompt-injection]
+title:
+  en: Safe agent loops — budgets, allow-lists and human approval
+  hinglish: Safe agent loops — budgets, allow-lists aur human approval
+summary:
+  en: An agent is a loop you control. Cap its steps, run only allow-listed tools, require a person to approve consequential actions, and keep a trace of everything it did.
+  hinglish: Agent ek loop hai jo aapke control mein hai. Uske steps limit karo, sirf allow-listed tools chalao, zaroori actions ke liye insaan ki approval lo, aur usne jo kiya uska trace rakho.
+objectives:
+  en:
+    - Explain why agent loops need a step and cost budget
+    - Enforce an allow-list of tools in code
+    - Decide which actions require human approval and implement an approval gate
+    - Record a trace that lets you audit and debug a run
+  hinglish:
+    - Samjhana ki agent loops ko step aur cost budget kyun chahiye
+    - Code mein tools ki allow-list lagu karna
+    - Tay karna ki kin actions ko human approval chahiye aur approval gate banana
+    - Aisa trace record karna jisse run ko audit aur debug kiya ja sake
+sections:
+  explanation:
+    en: |
+      Give a model tools and a loop and it becomes an **agent**: it plans, calls tools, reads results
+      and decides what to do next. That autonomy is useful and risky. The guard rails live in the
+      loop that *your* code runs:
+
+      - **Step and cost budget.** Models can loop — retrying the same failing call, or wandering.
+        Stop after `max_steps`, and also cap tokens, time and money per run.
+      - **Allow-list.** Only tools in an explicit list can run, each with the narrowest permissions
+        that work. Anything else is rejected and reported back to the model, never executed.
+      - **Human approval.** Actions that move money, delete data, send messages to customers or are
+        otherwise hard to undo pause until a person approves them — with a clear summary of exactly
+        what will happen. Approval policies can be rules ("refunds above ₹500 need approval").
+      - **Validation and idempotency.** Validate every argument (previous lesson). Give side-effecting
+        tools idempotency keys so a retry cannot do the action twice.
+      - **Trace.** Record every step — the tool, its arguments, the result or why it was refused — so
+        you can audit what happened, show it to the user, and debug failures.
+      - **Least privilege against injection.** If a tool reads untrusted content (web pages, emails,
+        documents), assume it can contain instructions. The allow-list and approvals still hold even
+        if the model is fooled — that is the point of putting them in code.
+
+      A useful rule of thumb: **the model proposes, code disposes.** The model suggests the next action;
+      deterministic code decides whether it is allowed.
+    hinglish: |
+      Model ko tools aur ek loop do, aur woh **agent** ban jaata hai: plan karta hai, tools call karta hai,
+      results padhta hai aur tay karta hai aage kya karna hai. Yeh autonomy useful bhi hai aur risky bhi.
+      Guard rails us loop mein rehte hain jo *aapka* code chalata hai:
+
+      - **Step aur cost budget.** Models loop mein phans sakte hain — wahi failing call dobara karte
+        rehna, ya bhatakna. `max_steps` ke baad ruko, aur har run ke tokens, time aur paise par bhi cap
+        lagao.
+      - **Allow-list.** Sirf ek explicit list ke tools chal sakte hain, har ek kam se kam permissions ke
+        saath. Baaki sab reject hota hai aur model ko bataya jaata hai, kabhi execute nahi hota.
+      - **Human approval.** Jo actions paisa hilate hain, data delete karte hain, customers ko message
+        bhejte hain ya jinhe undo karna mushkil hai, woh tab tak rukte hain jab tak insaan approve na kare
+        — saaf summary ke saath ki exactly kya hoga. Approval policies rules ho sakti hain ("₹500 se
+        zyada ke refund ko approval chahiye").
+      - **Validation aur idempotency.** Har argument validate karo (pichhla lesson). Side-effect wale
+        tools ko idempotency keys do taaki retry se action do baar na ho.
+      - **Trace.** Har step record karo — tool, uske arguments, result ya mana kyun hua — taaki aap audit
+        kar sako ki kya hua, user ko dikha sako, aur failures debug kar sako.
+      - **Injection ke against least privilege.** Agar koi tool untrusted content (web pages, emails,
+        documents) padhta hai, to maan lo usmein instructions ho sakte hain. Model bewakoof ban bhi jaaye,
+        allow-list aur approvals phir bhi lagu rehte hain — unhe code mein rakhne ka yahi matlab hai.
+
+      Ek kaam ka rule: **model propose karta hai, code tay karta hai.** Model agla action suggest karta
+      hai; deterministic code tay karta hai ki woh allowed hai ya nahi.
+  analogy:
+    en: |
+      A new intern can use the office systems they were given access to, has a fixed number of hours,
+      and needs a manager's signature for any payment. They can be clever and still cannot empty the
+      company bank account — because the limits are in the systems, not in the intern's good intentions.
+    hinglish: |
+      Naya intern sirf unhi office systems ko use kar sakta hai jinka access use mila hai, uske paas fixed
+      ghante hain, aur har payment ke liye manager ke sign chahiye. Woh kitna bhi smart ho, company ka
+      bank account khaali nahi kar sakta — kyunki limits systems mein hain, intern ki achhi niyat mein nahi.
+  guidedExercise:
+    en: |
+      1. Run the code example and explain each line of the trace.
+      2. Change the approval policy so refunds up to 2000 are automatic. What changes in the trace?
+      3. Put `delete_database` into `tools` but keep it out of the plan. Is that safe? What if a
+         document the agent reads tells it to call that tool?
+    hinglish: |
+      1. Code example chalao aur trace ki har line samjhao.
+      2. Approval policy badlo taaki 2000 tak ke refund automatic hon. Trace mein kya badalta hai?
+      3. `delete_database` ko `tools` mein daalo par plan se bahar rakho. Kya yeh safe hai? Agar agent ke
+         padhe kisi document mein likha ho ki yeh tool call karo, to kya hoga?
+  challenge:
+    en: |
+      Add a cost budget: each tool has a cost, and the loop stops with `("stopped", "cost budget used
+      up")` before running a step that would exceed `max_cost`.
+    hinglish: |
+      Ek cost budget jodo: har tool ki ek cost hai, aur loop `("stopped", "cost budget used up")` ke saath
+      ruk jaaye us step ko chalane se pehle jo `max_cost` paar kar de.
+  commonMistakes:
+    en:
+      - Relying on the system prompt ("never delete data") instead of not exposing the capability
+      - Running agents without a step, time or cost limit
+      - Asking for approval with a vague summary the approver cannot really judge
+      - Keeping no trace, so nobody can tell what the agent did or why
+    hinglish:
+      - Capability expose na karne ke bajaye system prompt ("data kabhi delete mat karna") par bharosa karna
+      - Bina step, time ya cost limit ke agents chalana
+      - Aisi dhundhli summary ke saath approval maangna jise approver sach mein judge na kar sake
+      - Koi trace na rakhna, jisse koi bata hi na sake ki agent ne kya kiya aur kyun
+  projectApplication:
+    en: |
+      A support agent that can look up orders freely but needs a human for refunds is exactly this loop.
+      This platform follows the same principle: the AI Mentor has no tools at all, so it cannot change
+      anything — it can only answer.
+    hinglish: |
+      Aisa support agent jo orders aazadi se dekh sake par refund ke liye insaan chahiye, bilkul yahi loop
+      hai. Yeh platform bhi isi principle par chalta hai: AI Mentor ke paas koi tool nahi hai, isliye woh kuch
+      badal nahi sakta — sirf jawab de sakta hai.
+  summary:
+    en:
+      - The model proposes actions; deterministic code decides what is allowed
+      - Cap steps, time and cost for every run
+      - Run only allow-listed, least-privilege tools; reject everything else
+      - Require human approval for consequential actions and keep a full trace
+    hinglish:
+      - Model actions propose karta hai; deterministic code tay karta hai kya allowed hai
+      - Har run ke steps, time aur cost par cap lagao
+      - Sirf allow-listed, least-privilege tools chalao; baaki sab reject karo
+      - Zaroori actions ke liye human approval lo aur poora trace rakho
+codeExamples:
+  - id: guarded-agent-loop
+    title:
+      en: An agent loop with a budget, an allow-list and an approval gate
+      hinglish: Budget, allow-list aur approval gate wala agent loop
+    description:
+      en: The plan is scripted to show each guard rail; with a real model the plan arrives one tool call at a time.
+      hinglish: Har guard rail dikhane ke liye plan scripted hai; asli model ke saath plan ek-ek tool call karke aata hai.
+    variants:
+      python: |
+        def run_agent(plan, tools, max_steps, needs_approval, approve):
+            """Runs planned actions with guard rails and returns a trace of what happened."""
+            trace = []
+            for step, (name, args) in enumerate(plan, start=1):
+                if step > max_steps:
+                    trace.append(("stopped", "step budget used up"))
+                    break
+                if name == "finish":
+                    trace.append(("finish", args["answer"]))
+                    break
+                if name not in tools:
+                    trace.append(("rejected", f"{name} is not an allowed tool"))
+                    continue
+                if name in needs_approval and not approve(name, args):
+                    trace.append(("denied", name, args))
+                    continue
+                trace.append(("ran", name, tools[name](**args)))
+            return trace
+
+
+        orders = {"A17": {"amount": 1200, "status": "delivered"}}
+        tools = {
+            "find_order": lambda order_id: orders.get(order_id, "not found"),
+            "refund": lambda order_id, amount: f"refunded {amount} for {order_id}",
+        }
+
+        # What a (scripted) model planned. One step is not on the allow-list.
+        plan = [
+            ("find_order", {"order_id": "A17"}),
+            ("delete_database", {}),
+            ("refund", {"order_id": "A17", "amount": 1200}),
+            ("finish", {"answer": "Refund needs a human decision; ticket raised."}),
+        ]
+
+
+        # Policy: a person must approve refunds above 500.
+        def approve(name, args):
+            return args["amount"] <= 500
+
+
+        for entry in run_agent(plan, tools, max_steps=5, needs_approval={"refund"}, approve=approve):
+            print(entry)
+        print("with max_steps=1:", run_agent(plan, tools, 1, {"refund"}, approve)[-1])
+    expectedOutput: |
+      ('ran', 'find_order', {'amount': 1200, 'status': 'delivered'})
+      ('rejected', 'delete_database is not an allowed tool')
+      ('denied', 'refund', {'order_id': 'A17', 'amount': 1200})
+      ('finish', 'Refund needs a human decision; ticket raised.')
+      with max_steps=1: ('stopped', 'step budget used up')
+exerciseIds: [ex-agent-guarded-loop]
+assessmentId: quiz-agent-safe-loop
+relatedLessonIds: [agent-tool-calling, llm-prompting-structured]

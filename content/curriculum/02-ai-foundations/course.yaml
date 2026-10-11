@@ -1,0 +1,58 @@
+id: ai-foundations
+slug: ai-foundations
+version: 1
+status: published
+level: 2
+order: 0
+tracks: [A, B, C, D, E]
+requiredForTracks: [A, B, C, D, E]
+likelyKnownBy: [ml_ai]
+estimatedHours: 4
+prerequisites: [python-foundations]
+title:
+  en: AI, ML and Vectors — the Foundations
+  hinglish: AI, ML aur Vectors — Foundations
+summary:
+  en: What AI, ML, deep learning and GenAI really are, plus the three bits of math every GenAI engineer uses daily — vectors, gradients and evaluation metrics.
+  hinglish: AI, ML, deep learning aur GenAI asal mein kya hain, aur woh teen math concepts jo har GenAI engineer roz use karta hai — vectors, gradients aur evaluation metrics.
+description:
+  en: |
+    You do not need a maths degree to build GenAI applications, but you do need intuition for a few
+    ideas that show up everywhere: how models learn from data (training and gradient descent), how
+    meaning becomes numbers (vectors and similarity), and how we know whether a model is any good
+    (datasets and metrics). Every idea here comes with runnable code and, where it helps, an
+    interactive lab.
+  hinglish: |
+    GenAI applications banane ke liye maths ki degree nahi chahiye, lekin kuch ideas ki intuition
+    zaroori hai jo har jagah aate hain: models data se kaise seekhte hain (training aur gradient
+    descent), meaning numbers kaise banta hai (vectors aur similarity), aur kaise pata chale model
+    achha hai ya nahi (datasets aur metrics). Har idea ke saath runnable code hai, aur jahan madad
+    mile wahan interactive lab bhi.
+outcomes:
+  en:
+    - Explain AI vs ML vs deep learning vs GenAI with concrete examples
+    - Compute dot products and cosine similarity and explain what they mean
+    - Describe how gradient descent reduces a loss, and what the learning rate does
+    - Split data correctly and choose between accuracy, precision, recall and F1
+  hinglish:
+    - Concrete examples se AI vs ML vs deep learning vs GenAI samjhana
+    - Dot product aur cosine similarity calculate karna aur unka matlab samjhana
+    - Gradient descent loss ko kaise kam karta hai aur learning rate kya karta hai, yeh batana
+    - Data sahi tarah split karna aur accuracy, precision, recall aur F1 mein se chunna
+modules:
+  - id: ai-big-picture
+    title:
+      en: The big picture
+      hinglish: Big picture
+    summary:
+      en: Where GenAI fits, and what training and inference mean.
+      hinglish: GenAI kahan fit hota hai, aur training aur inference ka matlab.
+    lessonIds: [ai-landscape]
+  - id: ai-math-intuition
+    title:
+      en: Math intuition
+      hinglish: Math intuition
+    summary:
+      en: Vectors, gradient descent and evaluation metrics — by running them.
+      hinglish: Vectors, gradient descent aur evaluation metrics — chala kar seekho.
+    lessonIds: [ai-vectors-similarity, ai-gradient-descent, ai-datasets-metrics]

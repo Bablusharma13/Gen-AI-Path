@@ -1,0 +1,67 @@
+id: ex-py-build-prompt
+version: 1
+status: published
+lessonId: py-variables-types
+language: python
+topics: [strings, data-types]
+title:
+  en: Build a prompt with an f-string
+  hinglish: f-string se prompt banao
+prompt:
+  en: |
+    Write `build_prompt(topic, max_words)` that returns exactly:
+
+    `Explain <topic> in at most <max_words> words.`
+
+    - `topic` is a string; strip surrounding spaces.
+    - `max_words` may arrive as an `int` **or** a numeric string such as `"50"` — convert it.
+    - If `max_words` is less than 1, raise `ValueError`.
+  hinglish: |
+    `build_prompt(topic, max_words)` likho jo exactly yeh return kare:
+
+    `Explain <topic> in at most <max_words> words.`
+
+    - `topic` ek string hai; aage-peeche ke spaces hata do.
+    - `max_words` `int` **ya** `"50"` jaisa numeric string ho sakta hai — convert karo.
+    - Agar `max_words` 1 se kam hai, `ValueError` raise karo.
+starterCode: |
+  def build_prompt(topic, max_words):
+      # Convert max_words to int, validate it, then return the f-string.
+      pass
+tests:
+  - id: basic
+    name: builds the exact sentence
+    code: |
+      assert build_prompt("embeddings", 40) == "Explain embeddings in at most 40 words."
+  - id: strips
+    name: strips spaces around the topic
+    code: |
+      assert build_prompt("  tokens  ", 10) == "Explain tokens in at most 10 words."
+  - id: string-number
+    name: accepts numeric strings
+    code: |
+      assert build_prompt("RAG", "25") == "Explain RAG in at most 25 words."
+  - id: rejects-zero
+    name: rejects max_words below 1
+    code: |
+      try:
+          build_prompt("RAG", 0)
+      except ValueError:
+          pass
+      else:
+          raise AssertionError("expected ValueError for max_words=0")
+hints:
+  en:
+    - Use int(max_words) to convert both 25 and "25"
+    - topic.strip() removes surrounding whitespace
+    - Raise with raise ValueError("max_words must be at least 1")
+  hinglish:
+    - int(max_words) se 25 aur "25" dono convert ho jaate hain
+    - topic.strip() aage-peeche ke spaces hata deta hai
+    - Raise karne ke liye raise ValueError("max_words must be at least 1")
+solution: |
+  def build_prompt(topic, max_words):
+      words = int(max_words)
+      if words < 1:
+          raise ValueError("max_words must be at least 1")
+      return f"Explain {topic.strip()} in at most {words} words."

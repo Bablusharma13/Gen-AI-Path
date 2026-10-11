@@ -1,0 +1,79 @@
+id: quiz-ai-landscape
+version: 1
+status: published
+courseId: ai-foundations
+lessonId: ai-landscape
+passingPercent: 70
+title:
+  en: 'Check: the AI landscape'
+  hinglish: 'Check: AI landscape'
+objectives:
+  en:
+    - Relate AI, ML, DL and GenAI
+    - Distinguish training from inference
+  hinglish:
+    - AI, ML, DL aur GenAI ko jodna
+    - Training aur inference mein farq karna
+questions:
+  - id: nesting
+    type: single_choice
+    topics: [ai-overview]
+    prompt:
+      en: Which statement is correct?
+      hinglish: Kaunsa statement sahi hai?
+    options:
+      - id: a
+        text:
+          {
+            en: GenAI is a subset of deep learning,
+            which is a subset of ML,
+            hinglish: 'GenAI deep learning ka subset hai, jo ML ka subset hai',
+          }
+      - id: b
+        text: { en: ML is a subset of GenAI, hinglish: ML GenAI ka subset hai }
+      - id: c
+        text:
+          {
+            en: Deep learning and ML are unrelated,
+            hinglish: Deep learning aur ML ka koi rishta nahi,
+          }
+    correctOptionIds: [a]
+    explanation:
+      en: GenAI ⊂ deep learning ⊂ machine learning ⊂ AI.
+      hinglish: GenAI ⊂ deep learning ⊂ machine learning ⊂ AI.
+  - id: api-call-phase
+    type: single_choice
+    topics: [training-inference]
+    prompt:
+      en: When your app sends a prompt to a hosted LLM and gets a reply, which phase is that?
+      hinglish: Jab aapka app hosted LLM ko prompt bhejta hai aur reply milta hai, yeh kaunsa phase hai?
+    options:
+      - id: a
+        text: { en: Training, hinglish: Training }
+      - id: b
+        text: { en: Inference, hinglish: Inference }
+      - id: c
+        text: { en: Fine-tuning, hinglish: Fine-tuning }
+    correctOptionIds: [b]
+    explanation:
+      en: Using a trained model to produce an output is inference. Your request does not update the model's parameters.
+      hinglish: Trained model se output banana inference hai. Aapki request model ke parameters update nahi karti.
+  - id: hyperparameters
+    type: multiple_choice
+    topics: [training-inference]
+    prompt:
+      en: Which of these are hyperparameters (chosen, not learned)?
+      hinglish: Inmein se kaunse hyperparameters hain (chune jaate hain, seekhe nahi)?
+    options:
+      - id: a
+        text: { en: Learning rate, hinglish: Learning rate }
+      - id: b
+        text: { en: The weights of a neural network, hinglish: Neural network ke weights }
+      - id: c
+        text: { en: Sampling temperature, hinglish: Sampling temperature }
+      - id: d
+        text: { en: Number of layers, hinglish: Layers ki ginti }
+    correctOptionIds: [a, c, d]
+    explanation:
+      en: Weights are learned parameters. Learning rate, temperature and architecture choices are hyperparameters.
+      hinglish: Weights seekhe hue parameters hain. Learning rate, temperature aur architecture choices hyperparameters hain.

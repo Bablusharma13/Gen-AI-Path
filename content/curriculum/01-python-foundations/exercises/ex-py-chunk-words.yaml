@@ -1,0 +1,86 @@
+id: ex-py-chunk-words
+version: 1
+status: published
+lessonId: py-functions
+language: python
+topics: [functions, chunking]
+title:
+  en: Write a sliding-window chunker
+  hinglish: Sliding-window chunker likho
+prompt:
+  en: |
+    Write `chunk_words(words, size, overlap=0)` that splits a list of words into chunks.
+
+    - Each chunk has at most `size` words.
+    - Each new chunk starts `size - overlap` words after the previous one.
+    - Stop once a chunk reaches the end of the list (no extra, fully-overlapping chunk).
+    - Raise `ValueError` if `size < 1`, or if `overlap < 0` or `overlap >= size`.
+    - An empty list gives `[]`.
+
+    Example: `chunk_words(list("abcdefg"), 3, 1)` → `[["a","b","c"], ["c","d","e"], ["e","f","g"]]`
+  hinglish: |
+    `chunk_words(words, size, overlap=0)` likho jo words ki list ko chunks mein baante.
+
+    - Har chunk mein zyada se zyada `size` words.
+    - Har naya chunk pichle se `size - overlap` words aage shuru ho.
+    - Jab koi chunk list ke end tak pahunch jaaye to ruk jao (koi extra, poora overlap wala chunk nahi).
+    - `size < 1` ho, ya `overlap < 0` ya `overlap >= size` ho to `ValueError` raise karo.
+    - Khaali list par `[]`.
+
+    Example: `chunk_words(list("abcdefg"), 3, 1)` → `[["a","b","c"], ["c","d","e"], ["e","f","g"]]`
+starterCode: |
+  def chunk_words(words, size, overlap=0):
+      chunks = []
+      # your code here
+      return chunks
+tests:
+  - id: overlap
+    name: overlapping windows
+    code: |
+      assert chunk_words(list("abcdefg"), 3, 1) == [["a", "b", "c"], ["c", "d", "e"], ["e", "f", "g"]]
+  - id: no-overlap
+    name: last chunk may be shorter
+    code: |
+      assert chunk_words(list("abcdefg"), 3) == [["a", "b", "c"], ["d", "e", "f"], ["g"]]
+  - id: exact-fit
+    name: no duplicate trailing chunk
+    code: |
+      assert chunk_words(list("abcd"), 2, 1) == [["a", "b"], ["b", "c"], ["c", "d"]]
+      assert chunk_words(list("abcd"), 4, 2) == [["a", "b", "c", "d"]]
+  - id: empty
+    name: empty input
+    code: |
+      assert chunk_words([], 3, 1) == []
+  - id: invalid
+    name: rejects invalid size and overlap
+    code: |
+      for size, overlap in [(0, 0), (3, 3), (3, -1)]:
+          try:
+              chunk_words(["a"], size, overlap)
+          except ValueError:
+              continue
+          raise AssertionError(f"expected ValueError for size={size}, overlap={overlap}")
+hints:
+  en:
+    - Validate first, then loop with a start index that grows by step = size - overlap
+    - Slice with words[start:start + size]
+    - After appending a chunk, break if start + size >= len(words)
+  hinglish:
+    - Pehle validate karo, phir start index ke saath loop chalao jo step = size - overlap se badhe
+    - words[start:start + size] se slice karo
+    - Chunk append karne ke baad, agar start + size >= len(words) to break karo
+solution: |
+  def chunk_words(words, size, overlap=0):
+      if size < 1:
+          raise ValueError("size must be at least 1")
+      if overlap < 0 or overlap >= size:
+          raise ValueError("overlap must be >= 0 and smaller than size")
+      chunks = []
+      start = 0
+      step = size - overlap
+      while start < len(words):
+          chunks.append(words[start:start + size])
+          if start + size >= len(words):
+              break
+          start += step
+      return chunks

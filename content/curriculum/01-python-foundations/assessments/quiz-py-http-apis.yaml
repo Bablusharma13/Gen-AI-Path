@@ -1,0 +1,87 @@
+id: quiz-py-http-apis
+version: 1
+status: published
+courseId: python-foundations
+lessonId: py-http-apis
+passingPercent: 70
+title:
+  en: 'Check: HTTP APIs and secrets'
+  hinglish: 'Check: HTTP APIs aur secrets'
+objectives:
+  en:
+    - Classify status codes as retryable or not
+    - Handle API keys safely
+  hinglish:
+    - Status codes ko retry layak ya nahi mein baantna
+    - API keys ko safely handle karna
+questions:
+  - id: retry-codes
+    type: multiple_choice
+    topics: [retries, http]
+    prompt:
+      en: Which responses are generally worth retrying after a delay?
+      hinglish: Kaunse responses aam taur par delay ke baad retry karne layak hain?
+    options:
+      - id: a
+        text: { en: 429 Too Many Requests, hinglish: 429 Too Many Requests }
+      - id: b
+        text: { en: 400 Bad Request, hinglish: 400 Bad Request }
+      - id: c
+        text: { en: 503 Service Unavailable, hinglish: 503 Service Unavailable }
+      - id: d
+        text: { en: 401 Unauthorized, hinglish: 401 Unauthorized }
+    correctOptionIds: [a, c]
+    explanation:
+      en: 429 and 5xx are temporary. 400 and 401 will fail the same way until you change the request or credentials.
+      hinglish: 429 aur 5xx temporary hain. 400 aur 401 tab tak waise hi fail honge jab tak request ya credentials na badlo.
+  - id: api-key-location
+    type: single_choice
+    topics: [environment-variables]
+    prompt:
+      en: Where should an API key live in a project?
+      hinglish: Project mein API key kahan rehni chahiye?
+    options:
+      - id: a
+        text:
+          { en: In a constant at the top of main.py, hinglish: main.py ke upar ek constant mein }
+      - id: b
+        text:
+          {
+            en: 'In an environment variable (for example from a .env file excluded from Git)',
+            hinglish: 'Environment variable mein (jaise .env file se jo Git se excluded ho)',
+          }
+      - id: c
+        text:
+          {
+            en: In the README so teammates can find it,
+            hinglish: README mein taaki teammates dhoondh sakein,
+          }
+    correctOptionIds: [b]
+    explanation:
+      en: Code and docs get shared and committed. Environment variables keep secrets out of version control.
+      hinglish: Code aur docs share aur commit hote hain. Environment variables secrets ko version control se bahar rakhte hain.
+  - id: why-backoff
+    type: short_text
+    topics: [retries]
+    prompt:
+      en: Why use exponential backoff instead of retrying immediately?
+      hinglish: Turant retry karne ki jagah exponential backoff kyun use karte hain?
+    rubric:
+      - id: give-time
+        idea:
+          en: It gives the overloaded or rate-limited server time to recover
+          hinglish: Overloaded ya rate-limited server ko recover hone ka time milta hai
+        anyOf:
+          [time, recover, overload, overloaded, rate limit, rate-limited, wait, load, samay, ruk]
+      - id: avoid-worse
+        idea:
+          en: Immediate retries add more load and make the problem (and cost) worse
+          hinglish: Turant retries load badhaate hain aur problem (aur cost) ko badtar banaate hain
+        anyOf: [worse, more load, more requests, hammer, flood, spam, cost, waste, badhta, zyada]
+    requiredGroups: 1
+    sampleAnswer:
+      en: Waiting longer between attempts gives a rate-limited or overloaded server time to recover, while immediate retries just add load and make things worse.
+      hinglish: Attempts ke beech zyada rukne se rate-limited ya overloaded server ko recover hone ka time milta hai, jabki turant retries sirf load badhaate hain.
+    explanation:
+      en: Backoff (plus jitter) spreads retries out, which is better for you and for the provider.
+      hinglish: Backoff (aur jitter) retries ko phaila deta hai, jo aapke aur provider dono ke liye behtar hai.

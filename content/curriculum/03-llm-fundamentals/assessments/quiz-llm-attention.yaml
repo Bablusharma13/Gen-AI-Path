@@ -1,0 +1,119 @@
+id: quiz-llm-attention
+version: 1
+status: published
+courseId: llm-fundamentals
+lessonId: llm-attention
+passingPercent: 70
+title:
+  en: 'Check: self-attention'
+  hinglish: 'Check: self-attention'
+objectives:
+  en:
+    - Explain queries, keys, values, scaling, causal masking and cost
+  hinglish:
+    - Queries, keys, values, scaling, causal masking aur cost samjhana
+questions:
+  - id: weights-from
+    type: single_choice
+    topics: [attention]
+    prompt:
+      en: In self-attention, what determines how much token A attends to token B?
+      hinglish: Self-attention mein kya tay karta hai ki token A token B ko kitna attend karega?
+    options:
+      - id: a
+        text:
+          en: The dot product of A's query with B's key, after scaling and softmax
+          hinglish: A ki query ka B ki key ke saath dot product, scaling aur softmax ke baad
+      - id: b
+        text:
+          en: The distance between A and B in the sentence only
+          hinglish: Sirf sentence mein A aur B ke beech ki doori
+      - id: c
+        text:
+          en: The dot product of A's value with B's value
+          hinglish: A ki value ka B ki value ke saath dot product
+    correctOptionIds: [a]
+    explanation:
+      en: Queries and keys produce the scores; values are what gets mixed using those weights.
+      hinglish: Queries aur keys scores banati hain; values woh hain jo un weights se milaye jaate hain.
+  - id: causal
+    type: single_choice
+    topics: [attention, transformers]
+    prompt:
+      en: Why do decoder (GPT-style) models use a causal mask?
+      hinglish: Decoder (GPT-style) models causal mask kyun use karte hain?
+    options:
+      - id: a
+        text:
+          en: To make attention faster on GPUs
+          hinglish: GPUs par attention tez karne ke liye
+      - id: b
+        text:
+          en: So a token cannot use tokens that come after it, matching left-to-right generation
+          hinglish: Taaki token apne baad aane wale tokens use na kar sake, left-to-right generation ke hisaab se
+      - id: c
+        text:
+          en: To hide private data from the model
+          hinglish: Model se private data chhupane ke liye
+    correctOptionIds: [b]
+    explanation:
+      en: During generation future tokens do not exist yet, so training must not let tokens look ahead.
+      hinglish: Generation ke time future tokens abhi bane hi nahi, isliye training mein tokens ko aage dekhne nahi diya jaata.
+  - id: cost
+    type: single_choice
+    topics: [attention, transformers]
+    prompt:
+      en: Roughly how does the attention computation grow when the sequence length doubles?
+      hinglish: Sequence length double hone par attention computation lagbhag kaise badhta hai?
+    options:
+      - id: a
+        text:
+          en: It stays the same
+          hinglish: Waisa hi rehta hai
+      - id: b
+        text:
+          en: It doubles
+          hinglish: Double hota hai
+      - id: c
+        text:
+          en: It roughly quadruples
+          hinglish: Lagbhag chaar guna hota hai
+    correctOptionIds: [c]
+    explanation:
+      en: Every token is compared with every other token, so the number of scores grows with n².
+      hinglish: Har token har doosre token se compare hota hai, isliye scores ki sankhya n² ke saath badhti hai.
+  - id: scaling-why
+    explanation:
+      en: Without scaling, large dot products push softmax towards one-hot weights and make training unstable.
+      hinglish: Scaling ke bina bade dot products softmax ko one-hot weights ki taraf dhakelte hain aur training unstable banate hain.
+    type: short_text
+    topics: [attention]
+    prompt:
+      en: Why are attention scores divided by √d before the softmax?
+      hinglish: Softmax se pehle attention scores ko √d se divide kyun kiya jaata hai?
+    rubric:
+      - id: keeps-range
+        idea:
+          en: Dot products grow with the vector size; scaling keeps the scores in a range where softmax is not too peaked
+          hinglish: Dot products vector size ke saath badhte hain; scaling scores ko aisi range mein rakhti hai jahan softmax bahut nukeela na ho
+        anyOf:
+          [
+            large,
+            larger,
+            grow,
+            big,
+            range,
+            peaked,
+            sharp,
+            saturate,
+            stable,
+            stability,
+            extreme,
+            one-hot,
+            dimension,
+            bade,
+            nukeela,
+          ]
+    sampleAnswer:
+      en: Dot products get larger as the dimension grows; dividing by √d keeps the scores in a sensible range so the softmax does not become almost one-hot.
+      hinglish: Dimension badhne par dot products bade hote jaate hain; √d se divide karne se scores theek range mein rehte hain aur softmax lagbhag one-hot nahi banta.

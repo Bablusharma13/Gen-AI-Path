@@ -1,0 +1,175 @@
+id: py-control-flow
+slug: conditions-and-loops
+version: 1
+status: published
+estimatedMinutes: 25
+prerequisites: [py-variables-types]
+topics: [python-basics, control-flow]
+title:
+  en: Conditions and loops
+  hinglish: Conditions aur loops
+summary:
+  en: Make decisions with if/elif/else and repeat work with for and while loops.
+  hinglish: if/elif/else se decisions lo aur for/while loops se kaam repeat karo.
+objectives:
+  en:
+    - Write if/elif/else chains that cover every case
+    - Loop over sequences with for, and with ranges
+    - Use while loops with a guaranteed exit condition
+    - Control loops with break and continue
+  hinglish:
+    - Aisi if/elif/else chains likhna jo har case cover karein
+    - for se sequences aur ranges par loop chalana
+    - Aise while loops likhna jinka exit condition pakka ho
+    - break aur continue se loops control karna
+sections:
+  explanation:
+    en: |
+      Programs need to **decide** and to **repeat**.
+
+      **Decisions** use `if`, `elif` and `else`. Python checks conditions top to bottom and runs
+      the first block whose condition is true:
+
+      ```python
+      if temperature <= 0.3:
+          style = "focused"
+      elif temperature <= 1.0:
+          style = "balanced"
+      else:
+          style = "creative"
+      ```
+
+      Indentation is not decoration in Python — it *defines* which lines belong to the block.
+
+      **Loops** repeat work. A `for` loop walks over any sequence (a list, a string, a range):
+      `for doc in documents:` or `for i in range(3):`. A `while` loop repeats *as long as* a
+      condition is true — perfect for "retry until it works or we give up", but it **must** have a
+      way to stop, or it runs forever.
+
+      `break` exits a loop immediately; `continue` skips to the next iteration. Combined with a
+      counter, they let you write safe retry loops — a pattern you will use for every AI API call.
+    hinglish: |
+      Programs ko **decide** karna hota hai aur kaam **repeat** karna hota hai.
+
+      **Decisions** ke liye `if`, `elif` aur `else`. Python upar se neeche conditions check karta
+      hai aur jis pehle block ki condition true ho, wahi run karta hai:
+
+      ```python
+      if temperature <= 0.3:
+          style = "focused"
+      elif temperature <= 1.0:
+          style = "balanced"
+      else:
+          style = "creative"
+      ```
+
+      Python mein indentation sajawat nahi hai — wahi *decide* karta hai ki kaunsi line kis block
+      mein hai.
+
+      **Loops** kaam repeat karte hain. `for` loop kisi bhi sequence (list, string, range) par
+      chalta hai: `for doc in documents:` ya `for i in range(3):`. `while` loop tab tak chalta hai
+      *jab tak* condition true hai — "kaam hone tak retry karo, warna haar maan lo" ke liye perfect,
+      lekin uska rukne ka raasta **zaroor** hona chahiye, warna woh hamesha chalta rahega.
+
+      `break` loop se turant bahar nikalta hai; `continue` agle iteration par chala jaata hai.
+      Counter ke saath milkar ye safe retry loops banate hain — yeh pattern aap har AI API call
+      ke liye use karoge.
+  analogy:
+    en: |
+      `if/elif/else` is a **railway junction**: the train takes exactly one track. A `for` loop is
+      a **conveyor belt** — each item passes once. A `while` loop is a **washing machine cycle**
+      that runs until a condition (clean clothes or a timer) says stop. A machine without a timer
+      floods the house.
+    hinglish: |
+      `if/elif/else` ek **railway junction** hai: train sirf ek track leti hai. `for` loop ek
+      **conveyor belt** hai — har item ek baar guzarta hai. `while` loop **washing machine ka
+      cycle** hai jo tab tak chalta hai jab tak condition (saaf kapde ya timer) rukne ko na kahe.
+      Bina timer wali machine ghar mein baadh le aati hai.
+  guidedExercise:
+    en: |
+      1. Write the temperature-to-style `if/elif/else` from above and test it with 0, 0.7 and 1.5.
+      2. Loop over `["intro", "body", "outro"]` and print each section with its index using `enumerate`.
+      3. Write a `while` loop that "retries" up to 3 times and prints `attempt 1`, `attempt 2`, `attempt 3`.
+      4. Add `break` so the loop stops early when `attempt == 2` (pretend it succeeded).
+    hinglish: |
+      1. Upar wala temperature-to-style `if/elif/else` likho aur 0, 0.7 aur 1.5 se test karo.
+      2. `["intro", "body", "outro"]` par loop chalao aur `enumerate` se index ke saath print karo.
+      3. Ek `while` loop likho jo 3 baar tak "retry" kare aur `attempt 1`, `attempt 2`, `attempt 3` print kare.
+      4. `break` add karo taaki `attempt == 2` par loop jaldi ruk jaaye (maan lo success mil gaya).
+  challenge:
+    en: |
+      Given a list of token counts per message, loop through it and stop adding messages once the
+      running total would exceed a budget of 1,000 tokens. Print how many messages fit.
+    hinglish: |
+      Har message ke token counts ki list di gayi hai. Uspar loop chalao aur jaise hi running total
+      1,000 tokens ke budget se upar jaane wala ho, messages add karna band karo. Print karo kitne
+      messages fit hue.
+  commonMistakes:
+    en:
+      - Forgetting the colon after if/for/while lines
+      - Mixing tabs and spaces, or mis-indenting a line so it leaves the block
+      - While loops with no exit (the condition never becomes False)
+      - Checking a broad condition before a narrow one, so the narrow branch never runs
+    hinglish:
+      - if/for/while line ke baad colon bhool jaana
+      - Tabs aur spaces mix karna, ya galat indentation se line block se bahar ho jaana
+      - Bina exit wale while loops (condition kabhi False nahi hoti)
+      - Narrow condition se pehle broad condition check karna, jisse narrow branch kabhi chalti hi nahi
+  projectApplication:
+    en: |
+      The API Assistant retries failed requests in a loop with a maximum attempt count and decides
+      whether an error is worth retrying with if/elif — exactly the patterns from this lesson.
+    hinglish: |
+      API Assistant failed requests ko maximum attempt count ke saath loop mein retry karta hai aur
+      if/elif se decide karta hai ki error retry karne layak hai ya nahi — bilkul isi lesson ke patterns.
+  summary:
+    en:
+      - if/elif/else picks exactly one branch, checked top to bottom
+      - for loops walk over sequences; range() generates numbers
+      - while loops need a guaranteed way to stop
+      - break exits, continue skips — both keep retry loops safe and readable
+    hinglish:
+      - if/elif/else upar se neeche check karke exactly ek branch chunta hai
+      - for loops sequences par chalte hain; range() numbers generate karta hai
+      - while loops ka rukna pakka hona chahiye
+      - break bahar nikalta hai, continue skip karta hai — dono retry loops ko safe aur readable rakhte hain
+codeExamples:
+  - id: py-retry-loop
+    title:
+      en: A bounded retry loop
+      hinglish: Bounded retry loop
+    variants:
+      python: |
+        import random
+
+        MAX_ATTEMPTS = 3
+        attempt = 0
+        succeeded = False
+
+        while attempt < MAX_ATTEMPTS:
+            attempt += 1
+            ok = random.random() > 0.5  # pretend this is an API call
+            print(f"attempt {attempt}: {'ok' if ok else 'failed'}")
+            if ok:
+                succeeded = True
+                break
+
+        if not succeeded:
+            print("Giving up after", MAX_ATTEMPTS, "attempts")
+      typescript: |
+        const MAX_ATTEMPTS = 3;
+        let succeeded = false;
+
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+          const ok = Math.random() > 0.5; // pretend this is an API call
+          console.log(`attempt ${attempt}: ${ok ? "ok" : "failed"}`);
+          if (ok) {
+            succeeded = true;
+            break;
+          }
+        }
+
+        if (!succeeded) console.log("Giving up after", MAX_ATTEMPTS, "attempts");
+exerciseIds: [ex-py-classify-temperature]
+assessmentId: quiz-py-control-flow
+relatedLessonIds: [py-http-apis]

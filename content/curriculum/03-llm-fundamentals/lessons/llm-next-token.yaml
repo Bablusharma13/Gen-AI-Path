@@ -1,0 +1,187 @@
+id: llm-next-token
+slug: next-token-generation
+version: 1
+status: published
+estimatedMinutes: 30
+prerequisites: [llm-tokens-context]
+topics: [next-token-prediction, sampling-temperature, hallucination]
+title:
+  en: How generation works — next-token prediction and temperature
+  hinglish: Generation kaise kaam karta hai — next-token prediction aur temperature
+summary:
+  en: An LLM writes one token at a time by turning scores into probabilities and picking from them. Understanding this explains temperature, stop reasons, streaming and why fluent text can still be wrong.
+  hinglish: LLM ek baar mein ek token likhta hai — scores ko probabilities mein badal kar unmein se chunta hai. Isse temperature, stop reasons, streaming aur fluent text bhi galat kyun ho sakta hai, sab samajh aata hai.
+objectives:
+  en:
+    - Describe the generation loop — predict, pick, append, repeat
+    - Convert logits to probabilities with softmax
+    - Explain greedy decoding, sampling and the effect of temperature
+    - Explain stop reasons such as end of turn and the output-token limit
+  hinglish:
+    - Generation loop samjhana — predict, chuno, jodo, dohrao
+    - Softmax se logits ko probabilities mein badalna
+    - Greedy decoding, sampling aur temperature ka asar samjhana
+    - End of turn aur output-token limit jaise stop reasons samjhana
+sections:
+  explanation:
+    en: |
+      Given the tokens so far, the model outputs a **score (logit)** for every token in its
+      vocabulary. **Softmax** turns these scores into probabilities that add up to 1:
+
+      `p_i = exp(z_i / T) / Σ_j exp(z_j / T)`
+
+      Then one token is **picked**, appended to the text, and the whole step repeats. This loop is why
+      answers can be **streamed** — each token is available as soon as it is chosen.
+
+      How the token is picked:
+
+      - **Greedy decoding** always takes the most probable token. Repeatable, but can be dull or
+        repetitive.
+      - **Sampling** draws a token according to the probabilities, so less likely tokens sometimes
+        appear. Variants such as top-k and top-p only sample from the most likely candidates.
+      - **Temperature `T`** reshapes the distribution: `T < 1` makes it sharper (more predictable),
+        `T > 1` flatter (more varied). Some newer models fix or ignore sampling parameters, so check
+        the provider's documentation rather than assuming they exist.
+
+      Generation stops when the model emits an **end-of-turn** token, hits a **stop sequence**, or
+      reaches the **maximum output tokens** you allowed. APIs report this as a *stop reason*. If it
+      says the limit was reached, the answer is **truncated** — your application should notice and
+      handle it instead of treating it as complete.
+
+      Crucially, the model chooses what is *likely*, not what is *true*. A confident, fluent sentence
+      is simply a high-probability one. That is the root of **hallucination**, and why grounding,
+      validation and evaluation are needed.
+    hinglish: |
+      Ab tak ke tokens dekhkar model apni vocabulary ke har token ke liye ek **score (logit)** deta
+      hai. **Softmax** in scores ko aisi probabilities mein badalta hai jinka total 1 ho:
+
+      `p_i = exp(z_i / T) / Σ_j exp(z_j / T)`
+
+      Phir ek token **chuna** jaata hai, text mein joda jaata hai, aur poora step dohraya jaata hai.
+      Isi loop ki wajah se answers **stream** ho sakte hain — har token chunte hi available hota hai.
+
+      Token kaise chuna jaata hai:
+
+      - **Greedy decoding** hamesha sabse probable token leta hai. Repeatable, par boring ya
+        repetitive ho sakta hai.
+      - **Sampling** probabilities ke hisaab se token nikalta hai, isliye kam probable tokens bhi
+        kabhi-kabhi aate hain. Top-k aur top-p jaise variants sirf sabse likely candidates mein se
+        sample karte hain.
+      - **Temperature `T`** distribution ki shape badalta hai: `T < 1` use tez (zyada predictable),
+        `T > 1` chapta (zyada varied) banata hai. Kuch naye models sampling parameters fix ya ignore
+        karte hain, isliye maan kar mat chalo — provider ki documentation dekho.
+
+      Generation tab rukta hai jab model **end-of-turn** token de, koi **stop sequence** aaye, ya
+      aapke diye **maximum output tokens** poore ho jaayein. APIs ise *stop reason* ke roop mein
+      batati hain. Agar limit poori hui, to answer **truncated** hai — application ko yeh pakad kar
+      sambhalna chahiye, use poora answer nahi maanna chahiye.
+
+      Sabse zaroori baat: model *probable* chunta hai, *sach* nahi. Confident, fluent sentence bas
+      high-probability sentence hai. Yahi **hallucination** ki jad hai, aur isi liye grounding,
+      validation aur evaluation chahiye.
+  analogy:
+    en: |
+      Autocomplete on your phone suggests the next word. An LLM is autocomplete with an enormous
+      vocabulary and a very long memory of the text so far — run again and again, one token at a time.
+      Temperature is how adventurous you let it be when choosing.
+    hinglish: |
+      Phone ka autocomplete agla word suggest karta hai. LLM ek bahut badi vocabulary aur ab tak ke
+      text ki lambi yaaddasht wala autocomplete hai — baar-baar, ek-ek token karke chalaya gaya.
+      Temperature batata hai ki chunte waqt use kitna adventurous hone dete ho.
+  guidedExercise:
+    en: |
+      1. Run the code example and compare the probabilities at T=0.5, 1.0 and 2.0.
+      2. Set every logit to the same value. What do the probabilities become, and does temperature
+         still matter?
+      3. Change the seed and sample again. Do the counts stay close to the probabilities?
+    hinglish: |
+      1. Code example chalao aur T=0.5, 1.0 aur 2.0 par probabilities compare karo.
+      2. Saare logits ki value barabar kar do. Probabilities kya ho jaati hain, aur kya temperature ab
+         bhi matter karta hai?
+      3. Seed badal kar dobara sample karo. Kya counts probabilities ke kareeb rehte hain?
+  challenge:
+    en: |
+      Implement top-k sampling: keep only the k highest-probability tokens, renormalise their
+      probabilities so they sum to 1, and sample from those. What happens with k = 1?
+    hinglish: |
+      Top-k sampling implement karo: sirf k sabse zyada probability wale tokens rakho, unki
+      probabilities ko renormalise karo taaki total 1 ho, aur unhi mein se sample karo. k = 1 par kya
+      hota hai?
+  commonMistakes:
+    en:
+      - Treating a fluent, confident answer as evidence that it is correct
+      - Using temperature to "fix" hallucinations — it changes variety, not truthfulness
+      - Ignoring a max-tokens stop reason and showing a cut-off answer as complete
+      - Computing softmax without subtracting the maximum, which overflows for large scores
+    hinglish:
+      - Fluent, confident answer ko sahi hone ka saboot maan lena
+      - Hallucinations "theek" karne ke liye temperature use karna — yeh variety badalta hai, sachchai nahi
+      - Max-tokens stop reason ignore karke kata hua answer poora dikhana
+      - Maximum subtract kiye bina softmax nikaalna, jo bade scores par overflow karta hai
+  projectApplication:
+    en: |
+      The AI Mentor here marks answers that hit the output limit as "truncated" instead of pretending
+      they are complete. You will handle stop reasons the same way in the Python API Assistant project.
+    hinglish: |
+      Yahan ka AI Mentor output limit tak pahunche answers ko "truncated" mark karta hai, unhe poora
+      hone ka dikhawa nahi karta. Python API Assistant project mein aap bhi stop reasons isi tarah
+      sambhaloge.
+  summary:
+    en:
+      - The model scores every possible next token; softmax turns scores into probabilities
+      - Greedy picks the top token; sampling draws by probability; temperature reshapes the distribution
+      - Generation stops at end of turn, a stop sequence or the output-token limit
+      - Models pick likely text, not verified facts
+    hinglish:
+      - Model har possible agle token ko score karta hai; softmax scores ko probabilities banata hai
+      - Greedy top token leta hai; sampling probability se nikalta hai; temperature distribution ki shape badalta hai
+      - Generation end of turn, stop sequence ya output-token limit par rukta hai
+      - Models likely text chunte hain, verified facts nahi
+codeExamples:
+  - id: softmax-temperature
+    title:
+      en: Softmax, temperature, greedy and sampling
+      hinglish: Softmax, temperature, greedy aur sampling
+    description:
+      en: Toy logits for four candidate tokens. A real model scores its whole vocabulary at every step.
+      hinglish: Chaar candidate tokens ke toy logits. Asli model har step par apni poori vocabulary score karta hai.
+    variants:
+      python: |
+        import math
+        import random
+
+        # Toy scores (logits) for the next token after "The capital of India is".
+        candidates = [" New", " Delhi", " Mumbai", " a"]
+        logits = [4.0, 2.5, 1.0, 0.5]
+
+
+        def softmax(scores, temperature=1.0):
+            scaled = [s / temperature for s in scores]
+            top = max(scaled)  # subtract the max so exp() never overflows
+            exps = [math.exp(s - top) for s in scaled]
+            total = sum(exps)
+            return [e / total for e in exps]
+
+
+        for t in (0.5, 1.0, 2.0):
+            probs = softmax(logits, t)
+            row = "  ".join(f"{c.strip():>6}={p:.2f}" for c, p in zip(candidates, probs))
+            print(f"T={t}: {row}")
+
+        greedy = candidates[logits.index(max(logits))]
+        print(f"greedy pick: {greedy.strip()!r}")
+
+        random.seed(42)
+        probs = softmax(logits, 1.0)
+        samples = random.choices(candidates, weights=probs, k=1000)
+        counts = {c.strip(): samples.count(c) for c in candidates}
+        print(f"1000 samples at T=1.0: {counts}")
+    expectedOutput: |
+      T=0.5:    New=0.95   Delhi=0.05  Mumbai=0.00       a=0.00
+      T=1.0:    New=0.77   Delhi=0.17  Mumbai=0.04       a=0.02
+      T=2.0:    New=0.53   Delhi=0.25  Mumbai=0.12       a=0.09
+      greedy pick: 'New'
+      1000 samples at T=1.0: {'New': 763, 'Delhi': 164, 'Mumbai': 46, 'a': 27}
+exerciseIds: [ex-llm-softmax-temperature]
+assessmentId: quiz-llm-next-token
+relatedLessonIds: [llm-tokens-context, llm-attention]

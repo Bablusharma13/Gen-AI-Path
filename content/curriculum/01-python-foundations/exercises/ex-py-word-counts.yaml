@@ -1,0 +1,87 @@
+id: ex-py-word-counts
+version: 1
+status: published
+lessonId: py-collections
+language: python
+topics: [collections]
+title:
+  en: Count words and find the most common ones
+  hinglish: Words count karo aur sabse common words dhoondo
+prompt:
+  en: |
+    Implement two functions:
+
+    1. `count_words(text)` → a dict mapping each word to its count.
+       - Lowercase everything.
+       - Split on whitespace.
+       - Strip these characters from both ends of each word: `.,!?;:"'()`
+       - Ignore words that become empty.
+    2. `top_words(counts, n)` → a list of the `n` most common `(word, count)` tuples, sorted by
+       count (highest first) and, for equal counts, alphabetically.
+  hinglish: |
+    Do functions banao:
+
+    1. `count_words(text)` → ek dict jo har word ko uske count se map kare.
+       - Sab kuch lowercase karo.
+       - Whitespace par split karo.
+       - Har word ke dono sides se ye characters hatao: `.,!?;:"'()`
+       - Jo words khaali ho jaayein unhe ignore karo.
+    2. `top_words(counts, n)` → `n` sabse common `(word, count)` tuples ki list, count ke hisaab se
+       (sabse zyada pehle) aur barabar count par alphabetically sorted.
+starterCode: |
+  def count_words(text):
+      counts = {}
+      # your code here
+      return counts
+
+
+  def top_words(counts, n):
+      pass
+tests:
+  - id: basic-count
+    name: counts lowercase words
+    code: |
+      assert count_words("RAG rag Rag tokens") == {"rag": 3, "tokens": 1}
+  - id: punctuation
+    name: strips punctuation at word edges
+    code: |
+      assert count_words('Hello, world! "Hello" (world).') == {"hello": 2, "world": 2}
+  - id: empty
+    name: handles empty and punctuation-only text
+    code: |
+      assert count_words("") == {}
+      assert count_words(" ... !! ") == {}
+  - id: top
+    name: sorts by count, then alphabetically
+    code: |
+      counts = {"b": 2, "a": 2, "c": 5, "d": 1}
+      assert top_words(counts, 3) == [("c", 5), ("a", 2), ("b", 2)]
+  - id: top-n-larger
+    name: works when n exceeds the number of words
+    code: |
+      assert top_words({"x": 1}, 10) == [("x", 1)]
+hints:
+  en:
+    - word.strip('.,!?;:"\'()') removes those characters from both ends
+    - counts.get(word, 0) + 1 avoids a KeyError for new words
+    - 'sorted(counts.items(), key=lambda item: (-item[1], item[0])) sorts by count desc, then word'
+  hinglish:
+    - word.strip('.,!?;:"\'()') un characters ko dono taraf se hata deta hai
+    - counts.get(word, 0) + 1 naye words par KeyError se bachata hai
+    - 'sorted(counts.items(), key=lambda item: (-item[1], item[0])) count desc, phir word se sort karta hai'
+solution: |
+  PUNCTUATION = ".,!?;:\"'()"
+
+
+  def count_words(text):
+      counts = {}
+      for raw in text.lower().split():
+          word = raw.strip(PUNCTUATION)
+          if word:
+              counts[word] = counts.get(word, 0) + 1
+      return counts
+
+
+  def top_words(counts, n):
+      ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+      return ranked[:n]

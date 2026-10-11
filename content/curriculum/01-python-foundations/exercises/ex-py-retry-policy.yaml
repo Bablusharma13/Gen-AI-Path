@@ -1,0 +1,90 @@
+id: ex-py-retry-policy
+version: 1
+status: published
+lessonId: py-http-apis
+language: python
+topics: [retries, http]
+title:
+  en: Write a retry policy
+  hinglish: Retry policy likho
+prompt:
+  en: |
+    Implement two small functions used by a robust API client:
+
+    1. `should_retry(status_code, attempt, max_attempts=3)` → `True` only if the status is
+       retryable (**408, 429, 500, 502, 503, 504**) **and** `attempt + 1 < max_attempts`
+       (`attempt` counts from 0, so with 3 attempts you may retry after attempts 0 and 1).
+    2. `backoff_seconds(attempt, base=1.0, cap=30.0)` → `base * 2 ** attempt`, but never more than
+       `cap`. Raise `ValueError` for a negative `attempt`.
+  hinglish: |
+    Ek robust API client ke liye do chhote functions banao:
+
+    1. `should_retry(status_code, attempt, max_attempts=3)` → `True` sirf tab jab status retry
+       layak ho (**408, 429, 500, 502, 503, 504**) **aur** `attempt + 1 < max_attempts`
+       (`attempt` 0 se ginti hai, to 3 attempts mein attempts 0 aur 1 ke baad retry kar sakte ho).
+    2. `backoff_seconds(attempt, base=1.0, cap=30.0)` → `base * 2 ** attempt`, lekin `cap` se zyada
+       kabhi nahi. Negative `attempt` par `ValueError` raise karo.
+starterCode: |
+  RETRYABLE = {408, 429, 500, 502, 503, 504}
+
+
+  def should_retry(status_code, attempt, max_attempts=3):
+      pass
+
+
+  def backoff_seconds(attempt, base=1.0, cap=30.0):
+      pass
+tests:
+  - id: retryable
+    name: retries rate limits and server errors
+    code: |
+      for code in (408, 429, 500, 502, 503, 504):
+          assert should_retry(code, 0) is True, code
+  - id: not-retryable
+    name: never retries client errors or success
+    code: |
+      for code in (200, 400, 401, 403, 404, 422):
+          assert should_retry(code, 0) is False, code
+  - id: attempt-limit
+    name: respects max_attempts
+    code: |
+      assert should_retry(503, 1, max_attempts=3) is True
+      assert should_retry(503, 2, max_attempts=3) is False
+      assert should_retry(429, 0, max_attempts=1) is False
+  - id: backoff
+    name: grows exponentially and is capped
+    code: |
+      assert backoff_seconds(0) == 1.0
+      assert backoff_seconds(3) == 8.0
+      assert backoff_seconds(10) == 30.0
+      assert backoff_seconds(2, base=0.5, cap=10) == 2.0
+  - id: negative
+    name: rejects negative attempts
+    code: |
+      try:
+          backoff_seconds(-1)
+      except ValueError:
+          pass
+      else:
+          raise AssertionError("expected ValueError")
+hints:
+  en:
+    - status_code in RETRYABLE checks membership in a set
+    - Combine both conditions with and
+    - min(cap, base * 2 ** attempt) applies the cap
+  hinglish:
+    - status_code in RETRYABLE set mein membership check karta hai
+    - Dono conditions ko and se jodo
+    - min(cap, base * 2 ** attempt) cap laga deta hai
+solution: |
+  RETRYABLE = {408, 429, 500, 502, 503, 504}
+
+
+  def should_retry(status_code, attempt, max_attempts=3):
+      return status_code in RETRYABLE and attempt + 1 < max_attempts
+
+
+  def backoff_seconds(attempt, base=1.0, cap=30.0):
+      if attempt < 0:
+          raise ValueError("attempt must be >= 0")
+      return float(min(cap, base * 2 ** attempt))

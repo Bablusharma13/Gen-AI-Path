@@ -1,0 +1,61 @@
+id: agents-tool-calling
+slug: agents-tool-calling
+version: 1
+status: published
+level: 10
+order: 0
+tracks: [A, B, D]
+requiredForTracks: [B]
+likelyKnownBy: []
+estimatedHours: 3
+prerequisites: [llm-fundamentals]
+title:
+  en: AI Agents and Tool Calling — Safely
+  hinglish: AI Agents aur Tool Calling — Safely
+summary:
+  en: How a model asks your code to run a tool, how your code validates and executes it, and how to wrap the loop in guard rails — budgets, allow-lists and human approval — so an agent cannot do damage.
+  hinglish: Model aapke code se tool chalane ko kaise kehta hai, aapka code use kaise validate karke chalata hai, aur loop ko guard rails mein kaise lapetna hai — budgets, allow-lists aur human approval — taaki agent nuksaan na kar sake.
+description:
+  en: |
+    "Agent" usually means a loop: the model decides which tool to call, your application runs it,
+    the result goes back to the model, and this repeats until the model answers. The model never
+    executes anything itself — your code does. That makes the safety of an agent an engineering
+    problem you control: which tools exist, how arguments are validated, how many steps are allowed,
+    and which actions need a person to approve them. Every example here runs without an AI provider,
+    using a scripted stand-in for the model so you can see each step.
+  hinglish: |
+    "Agent" ka aamtaur par matlab ek loop hai: model tay karta hai kaunsa tool call karna hai, aapki
+    application use chalati hai, result model ko wapas jaata hai, aur yeh tab tak chalta hai jab tak
+    model answer na de. Model khud kuch execute nahi karta — aapka code karta hai. Isliye agent ki
+    safety ek engineering problem hai jo aapke haath mein hai: kaunse tools hain, arguments kaise
+    validate hote hain, kitne steps allowed hain, aur kin actions ke liye insaan ki approval chahiye.
+    Yahan ka har example bina AI provider ke chalta hai, model ki jagah ek scripted stand-in ke saath,
+    taaki aap har step dekh sako.
+outcomes:
+  en:
+    - Explain the tool-calling loop and who executes what
+    - Validate tool arguments in code before running anything
+    - Build an agent loop with a step budget, an allow-list and an approval gate
+    - Decide which actions need human approval and why
+  hinglish:
+    - Tool-calling loop samjhana aur kaun kya execute karta hai
+    - Kuch bhi chalane se pehle tool arguments ko code mein validate karna
+    - Step budget, allow-list aur approval gate ke saath agent loop banana
+    - Tay karna ki kin actions ko human approval chahiye aur kyun
+modules:
+  - id: agents-tools
+    title:
+      en: Tool calling
+      hinglish: Tool calling
+    summary:
+      en: Tool schemas, tool calls, validation and results.
+      hinglish: Tool schemas, tool calls, validation aur results.
+    lessonIds: [agent-tool-calling]
+  - id: agents-safety
+    title:
+      en: Safe agent loops
+      hinglish: Safe agent loops
+    summary:
+      en: Budgets, allow-lists, approvals and traces.
+      hinglish: Budgets, allow-lists, approvals aur traces.
+    lessonIds: [agent-safe-loop]

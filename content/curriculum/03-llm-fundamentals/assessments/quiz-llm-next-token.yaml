@@ -1,0 +1,120 @@
+id: quiz-llm-next-token
+version: 1
+status: published
+courseId: llm-fundamentals
+lessonId: llm-next-token
+passingPercent: 70
+title:
+  en: 'Check: next-token generation and temperature'
+  hinglish: 'Check: next-token generation aur temperature'
+objectives:
+  en:
+    - Explain how a model picks tokens and what temperature and stop reasons mean
+  hinglish:
+    - Samjhana ki model tokens kaise chunta hai aur temperature aur stop reasons ka matlab
+questions:
+  - id: low-temperature
+    type: single_choice
+    topics: [sampling-temperature]
+    prompt:
+      en: What does lowering the temperature (for example from 1.0 to 0.3) do?
+      hinglish: Temperature kam karne se (jaise 1.0 se 0.3) kya hota hai?
+    options:
+      - id: a
+        text:
+          en: Makes the distribution sharper, so the most likely tokens are chosen more often
+          hinglish: Distribution ko tez banata hai, isliye sabse likely tokens zyada baar chune jaate hain
+      - id: b
+        text:
+          en: Makes the model check facts more carefully
+          hinglish: Model ko facts zyada dhyaan se check karwata hai
+      - id: c
+        text:
+          en: Makes the answers longer
+          hinglish: Answers ko lamba banata hai
+    correctOptionIds: [a]
+    explanation:
+      en: Temperature reshapes the probabilities. It does not add any fact checking.
+      hinglish: Temperature probabilities ki shape badalta hai. Isse koi fact checking nahi judti.
+  - id: max-tokens
+    type: single_choice
+    topics: [next-token-prediction]
+    prompt:
+      en: The API reports that generation stopped because it reached the maximum output tokens. What should the application do?
+      hinglish: API batati hai ki generation maximum output tokens tak pahunch kar ruka. Application ko kya karna chahiye?
+    options:
+      - id: a
+        text:
+          en: Show the answer as complete — the model always finishes its thought
+          hinglish: Answer ko poora dikhao — model hamesha apni baat poori karta hai
+      - id: b
+        text:
+          en: Treat the answer as truncated and tell the user or continue
+          hinglish: Answer ko truncated maano aur user ko batao ya continue karo
+      - id: c
+        text:
+          en: Retry the same request with a higher temperature
+          hinglish: Wahi request zyada temperature ke saath retry karo
+    correctOptionIds: [b]
+    explanation:
+      en: Hitting the limit means the text was cut off; presenting it as complete would be misleading.
+      hinglish: Limit tak pahunchna matlab text kat gaya; use poora dikhana gumraah karna hoga.
+  - id: greedy
+    type: single_choice
+    topics: [next-token-prediction]
+    prompt:
+      en: What does greedy decoding do at each step?
+      hinglish: Greedy decoding har step par kya karta hai?
+    options:
+      - id: a
+        text:
+          en: Picks a random token
+          hinglish: Random token chunta hai
+      - id: b
+        text:
+          en: Picks the single most probable token
+          hinglish: Sabse probable ek token chunta hai
+      - id: c
+        text:
+          en: Picks the longest token
+          hinglish: Sabse lamba token chunta hai
+    correctOptionIds: [b]
+    explanation:
+      en: Greedy decoding always takes the highest-probability token, which makes it repeatable.
+      hinglish: Greedy decoding hamesha sabse zyada probability wala token leta hai, isliye repeatable hai.
+  - id: fluent-wrong
+    explanation:
+      en: Generation chooses probable tokens; nothing in that loop checks truth, which is why grounding and validation are needed.
+      hinglish: Generation probable tokens chunta hai; us loop mein koi sachchai check nahi karta, isi liye grounding aur validation chahiye.
+    type: short_text
+    topics: [hallucination, next-token-prediction]
+    prompt:
+      en: Why can an LLM produce a fluent, confident answer that is false?
+      hinglish: LLM aisa fluent, confident answer kyun de sakta hai jo galat ho?
+    rubric:
+      - id: likely-not-true
+        idea:
+          en: It generates likely or plausible text, not verified facts
+          hinglish: Yeh likely ya plausible text banata hai, verified facts nahi
+        anyOf:
+          [
+            likely,
+            probable,
+            probability,
+            plausible,
+            predict,
+            prediction,
+            next token,
+            pattern,
+            sambhavit,
+          ]
+      - id: no-check
+        idea:
+          en: Nothing in generation checks the claim against reality or sources
+          hinglish: Generation mein koi claim ko reality ya sources se check nahi karta
+        anyOf:
+          [check, verify, verified, truth, 'true', fact, facts, source, sources, grounding, sach]
+    requiredGroups: 1
+    sampleAnswer:
+      en: It predicts the most likely next tokens; fluency comes from probability, and nothing in generation verifies the claim against facts or sources.
+      hinglish: Yeh sabse likely agle tokens predict karta hai; fluency probability se aati hai, aur generation mein koi claim ko facts ya sources se verify nahi karta.

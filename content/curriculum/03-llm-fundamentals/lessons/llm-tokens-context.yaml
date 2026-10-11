@@ -1,0 +1,202 @@
+id: llm-tokens-context
+slug: tokens-and-context-windows
+version: 1
+status: published
+estimatedMinutes: 30
+prerequisites: [ai-vectors-similarity]
+topics: [tokens, context-window, llm-cost]
+title:
+  en: Tokens, context windows and cost
+  hinglish: Tokens, context windows aur cost
+summary:
+  en: Models read and write tokens, not characters or words. Tokens decide what a request costs, how much fits in the context window, and why some languages are more expensive than others.
+  hinglish: Models tokens padhte aur likhte hain, characters ya words nahi. Tokens tay karte hain ki request kitne ki padegi, context window mein kitna aayega, aur kuch languages mehngi kyun padti hain.
+objectives:
+  en:
+    - Explain what a token is and how subword tokenization works
+    - Explain that the context window holds input and output tokens together
+    - Estimate the cost of a request from token counts and prices
+    - Keep a conversation inside a token budget
+  hinglish:
+    - Token kya hai aur subword tokenization kaise kaam karta hai, samjhana
+    - Samjhana ki context window mein input aur output tokens dono saath aate hain
+    - Token counts aur prices se request ki cost estimate karna
+    - Conversation ko token budget ke andar rakhna
+sections:
+  explanation:
+    en: |
+      A model cannot read letters. A **tokenizer** first splits text into **tokens** — pieces from a
+      fixed vocabulary of tens of thousands to a few hundred thousand entries — and maps each to an
+      integer id. Most modern tokenizers use **byte-pair encoding (BPE)**: frequent sequences such as
+      `ing` or ` the` become single tokens, while rare words are split into several pieces.
+
+      Why this matters for engineers:
+
+      - **Cost.** Providers charge per token, with separate prices for input and output tokens.
+        Output tokens usually cost several times more than input tokens.
+      - **Context window.** A model has a maximum number of tokens it can handle in one request —
+        the system prompt, the conversation history, retrieved documents *and* the answer all share
+        it. If you ask for a long answer, less room is left for input.
+      - **Rate limits** are often expressed in tokens per minute.
+      - **Languages differ.** Tokenizers learn from their training text, which is mostly English. The
+        same sentence in Hindi (Devanagari) or Hinglish can take noticeably more tokens; newer
+        tokenizers narrow the gap. Measure with the real tokenizer before you estimate a budget.
+
+      A rule of thumb for English is about 4 characters per token, but that is only for rough
+      planning. In code, count with the provider's tokenizer or token-counting endpoint.
+
+      When a chat grows longer than the budget, applications **trim** the oldest turns, **summarise**
+      them, or **retrieve** only the relevant parts — and always keep the system prompt.
+    hinglish: |
+      Model letters nahi padh sakta. Pehle ek **tokenizer** text ko **tokens** mein todta hai — ek
+      fixed vocabulary (das hazaar se kuch lakh entries) ke tukde — aur har ek ko integer id deta hai.
+      Zyada tar modern tokenizers **byte-pair encoding (BPE)** use karte hain: `ing` ya ` the` jaise
+      baar-baar aane wale sequences ek token ban jaate hain, jabki rare words kai tukdon mein toot-te hain.
+
+      Engineers ke liye yeh kyun matter karta hai:
+
+      - **Cost.** Providers per token charge karte hain, input aur output tokens ke alag prices.
+        Output tokens aamtaur par input se kai guna mehnge hote hain.
+      - **Context window.** Model ek request mein maximum kitne tokens sambhal sakta hai — system
+        prompt, conversation history, retrieved documents *aur* answer sab isi ko share karte hain.
+        Lamba answer maangoge to input ke liye kam jagah bachegi.
+      - **Rate limits** aksar tokens per minute mein hoti hain.
+      - **Languages alag hain.** Tokenizers apne training text se seekhte hain, jo zyada tar English
+        hai. Wahi sentence Hindi (Devanagari) ya Hinglish mein kaafi zyada tokens le sakta hai; naye
+        tokenizers yeh gap kam karte hain. Budget estimate karne se pehle asli tokenizer se naapo.
+
+      English ke liye rule of thumb lagbhag 4 characters per token hai, par yeh sirf rough planning
+      ke liye. Code mein provider ke tokenizer ya token-counting endpoint se gino.
+
+      Jab chat budget se lambi ho jaaye, applications purane turns **trim** karti hain, unka
+      **summary** banati hain, ya sirf relevant hisse **retrieve** karti hain — aur system prompt
+      hamesha rakhti hain.
+  analogy:
+    en: |
+      Think of the context window as a whiteboard of fixed size. Your instructions, the conversation
+      and the model's answer must all be written on the same board. Tokens are the squares on the
+      board — and some scripts need more squares to write the same sentence.
+    hinglish: |
+      Context window ko fixed size ka whiteboard samjho. Aapke instructions, conversation aur model
+      ka answer — sab usi board par likhne hain. Tokens board ke khaane hain — aur kuch scripts ko wahi
+      sentence likhne ke liye zyada khaane chahiye.
+  visual:
+    en: |
+      Open the Tokens lab below. Paste the same sentence in English, Hindi and Hinglish and compare
+      the token counts for the two tokenizers. Then watch the context-window bar fill up as you
+      increase the reserved output tokens.
+    hinglish: |
+      Neeche Tokens lab kholo. Wahi sentence English, Hindi aur Hinglish mein paste karo aur dono
+      tokenizers ke token counts compare karo. Phir reserved output tokens badhate hue context-window
+      bar ko bharte dekho.
+  guidedExercise:
+    en: |
+      1. Run the code example. Why does a budget of 30 keep only the last two messages?
+      2. Change `estimate_tokens` to count words (`len(text.split())`) and compare the results.
+      3. Double the output tokens in the cost estimate. How much does the total change compared with
+         doubling the input tokens? Why?
+    hinglish: |
+      1. Code example chalao. 30 ka budget sirf aakhri do messages kyun rakhta hai?
+      2. `estimate_tokens` ko words gin-ne wala bana do (`len(text.split())`) aur results compare karo.
+      3. Cost estimate mein output tokens double karo. Input tokens double karne ke mukable total
+         kitna badalta hai? Kyun?
+  challenge:
+    en: |
+      Change `fit_history` so a system message (role `"system"`) is always kept, even when it is the
+      oldest message, and raise an error if the system message alone does not fit. (The practice
+      exercise checks this behaviour.)
+    hinglish: |
+      `fit_history` ko aisa badlo ki system message (role `"system"`) hamesha rahe, chahe woh sabse
+      purana ho, aur agar akela system message hi fit na ho to error raise karo. (Practice exercise yahi
+      behaviour check karta hai.)
+  commonMistakes:
+    en:
+      - Estimating tokens from characters in production instead of using the real tokenizer
+      - Forgetting that the answer also consumes the context window
+      - Dropping the system prompt when trimming a long conversation
+      - Assuming every language costs the same number of tokens per sentence
+    hinglish:
+      - Production mein asli tokenizer ke bajaye characters se tokens estimate karna
+      - Bhool jaana ki answer bhi context window khaata hai
+      - Lambi conversation trim karte waqt system prompt gira dena
+      - Maan lena ki har language mein sentence ke utne hi tokens lagte hain
+  projectApplication:
+    en: |
+      In the Python API Assistant project you will log token usage for every call and cap the output
+      length. The AI Mentor in this platform trims long conversations the same way before each request.
+    hinglish: |
+      Python API Assistant project mein aap har call ka token usage log karoge aur output length par cap
+      lagaoge. Is platform ka AI Mentor bhi har request se pehle lambi conversations isi tarah trim karta hai.
+  summary:
+    en:
+      - Models process tokens, produced by a tokenizer such as BPE
+      - Cost, rate limits and the context window are all measured in tokens
+      - Input and output share the context window; output tokens usually cost more
+      - Token counts differ by language and tokenizer — measure, do not guess
+    hinglish:
+      - Models tokens process karte hain, jo BPE jaise tokenizer se bante hain
+      - Cost, rate limits aur context window sab tokens mein naape jaate hain
+      - Input aur output context window share karte hain; output tokens aamtaur par mehnge hote hain
+      - Token counts language aur tokenizer ke hisaab se badalte hain — naapo, guess mat karo
+codeExamples:
+  - id: token-budget
+    title:
+      en: Trimming a chat to a token budget and estimating cost
+      hinglish: Chat ko token budget mein trim karna aur cost estimate karna
+    description:
+      en: Uses a rough 4-characters-per-token estimate and example prices, both clearly labelled. Real code uses the provider's tokenizer and current price list.
+      hinglish: Rough 4-characters-per-token estimate aur example prices use karta hai, dono saaf labelled. Asli code provider ka tokenizer aur current price list use karta hai.
+    variants:
+      python: |
+        # Rough rule of thumb for English text: about 4 characters per token.
+        # Real applications count with the provider's tokenizer or token-counting API.
+        def estimate_tokens(text):
+            return max(1, len(text) // 4)
+
+
+        history = [
+            ("user", "What is an embedding?"),
+            ("assistant", "An embedding is a list of numbers that represents the meaning of a text."),
+            ("user", "How is it different from a token?"),
+            ("assistant", "A token is a piece of text the model reads; an embedding is a vector for meaning."),
+            ("user", "Can you give me a Python example?"),
+        ]
+
+
+        def fit_history(messages, budget):
+            """Keep the newest messages that fit in the budget, in their original order."""
+            kept, used = [], 0
+            for role, text in reversed(messages):
+                cost = estimate_tokens(text)
+                if used + cost > budget:
+                    break
+                kept.append((role, text))
+                used += cost
+            return list(reversed(kept)), used
+
+
+        for budget in (60, 30, 12):
+            kept, used = fit_history(history, budget)
+            print(f"budget={budget:2d} -> kept {len(kept)} of {len(history)} messages ({used} tokens)")
+
+        # Example prices only — always check your provider's current pricing page.
+        input_price_per_million = 3.00
+        output_price_per_million = 15.00
+        input_tokens, output_tokens = 1_200, 400
+        cost = input_tokens / 1e6 * input_price_per_million + output_tokens / 1e6 * output_price_per_million
+        print(f"one request ~ ${cost:.4f}; 10,000 requests ~ ${cost * 10_000:.2f}")
+    expectedOutput: |
+      budget=60 -> kept 5 of 5 messages (59 tokens)
+      budget=30 -> kept 2 of 5 messages (28 tokens)
+      budget=12 -> kept 1 of 5 messages (8 tokens)
+      one request ~ $0.0096; 10,000 requests ~ $96.00
+lab:
+  id: tokens
+  config:
+    text: 'Embeddings meaning ko numbers mein badalte hain. Embeddings turn meaning into numbers.'
+  prompt:
+    en: Compare the token count of the English and Hinglish halves. Which tokenizer handles the Hinglish part better?
+    hinglish: English aur Hinglish hisson ke token count compare karo. Kaunsa tokenizer Hinglish hissa behtar sambhalta hai?
+exerciseIds: [ex-llm-fit-context]
+assessmentId: quiz-llm-tokens-context
+relatedLessonIds: [llm-next-token]

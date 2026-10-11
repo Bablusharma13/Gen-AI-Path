@@ -1,0 +1,25 @@
+{
+  "name": "@genpath/ai-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider-agnostic AI layer, retrieval utilities and deterministic lab simulations for GenPath AI.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./labs": "./src/labs/index.ts",
+    "./llm": "./src/llm/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.132.0",
+    "@genpath/shared": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "vitest": "4.1.11"
+  }
+}

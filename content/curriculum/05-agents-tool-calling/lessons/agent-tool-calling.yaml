@@ -1,0 +1,215 @@
+id: agent-tool-calling
+slug: how-tool-calling-works
+version: 1
+status: published
+estimatedMinutes: 35
+prerequisites: [llm-prompting-structured]
+topics: [tool-calling, structured-output, agents]
+title:
+  en: How tool calling works — and who runs the code
+  hinglish: Tool calling kaise kaam karta hai — aur code kaun chalata hai
+summary:
+  en: The model never runs a tool. It returns a structured request; your application validates the arguments, executes the function and sends the result back as data.
+  hinglish: Model kabhi tool nahi chalata. Woh ek structured request deta hai; aapki application arguments validate karti hai, function chalati hai aur result ko data ke roop mein wapas bhejti hai.
+objectives:
+  en:
+    - Describe a tool by name, description and parameter schema
+    - Follow the loop — request, tool call, validation, execution, result, final answer
+    - Validate tool arguments (JSON, required fields, types) before executing
+    - Treat tool results as untrusted data
+  hinglish:
+    - Tool ko naam, description aur parameter schema se describe karna
+    - Loop samjhana — request, tool call, validation, execution, result, final answer
+    - Execute karne se pehle tool arguments (JSON, required fields, types) validate karna
+    - Tool results ko untrusted data maanna
+sections:
+  explanation:
+    en: |
+      A language model can only produce text. **Tool calling** (also called function calling) is a
+      convention on top of that: your application tells the model which tools exist, and the model
+      may reply with a structured request instead of an answer.
+
+      1. **Describe tools.** Each tool has a *name*, a *description* the model reads to decide when
+         to use it, and a *JSON schema* for its parameters.
+      2. **The model asks.** Instead of text it returns something like
+         `{"name": "get_weather", "arguments": "{\"city\": \"Delhi\"}"}`.
+      3. **Your code validates.** The arguments arrive as model output — they can be invalid JSON,
+         miss fields, have wrong types, or name a tool that does not exist. Check all of that in code.
+      4. **Your code executes** the real function with its own credentials and limits.
+      5. **The result goes back** to the model as a tool-result message, and the model either calls
+         another tool or writes the final answer.
+
+      Two consequences matter most:
+
+      - **The model has no powers of its own.** Everything an agent can do is decided by the tools
+        you expose and the checks you write. A tool called `run_sql(query)` gives the model your
+        database; `get_order_status(order_id)` gives it one narrow capability.
+      - **Tool results are untrusted.** A web page or document returned by a tool can contain text
+        like "ignore your instructions". Pass results back as data, and never let a tool result
+        trigger another action without the same validation.
+
+      Providers differ in the exact message format, but the loop is the same everywhere. Many SDKs
+      can validate arguments against the schema for you; validate in your own code anyway, because
+      that is where the security boundary is.
+    hinglish: |
+      Language model sirf text bana sakta hai. **Tool calling** (ise function calling bhi kehte hain)
+      uske upar ek convention hai: aapki application model ko batati hai ki kaunse tools hain, aur
+      model answer ke bajaye ek structured request de sakta hai.
+
+      1. **Tools describe karo.** Har tool ka ek *naam*, ek *description* (jise padhkar model tay
+         karta hai kab use karna hai), aur parameters ka ek *JSON schema* hota hai.
+      2. **Model maangta hai.** Text ke bajaye woh kuch aisa return karta hai:
+         `{"name": "get_weather", "arguments": "{\"city\": \"Delhi\"}"}`.
+      3. **Aapka code validate karta hai.** Arguments model output hain — invalid JSON ho sakte hain,
+         fields missing ho sakti hain, types galat ho sakte hain, ya aisa tool ho sakta hai jo exist
+         hi nahi karta. Yeh sab code mein check karo.
+      4. **Aapka code execute karta hai** asli function ko, apne credentials aur limits ke saath.
+      5. **Result wapas jaata hai** model ko tool-result message ke roop mein, aur model ya to doosra
+         tool call karta hai ya final answer likhta hai.
+
+      Do baatein sabse zaroori hain:
+
+      - **Model ke paas apni koi taakat nahi.** Agent jo bhi kar sakta hai woh aapke expose kiye tools
+        aur likhe checks se tay hota hai. `run_sql(query)` naam ka tool model ko aapka poora database
+        de deta hai; `get_order_status(order_id)` sirf ek chhoti si capability deta hai.
+      - **Tool results untrusted hain.** Tool se aaya web page ya document "apne instructions ignore
+        karo" jaisa text rakh sakta hai. Results ko data ki tarah wapas bhejo, aur kisi tool result ko
+        bina wahi validation ke doosra action trigger mat karne do.
+
+      Providers ka exact message format alag hota hai, par loop har jagah wahi hai. Kai SDKs schema ke
+      against arguments validate kar dete hain; phir bhi apne code mein validate karo, kyunki security
+      boundary wahi hai.
+  analogy:
+    en: |
+      A manager (the model) writes requests on slips of paper: "Please fetch the weather for Delhi."
+      A clerk (your code) checks each slip — is this a task we do, is the form filled in correctly —
+      and only then does the work and hands back the result. The manager never touches the filing
+      cabinet; the clerk decides what is allowed.
+    hinglish: |
+      Ek manager (model) parchiyon par requests likhta hai: "Delhi ka weather la do." Ek clerk (aapka
+      code) har parchi check karta hai — kya yeh kaam hum karte hain, kya form sahi bhara hai — aur tabhi
+      kaam karke result wapas deta hai. Manager filing cabinet ko kabhi haath nahi lagata; kya allowed
+      hai, yeh clerk tay karta hai.
+  guidedExercise:
+    en: |
+      1. Run the code example and match each printed line to a step of the loop.
+      2. Change the scripted tool call's arguments to `'{"town": "Delhi"}'`. What does validation
+         report, and what would the model see?
+      3. Add a second tool `get_time(city)` and a scripted reply that calls it.
+    hinglish: |
+      1. Code example chalao aur har print hui line ko loop ke ek step se milao.
+      2. Scripted tool call ke arguments ko `'{"town": "Delhi"}'` kar do. Validation kya batata hai, aur
+         model ko kya dikhega?
+      3. Ek doosra tool `get_time(city)` jodo aur ek scripted reply jo use call kare.
+  challenge:
+    en: |
+      Some tools must never be called twice for the same request (for example "send email"). Add an
+      `idempotency_key` argument and make the tool refuse a key it has already seen.
+    hinglish: |
+      Kuch tools ek hi request ke liye do baar kabhi call nahi hone chahiye (jaise "send email"). Ek
+      `idempotency_key` argument jodo aur tool ko aisi key mana karne do jo woh pehle dekh chuka hai.
+  commonMistakes:
+    en:
+      - Believing the model executes tools or can be trusted to pass valid arguments
+      - Exposing broad tools (run any SQL, run any shell command) instead of narrow ones
+      - Passing tool results back as instructions instead of data
+      - Letting an error crash the agent instead of returning it to the model as a result
+    hinglish:
+      - Maanna ki model tools execute karta hai ya valid arguments dene par bharosa kiya ja sakta hai
+      - Narrow tools ke bajaye broad tools (koi bhi SQL, koi bhi shell command) expose karna
+      - Tool results ko data ke bajaye instructions ki tarah wapas bhejna
+      - Error ko model ko result ki tarah wapas dene ke bajaye agent ko crash karne dena
+  projectApplication:
+    en: |
+      Any assistant that looks up orders, books meetings or searches documents is built from this
+      loop. In the RAG Docs Assistant project, "search the documentation" can become a tool the model
+      calls when it needs more context.
+    hinglish: |
+      Jo bhi assistant orders dekhta hai, meetings book karta hai ya documents search karta hai, woh isi
+      loop se bana hai. RAG Docs Assistant project mein "documentation search karo" ek tool ban sakta hai
+      jise model tab call kare jab use aur context chahiye.
+  summary:
+    en:
+      - Tools are described by name, description and parameter schema
+      - The model returns a structured tool call; your code validates and executes it
+      - Results go back to the model as data, then the model answers or calls again
+      - Narrow tools and strict validation are the security boundary
+    hinglish:
+      - Tools naam, description aur parameter schema se describe hote hain
+      - Model ek structured tool call deta hai; aapka code use validate aur execute karta hai
+      - Results data ke roop mein model ko wapas jaate hain, phir model answer deta hai ya dobara call karta hai
+      - Narrow tools aur strict validation hi security boundary hain
+codeExamples:
+  - id: tool-call-loop
+    title:
+      en: A tool-calling loop with argument validation
+      hinglish: Argument validation ke saath tool-calling loop
+    description:
+      en: The model is replaced by scripted replies so the example runs offline; a real model returns the same two kinds of message.
+      hinglish: Model ki jagah scripted replies hain taaki example offline chale; asli model bhi isi tarah ke do messages deta hai.
+    variants:
+      python: |
+        import json
+
+
+        # Tools the application exposes. The model only ever sees names, descriptions and schemas.
+        def get_weather(city):
+            temperatures = {"Delhi": 31, "Mumbai": 29}
+            if city not in temperatures:
+                raise ValueError(f"unknown city: {city}")
+            return {"city": city, "temp_c": temperatures[city]}
+
+
+        TOOLS = {
+            "get_weather": {
+                "fn": get_weather,
+                "description": "Current temperature in Celsius for a city",
+                "params": {"city": str},
+            }
+        }
+
+        # A scripted stand-in for the model: first it asks for a tool, then it answers.
+        # A real model returns the same two kinds of message.
+        scripted_replies = [
+            {"type": "tool_call", "name": "get_weather", "arguments": '{"city": "Delhi"}'},
+            {"type": "text", "content": "Delhi mein abhi 31 degree Celsius hai."},
+        ]
+
+
+        def validate(name, raw_arguments):
+            if name not in TOOLS:
+                return None, f"unknown tool {name!r}"
+            try:
+                args = json.loads(raw_arguments)
+            except json.JSONDecodeError:
+                return None, "arguments are not valid JSON"
+            params = TOOLS[name]["params"]
+            if not isinstance(args, dict) or set(args) != set(params):
+                return None, f"expected exactly {sorted(params)}"
+            for key, expected in params.items():
+                if not isinstance(args[key], expected):
+                    return None, f"{key} must be {expected.__name__}"
+            return args, None
+
+
+        messages = [{"role": "user", "content": "Delhi ka temperature kya hai?"}]
+        for reply in scripted_replies:
+            if reply["type"] == "text":
+                print("final answer:", reply["content"])
+                break
+            args, error = validate(reply["name"], reply["arguments"])
+            result = {"error": error} if error else TOOLS[reply["name"]]["fn"](**args)
+            print("tool call:", reply["name"], args, "->", result)
+            # The result goes back to the model as data in the conversation.
+            messages.append({"role": "tool", "name": reply["name"], "content": json.dumps(result)})
+
+        print("bad call ->", validate("get_weather", '{"city": 42}'))
+        print("unknown tool ->", validate("delete_files", "{}"))
+    expectedOutput: |
+      tool call: get_weather {'city': 'Delhi'} -> {'city': 'Delhi', 'temp_c': 31}
+      final answer: Delhi mein abhi 31 degree Celsius hai.
+      bad call -> (None, 'city must be str')
+      unknown tool -> (None, "unknown tool 'delete_files'")
+exerciseIds: [ex-agent-validate-tool-call]
+assessmentId: quiz-agent-tool-calling
+relatedLessonIds: [llm-prompting-structured, agent-safe-loop]

@@ -1,0 +1,57 @@
+id: python-foundations
+slug: python-foundations
+version: 1
+status: published
+level: 1
+order: 0
+tracks: [A, B, C, D, E]
+requiredForTracks: [A, B, C, D, E]
+likelyKnownBy: [python_development, ml_ai]
+estimatedHours: 6
+prerequisites: []
+title:
+  en: Python Foundations for AI
+  hinglish: AI ke liye Python Foundations
+summary:
+  en: The Python you actually need for AI work — data types, control flow, collections, functions, files, JSON, errors and calling HTTP APIs.
+  hinglish: AI kaam ke liye zaroori Python — data types, control flow, collections, functions, files, JSON, errors aur HTTP APIs call karna.
+description:
+  en: |
+    Python is the language of the AI ecosystem: model SDKs, data tools, notebooks and ML frameworks all
+    speak it first. This course teaches Python through AI-flavoured examples — formatting prompts,
+    counting tokens, chunking text, parsing model output and calling APIs safely. Every lesson ends
+    with an exercise you run in your browser against real test cases.
+  hinglish: |
+    AI ecosystem ki language Python hai: model SDKs, data tools, notebooks aur ML frameworks sab
+    pehle Python support karte hain. Is course mein Python AI-style examples se seekhenge — prompts
+    format karna, tokens count karna, text ke chunks banana, model output parse karna aur APIs
+    safely call karna. Har lesson ke end mein ek exercise hai jo aap browser mein real test cases
+    ke against run karte ho.
+outcomes:
+  en:
+    - Write clean Python with the right data types and control flow
+    - Model chat messages and documents with lists and dictionaries
+    - Write reusable, typed functions and handle errors deliberately
+    - Read and write files and JSON, and call HTTP APIs with timeouts and retries
+  hinglish:
+    - Sahi data types aur control flow ke saath clean Python likhna
+    - Lists aur dictionaries se chat messages aur documents represent karna
+    - Reusable, typed functions likhna aur errors ko soch-samajh kar handle karna
+    - Files aur JSON read/write karna, aur timeouts/retries ke saath HTTP APIs call karna
+modules:
+  - id: py-core
+    title:
+      en: Core Python
+      hinglish: Core Python
+    summary:
+      en: Variables, decisions, loops, collections and functions.
+      hinglish: Variables, decisions, loops, collections aur functions.
+    lessonIds: [py-variables-types, py-control-flow, py-collections, py-functions]
+  - id: py-real-world
+    title:
+      en: Working with real data
+      hinglish: Real data ke saath kaam
+    summary:
+      en: Files, JSON, errors and HTTP APIs — the glue of every AI application.
+      hinglish: Files, JSON, errors aur HTTP APIs — har AI application ka glue.
+    lessonIds: [py-files-json-errors, py-http-apis]

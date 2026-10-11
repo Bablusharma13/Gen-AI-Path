@@ -1,0 +1,177 @@
+id: py-collections
+slug: lists-dicts-and-sets
+version: 1
+status: published
+estimatedMinutes: 30
+prerequisites: [py-control-flow]
+topics: [python-basics, collections]
+title:
+  en: Lists, tuples, dictionaries and sets
+  hinglish: Lists, tuples, dictionaries aur sets
+summary:
+  en: Group data with the four core collections and model chat messages the way every LLM API expects them.
+  hinglish: Chaar core collections se data group karo aur chat messages ko waise represent karo jaise har LLM API expect karti hai.
+objectives:
+  en:
+    - Choose between list, tuple, dict and set for a job
+    - Represent a chat conversation as a list of message dictionaries
+    - Count and group items with dictionaries
+    - Transform data with list and dict comprehensions
+  hinglish:
+    - Kaam ke hisaab se list, tuple, dict aur set mein se chunna
+    - Chat conversation ko message dictionaries ki list ke roop mein represent karna
+    - Dictionaries se items count aur group karna
+    - List aur dict comprehensions se data transform karna
+sections:
+  explanation:
+    en: |
+      Python has four everyday collections:
+
+      - **list** `[...]` — ordered, changeable. *"The messages in this chat."*
+      - **tuple** `(...)` — ordered, fixed. *"A (word, count) pair."*
+      - **dict** `{key: value}` — look up values by key. *"One message: role and content."*
+      - **set** `{...}` — unique items, fast membership checks. *"Topics already covered."*
+
+      Nearly every LLM API represents a conversation as a **list of dicts**:
+
+      ```python
+      messages = [
+          {"role": "system", "content": "You are a concise tutor."},
+          {"role": "user", "content": "What is an embedding?"},
+      ]
+      ```
+
+      Dictionaries are also the natural tool for **counting**: `counts[word] = counts.get(word, 0) + 1`.
+
+      **Comprehensions** build new collections in one readable line:
+      `[m["content"] for m in messages if m["role"] == "user"]` collects every user message.
+
+      Lists and dicts are **mutable**: if two variables point to the same list, changing it through
+      one changes it for both. Copy with `list(x)` or `dict(x)` when you need an independent copy.
+    hinglish: |
+      Python mein chaar roz kaam aane wale collections hain:
+
+      - **list** `[...]` — ordered, badal sakte ho. *"Is chat ke messages."*
+      - **tuple** `(...)` — ordered, fixed. *"Ek (word, count) pair."*
+      - **dict** `{key: value}` — key se value dhoondo. *"Ek message: role aur content."*
+      - **set** `{...}` — unique items, membership check fast. *"Jo topics cover ho chuke."*
+
+      Lagbhag har LLM API conversation ko **dicts ki list** ke roop mein represent karti hai:
+
+      ```python
+      messages = [
+          {"role": "system", "content": "You are a concise tutor."},
+          {"role": "user", "content": "What is an embedding?"},
+      ]
+      ```
+
+      **Counting** ke liye dictionaries natural tool hain: `counts[word] = counts.get(word, 0) + 1`.
+
+      **Comprehensions** ek readable line mein naya collection banate hain:
+      `[m["content"] for m in messages if m["role"] == "user"]` saare user messages collect karta hai.
+
+      Lists aur dicts **mutable** hain: agar do variables ek hi list ko point karein, to ek se badlo
+      to dono mein badal jaati hai. Independent copy chahiye to `list(x)` ya `dict(x)` se copy karo.
+  analogy:
+    en: |
+      A **list** is a queue at a ticket counter (order matters). A **tuple** is a printed ticket
+      (fixed once issued). A **dict** is a phone contact list (find a number by name). A **set** is
+      a guest list at the door (each name once, quick "are you on the list?" checks).
+    hinglish: |
+      **List** ticket counter ki line hai (order matter karta hai). **Tuple** chhapa hua ticket hai
+      (ek baar issue hua to fixed). **Dict** phone ki contact list hai (naam se number dhoondo).
+      **Set** darwaze par guest list hai (har naam ek baar, "kya aap list mein ho?" turant check).
+  guidedExercise:
+    en: |
+      1. Create the `messages` list above and append an assistant reply.
+      2. Print only the `content` of user messages using a list comprehension.
+      3. Count how many messages each role sent using a dict.
+      4. Put the set of distinct roles in a variable and check `"tool" in roles`.
+    hinglish: |
+      1. Upar wali `messages` list banao aur ek assistant reply append karo.
+      2. List comprehension se sirf user messages ka `content` print karo.
+      3. Dict se count karo har role ne kitne messages bheje.
+      4. Distinct roles ka set ek variable mein rakho aur `"tool" in roles` check karo.
+  challenge:
+    en: |
+      Write `last_n_turns(messages, n)` that keeps the system message (if any) plus only the last
+      `n` non-system messages — the simplest form of conversation memory trimming.
+    hinglish: |
+      `last_n_turns(messages, n)` likho jo system message (agar ho) aur sirf aakhri `n` non-system
+      messages rakhe — conversation memory trimming ka sabse simple roop.
+  commonMistakes:
+    en:
+      - Using a list when you need fast lookups by key (use a dict)
+      - Reading a missing key with d[key] — use d.get(key, default) when absence is normal
+      - Modifying a list while looping over it
+      - Accidentally sharing one list between variables instead of copying it
+    hinglish:
+      - Key se fast lookup chahiye aur list use karna (dict use karo)
+      - Missing key ko d[key] se padhna — jab key na hona normal ho to d.get(key, default) use karo
+      - Jis list par loop chal raha ho usi ko loop ke andar modify karna
+      - Copy karne ki jagah galti se ek hi list do variables mein share karna
+  projectApplication:
+    en: |
+      The Streaming AI Chatbot stores conversations as a list of `{"role", "content"}` dicts and
+      trims old turns before each request so the history fits the model's context window.
+    hinglish: |
+      Streaming AI Chatbot conversations ko `{"role", "content"}` dicts ki list mein store karta hai
+      aur har request se pehle purane turns trim karta hai taaki history model ki context window
+      mein fit ho.
+  summary:
+    en:
+      - list = ordered and changeable; tuple = ordered and fixed
+      - dict = key → value lookups; set = unique items
+      - Chat history is a list of message dicts in almost every LLM API
+      - Comprehensions transform collections clearly in one line
+    hinglish:
+      - list = ordered aur badalne layak; tuple = ordered aur fixed
+      - dict = key → value lookup; set = unique items
+      - Lagbhag har LLM API mein chat history message dicts ki list hoti hai
+      - Comprehensions ek line mein collections ko clearly transform karte hain
+codeExamples:
+  - id: py-messages
+    title:
+      en: Chat messages as a list of dicts
+      hinglish: Chat messages dicts ki list ke roop mein
+    variants:
+      python: |
+        messages = [
+            {"role": "system", "content": "You are a concise tutor."},
+            {"role": "user", "content": "What is an embedding?"},
+            {"role": "assistant", "content": "A list of numbers that captures meaning."},
+            {"role": "user", "content": "Why are they useful?"},
+        ]
+
+        user_questions = [m["content"] for m in messages if m["role"] == "user"]
+        per_role = {}
+        for m in messages:
+            per_role[m["role"]] = per_role.get(m["role"], 0) + 1
+
+        print(user_questions)
+        print(per_role)
+        print("tool" in {m["role"] for m in messages})
+      typescript: |
+        type Message = { role: "system" | "user" | "assistant"; content: string };
+
+        const messages: Message[] = [
+          { role: "system", content: "You are a concise tutor." },
+          { role: "user", content: "What is an embedding?" },
+          { role: "assistant", content: "A list of numbers that captures meaning." },
+          { role: "user", content: "Why are they useful?" },
+        ];
+
+        const userQuestions = messages.filter((m) => m.role === "user").map((m) => m.content);
+        const perRole: Record<string, number> = {};
+        for (const m of messages) perRole[m.role] = (perRole[m.role] ?? 0) + 1;
+
+        console.log(userQuestions);
+        console.log(perRole);
+        console.log(new Set(messages.map((m) => m.role)).has("tool" as Message["role"]));
+    expectedOutput: |
+      ['What is an embedding?', 'Why are they useful?']
+      {'system': 1, 'user': 2, 'assistant': 1}
+      False
+exerciseIds: [ex-py-word-counts]
+assessmentId: quiz-py-collections
+relatedLessonIds: [py-functions]

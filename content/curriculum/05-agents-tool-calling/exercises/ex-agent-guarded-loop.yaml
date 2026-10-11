@@ -1,0 +1,116 @@
+id: ex-agent-guarded-loop
+version: 1
+status: published
+lessonId: agent-safe-loop
+language: python
+topics: [agents, agent-safety]
+title:
+  en: Build a guarded agent loop
+  hinglish: Guarded agent loop banao
+prompt:
+  en: |
+    Implement `run_agent(plan, tools, max_steps, needs_approval, approve)`. `plan` is a list of
+    `(name, args)` steps proposed by a model; `tools` maps allowed tool names to functions. Return a
+    trace (list of tuples), processing steps in order:
+
+    1. If more than `max_steps` steps would run, append `("stopped", "step budget used up")` and stop.
+       (Every planned step counts, including rejected or denied ones.)
+    2. `("finish", {"answer": text})` appends `("finish", text)` and stops.
+    3. A name not in `tools` appends `("rejected", name)` and continues — it is never executed.
+    4. A name in `needs_approval` calls `approve(name, args)`; if it returns `False`, append
+       `("denied", name)` and continue.
+    5. Otherwise run `tools[name](**args)`. On success append `("ran", name, result)`; if the tool
+       raises, append `("error", name, str(exception))` and continue.
+  hinglish: |
+    `run_agent(plan, tools, max_steps, needs_approval, approve)` implement karo. `plan` model ke propose
+    kiye `(name, args)` steps ki list hai; `tools` allowed tool names ko functions se map karta hai. Steps
+    ko order mein process karte hue ek trace (tuples ki list) return karo:
+
+    1. Agar `max_steps` se zyada steps chalenge, `("stopped", "step budget used up")` jodo aur ruk jao.
+       (Har planned step ginta hai, rejected ya denied bhi.)
+    2. `("finish", {"answer": text})` par `("finish", text)` jodo aur ruk jao.
+    3. Jo naam `tools` mein nahi hai, us par `("rejected", name)` jodo aur aage badho — use kabhi
+       execute nahi karna.
+    4. Jo naam `needs_approval` mein hai, us par `approve(name, args)` call karo; `False` aaye to
+       `("denied", name)` jodo aur aage badho.
+    5. Warna `tools[name](**args)` chalao. Success par `("ran", name, result)` jodo; tool exception de to
+       `("error", name, str(exception))` jodo aur aage badho.
+starterCode: |
+  def run_agent(plan, tools, max_steps, needs_approval, approve):
+      trace = []
+      for name, args in plan:
+          trace.append(("ran", name, tools[name](**args)))
+      return trace
+tests:
+  - id: happy-path
+    name: runs allowed tools and stops at finish
+    code: |
+      tools = {"add": lambda a, b: a + b}
+      plan = [("add", {"a": 2, "b": 3}), ("finish", {"answer": "5"}), ("add", {"a": 1, "b": 1})]
+      assert run_agent(plan, tools, 10, set(), lambda n, a: True) == [("ran", "add", 5), ("finish", "5")]
+  - id: allow-list
+    name: rejects tools that are not allowed, without running them
+    code: |
+      calls = []
+      tools = {"ok": lambda: calls.append("ok") or "fine"}
+      plan = [("delete_everything", {}), ("ok", {})]
+      trace = run_agent(plan, tools, 10, set(), lambda n, a: True)
+      assert trace == [("rejected", "delete_everything"), ("ran", "ok", "fine")], trace
+  - id: approval
+    name: asks for approval and respects a denial
+    code: |
+      seen = []
+      def approve(name, args):
+          seen.append((name, args))
+          return args["amount"] <= 100
+      tools = {"refund": lambda amount: f"refunded {amount}"}
+      plan = [("refund", {"amount": 50}), ("refund", {"amount": 500})]
+      trace = run_agent(plan, tools, 10, {"refund"}, approve)
+      assert trace == [("ran", "refund", "refunded 50"), ("denied", "refund")], trace
+      assert seen == [("refund", {"amount": 50}), ("refund", {"amount": 500})]
+  - id: budget
+    name: stops when the step budget is used up
+    code: |
+      tools = {"ping": lambda: "pong"}
+      trace = run_agent([("ping", {})] * 5, tools, 3, set(), lambda n, a: True)
+      assert trace == [("ran", "ping", "pong")] * 3 + [("stopped", "step budget used up")], trace
+  - id: errors
+    name: records tool errors and keeps going
+    code: |
+      def boom():
+          raise ValueError("database offline")
+      tools = {"boom": boom, "ping": lambda: "pong"}
+      trace = run_agent([("boom", {}), ("ping", {})], tools, 10, set(), lambda n, a: True)
+      assert trace == [("error", "boom", "database offline"), ("ran", "ping", "pong")], trace
+hints:
+  en:
+    - Use enumerate(plan, start=1) and compare the step number with max_steps first
+    - Check "finish", then the allow-list, then approval — the order matters
+    - Wrap only the tool call in try/except Exception so your own bugs are not hidden
+  hinglish:
+    - enumerate(plan, start=1) use karo aur sabse pehle step number ko max_steps se compare karo
+    - Pehle "finish", phir allow-list, phir approval check karo — order zaroori hai
+    - Sirf tool call ko try/except Exception mein lapeto taaki aapke apne bugs na chhupein
+solution: |
+  def run_agent(plan, tools, max_steps, needs_approval, approve):
+      trace = []
+      for step, (name, args) in enumerate(plan, start=1):
+          if step > max_steps:
+              trace.append(("stopped", "step budget used up"))
+              break
+          if name == "finish":
+              trace.append(("finish", args["answer"]))
+              break
+          if name not in tools:
+              trace.append(("rejected", name))
+              continue
+          if name in needs_approval and not approve(name, args):
+              trace.append(("denied", name))
+              continue
+          try:
+              result = tools[name](**args)
+          except Exception as exc:
+              trace.append(("error", name, str(exc)))
+              continue
+          trace.append(("ran", name, result))
+      return trace
