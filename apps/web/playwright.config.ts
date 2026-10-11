@@ -11,7 +11,9 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   fullyParallel: false,
   retries: 0,
-  reporter: [['list']],
+  // On CI, `github` turns failures into annotations on the pull request (readable without
+  // downloading logs).
+  reporter: process.env.CI ? [['github'], ['list']] : [['list']],
   outputDir: '../../test-results/e2e',
   use: {
     baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
