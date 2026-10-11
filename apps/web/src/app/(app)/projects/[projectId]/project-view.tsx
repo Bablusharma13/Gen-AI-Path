@@ -84,9 +84,15 @@ function LocalMarkdown({ text }: { text: LocalizedText }) {
 function Milestones({ project }: { project: ProjectDetailDto }) {
   const { lang } = useLearnerLanguages();
   const toggle = useToggleMilestone(project.id);
-  const done = project.milestones.filter((m) => m.completedAt).length;
+  // The box flips in the same click (local state), not after the cache update lands — on a slow
+  // device the controlled checkbox would otherwise snap back for a moment.
+  const [ticked, setTicked] = useState<Record<string, boolean>>({});
+  const isDone = (m: ProjectDetailDto['milestones'][number]) =>
+    ticked[m.id] ?? Boolean(m.completedAt);
+  const done = project.milestones.filter(isDone).length;
 
-  const onToggle = (milestoneId: string, completed: boolean) =>
+  const onToggle = (milestoneId: string, completed: boolean) => {
+    setTicked((t) => ({ ...t, [milestoneId]: completed }));
     toggle.mutate(
       { milestoneId, completed },
       {
@@ -94,8 +100,16 @@ function Milestones({ project }: { project: ProjectDetailDto }) {
           if (r.xpAwarded > 0) toast.success(`Milestone done · +${r.xpAwarded} XP`);
         },
         onError: (err) => toast.error(errorMessage(err)),
+        // Hand control back to the server data (rolled back on error, confirmed on success).
+        onSettled: () =>
+          setTicked((t) => {
+            const next = { ...t };
+            delete next[milestoneId];
+            return next;
+          }),
       },
     );
+  };
 
   return (
     <Card>
@@ -112,7 +126,7 @@ function Milestones({ project }: { project: ProjectDetailDto }) {
       <CardContent>
         <ol className="space-y-4">
           {project.milestones.map((m, i) => {
-            const checked = Boolean(m.completedAt);
+            const checked = isDone(m);
             const pending = toggle.isPending && toggle.variables?.milestoneId === m.id;
             return (
               <li key={m.id} className="space-y-2">
