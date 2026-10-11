@@ -1,0 +1,120 @@
+id: quiz-agent-safe-loop
+version: 1
+status: published
+courseId: agents-tool-calling
+lessonId: agent-safe-loop
+passingPercent: 70
+title:
+  en: 'Check: safe agent loops'
+  hinglish: 'Check: safe agent loops'
+objectives:
+  en:
+    - Choose guard rails for an agent loop and explain why they live in code
+  hinglish:
+    - Agent loop ke guard rails chunna aur samjhana ki woh code mein kyun rehte hain
+questions:
+  - id: step-budget
+    type: single_choice
+    topics: [agents, agent-safety]
+    prompt:
+      en: An agent keeps calling the same failing tool again and again. Which guard rail stops this?
+      hinglish: Ek agent wahi failing tool baar-baar call karta rehta hai. Kaunsa guard rail ise rokta hai?
+    options:
+      - id: a
+        text:
+          en: A step (and cost) budget enforced by the loop
+          hinglish: Loop ka lagaya step (aur cost) budget
+      - id: b
+        text:
+          en: A longer system prompt
+          hinglish: Lamba system prompt
+      - id: c
+        text:
+          en: A higher temperature
+          hinglish: Zyada temperature
+    correctOptionIds: [a]
+    explanation:
+      en: Only a hard limit in code guarantees the loop ends; prompts and sampling settings do not.
+      hinglish: Sirf code mein lagi hard limit guarantee karti hai ki loop khatam hoga; prompts aur sampling settings nahi.
+  - id: needs-approval
+    type: multiple_choice
+    topics: [agent-safety]
+    prompt:
+      en: Which actions should normally wait for human approval? (Select all that apply.)
+      hinglish: Kaunse actions aamtaur par human approval ka intezaar karne chahiye? (Sabhi sahi chuno.)
+    options:
+      - id: a
+        text:
+          en: Issuing a refund above a set amount
+          hinglish: Ek tay amount se zyada ka refund dena
+      - id: b
+        text:
+          en: Sending an email to a customer
+          hinglish: Customer ko email bhejna
+      - id: c
+        text:
+          en: Deleting records
+          hinglish: Records delete karna
+      - id: d
+        text:
+          en: Reading the status of an order
+          hinglish: Order ka status padhna
+    correctOptionIds: [a, b, c]
+    explanation:
+      en: Actions that move money, contact people or destroy data are hard to undo; read-only lookups usually are not.
+      hinglish: Jo actions paisa hilate hain, logon se sampark karte hain ya data mitate hain unhe undo karna mushkil hai; read-only lookups aamtaur par aise nahi hote.
+  - id: prompt-vs-code
+    type: single_choice
+    topics: [agent-safety, prompt-injection]
+    prompt:
+      en: Why is "never delete data" in the system prompt not enough protection?
+      hinglish: System prompt mein "data kabhi delete mat karna" kaafi protection kyun nahi hai?
+    options:
+      - id: a
+        text:
+          en: Because models cannot read system prompts
+          hinglish: Kyunki models system prompts padh nahi sakte
+      - id: b
+        text:
+          en: Because the model can still be wrong or manipulated; only not exposing the tool (or requiring approval) guarantees it
+          hinglish: Kyunki model phir bhi galat ho sakta hai ya manipulate ho sakta hai; sirf tool expose na karna (ya approval zaroori karna) hi guarantee deta hai
+      - id: c
+        text:
+          en: Because system prompts are deleted after each step
+          hinglish: Kyunki har step ke baad system prompts delete ho jaate hain
+    correctOptionIds: [b]
+    explanation:
+      en: Instructions influence the model; code-level limits enforce behaviour even when the model is fooled.
+      hinglish: Instructions model ko prabhavit karte hain; code-level limits model ke bewakoof banne par bhi behaviour lagu karti hain.
+  - id: why-trace
+    type: short_text
+    topics: [agents]
+    explanation:
+      en: A trace records each step, its arguments and outcome, so you can audit, explain and debug what an agent did.
+      hinglish: Trace har step, uske arguments aur nateeje ko record karta hai, taaki aap agent ke kaam ko audit, explain aur debug kar sako.
+    prompt:
+      en: Why should an agent loop record a trace of every step?
+      hinglish: Agent loop ko har step ka trace kyun record karna chahiye?
+    rubric:
+      - id: audit-debug
+        idea:
+          en: To audit, explain or debug what the agent did (and why something was refused)
+          hinglish: Agent ne kya kiya (aur kuch mana kyun hua) use audit, explain ya debug karne ke liye
+        anyOf:
+          [
+            audit,
+            debug,
+            debugging,
+            explain,
+            accountability,
+            review,
+            investigate,
+            what happened,
+            inspect,
+            record,
+            history,
+            track,
+          ]
+    sampleAnswer:
+      en: So you can audit and debug what the agent did — which tools ran with which arguments, what was refused and why — and show it to users or reviewers.
+      hinglish: Taaki aap audit aur debug kar sako ki agent ne kya kiya — kaunse tools kin arguments ke saath chale, kya mana hua aur kyun — aur use users ya reviewers ko dikha sako.

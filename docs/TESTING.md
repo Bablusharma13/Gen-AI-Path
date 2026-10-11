@@ -14,7 +14,7 @@ pnpm --filter @genpath/web exec playwright test --workers=1   # E2E against a ru
 ```
 
 Current counts (all passing locally): shared 23, ai-core 68, web 20, API 128 (+1 BullMQ test that
-runs only with Redis), E2E 3 specs. Exercises: 16, code examples: 14.
+runs only with Redis), E2E 3 specs. Exercises: 18, code examples: 16.
 
 ## 2. Test layers
 

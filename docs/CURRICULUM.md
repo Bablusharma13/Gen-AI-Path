@@ -42,7 +42,7 @@ in Hindi. The explanation language never changes the programming language of cod
 | 7     | Building GenAI Applications        | 🟡 Covered by the HTTP/JSON Python lessons and the Python API Assistant project                  |
 | 8     | Embeddings, Vector Search and RAG  | ✅ RAG Fundamentals — 2 modules, 2 lessons (chunking + hybrid retrieval, grounding + evaluation) |
 | 9     | Advanced RAG                       | ⬜                                                                                               |
-| 10    | AI Agents and Tool Calling         | ⬜                                                                                               |
+| 10    | AI Agents and Tool Calling         | ✅ AI Agents and Tool Calling — 2 modules, 2 lessons (tool calling, safe agent loops)            |
 | 11    | Agent Frameworks and Orchestration | ⬜                                                                                               |
 | 12    | Fine-Tuning and Model Adaptation   | ⬜                                                                                               |
 | 13    | Production GenAI Engineering       | ⬜                                                                                               |
@@ -50,7 +50,7 @@ in Hindi. The explanation language never changes the programming language of cod
 | 15    | Multimodal and Emerging GenAI      | ⬜                                                                                               |
 | 16    | Interview and Career Preparation   | 🟡 Career Center: 25-question interview bank (10 topics) and readiness checklist                 |
 
-Totals: 4 courses, 9 modules, 16 lessons, 16 quizzes (56 questions), 16 Python exercises, 14
+Totals: 5 courses, 11 modules, 18 lessons, 18 quizzes (64 questions), 18 Python exercises, 16
 verified code examples. Every lab is used by a lesson: Tokens (level 5), Embeddings (level 2),
 Attention (level 5), Gradient Descent (level 2), RAG Pipeline (level 8).
 

@@ -12,16 +12,16 @@ career center — Hinglish-first, with English technical terms (English and Hind
 
 ## What's inside
 
-| Area           | What you get                                                                                                                                              |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Curriculum     | 4 courses, 9 modules, 16 lessons (Python for AI → AI foundations → how LLMs work → RAG), 16 quizzes, 16 Python exercises — all verified with real CPython |
-| Labs           | Tokens & context, embeddings, attention, RAG pipeline, gradient descent — step-by-step, deterministic, honest about simplifications                       |
-| Practice       | Python runs in your browser (Pyodide in a Web Worker); never on the server                                                                                |
-| AI Mentor      | Streaming chat with your learning context, hints that don't leak solutions, concept cards; OpenAI-compatible (incl. Ollama), Anthropic or Gemini          |
-| Knowledge Base | Organizations upload txt/md/pdf/docx; answers come only from their documents, with citations checked in code and a "not found" path                       |
-| Projects       | 3 guided projects with milestones, rubrics and instructor review                                                                                          |
-| Career Center  | Readiness checklist from real progress + 25-question interview bank with model answers                                                                    |
-| Admin          | Users and roles, AI usage and cost, project reviews, audit log, prompt catalogue                                                                          |
+| Area           | What you get                                                                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Curriculum     | 5 courses, 11 modules, 18 lessons (Python for AI → AI foundations → how LLMs work → RAG → agents), 18 quizzes, 18 Python exercises — all verified with real CPython |
+| Labs           | Tokens & context, embeddings, attention, RAG pipeline, gradient descent — step-by-step, deterministic, honest about simplifications                                 |
+| Practice       | Python runs in your browser (Pyodide in a Web Worker); never on the server                                                                                          |
+| AI Mentor      | Streaming chat with your learning context, hints that don't leak solutions, concept cards; OpenAI-compatible (incl. Ollama), Anthropic or Gemini                    |
+| Knowledge Base | Organizations upload txt/md/pdf/docx; answers come only from their documents, with citations checked in code and a "not found" path                                 |
+| Projects       | 3 guided projects with milestones, rubrics and instructor review                                                                                                    |
+| Career Center  | Readiness checklist from real progress + 25-question interview bank with model answers                                                                              |
+| Admin          | Users and roles, AI usage and cost, project reviews, audit log, prompt catalogue                                                                                    |
 
 ## Quick start
 

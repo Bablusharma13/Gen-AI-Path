@@ -1,0 +1,116 @@
+id: quiz-agent-tool-calling
+version: 1
+status: published
+courseId: agents-tool-calling
+lessonId: agent-tool-calling
+passingPercent: 70
+title:
+  en: 'Check: tool calling'
+  hinglish: 'Check: tool calling'
+objectives:
+  en:
+    - Explain who executes tools and why arguments must be validated
+  hinglish:
+    - Samjhana ki tools kaun execute karta hai aur arguments validate karna kyun zaroori hai
+questions:
+  - id: who-executes
+    type: single_choice
+    topics: [tool-calling]
+    prompt:
+      en: When a model "calls" the tool get_weather, who actually runs the function?
+      hinglish: Jab model tool get_weather ko "call" karta hai, to function asal mein kaun chalata hai?
+    options:
+      - id: a
+        text:
+          en: The model provider's servers
+          hinglish: Model provider ke servers
+      - id: b
+        text:
+          en: Your application, after validating the request
+          hinglish: Aapki application, request validate karne ke baad
+      - id: c
+        text:
+          en: The model itself, inside its neural network
+          hinglish: Model khud, apne neural network ke andar
+    correctOptionIds: [b]
+    explanation:
+      en: The model only returns a structured request. Your code decides whether to run it and runs it.
+      hinglish: Model sirf ek structured request deta hai. Use chalana hai ya nahi, yeh aapka code tay karta hai aur wahi chalata hai.
+  - id: validate-what
+    type: multiple_choice
+    topics: [tool-calling, structured-output]
+    prompt:
+      en: Which problems should your code check for before running a tool call? (Select all that apply.)
+      hinglish: Tool call chalane se pehle aapke code ko kaunsi problems check karni chahiye? (Sabhi sahi chuno.)
+    options:
+      - id: a
+        text:
+          en: The tool name is not one you exposed
+          hinglish: Tool ka naam aapke expose kiye tools mein nahi hai
+      - id: b
+        text:
+          en: The arguments are not valid JSON
+          hinglish: Arguments valid JSON nahi hain
+      - id: c
+        text:
+          en: A required argument is missing or has the wrong type
+          hinglish: Koi zaroori argument missing hai ya uska type galat hai
+      - id: d
+        text:
+          en: The model sounded confident, so no check is needed
+          hinglish: Model confident laga, isliye check ki zaroorat nahi
+    correctOptionIds: [a, b, c]
+    explanation:
+      en: Tool calls are model output and can be wrong in all of these ways; confidence proves nothing.
+      hinglish: Tool calls model output hain aur in sab tareekon se galat ho sakte hain; confidence kuch saabit nahi karta.
+  - id: narrow-tools
+    type: single_choice
+    topics: [tool-calling, agents]
+    prompt:
+      en: A support assistant needs order status. Which tool design is safer?
+      hinglish: Support assistant ko order status chahiye. Kaunsa tool design zyada safe hai?
+    options:
+      - id: a
+        text:
+          en: run_sql(query) with full database access
+          hinglish: Poore database access ke saath run_sql(query)
+      - id: b
+        text:
+          en: get_order_status(order_id) for the signed-in customer's orders only
+          hinglish: Sirf signed-in customer ke orders ke liye get_order_status(order_id)
+    correctOptionIds: [b]
+    explanation:
+      en: A narrow tool gives the model one capability with limited permissions; a broad tool gives it everything.
+      hinglish: Narrow tool model ko limited permissions ke saath ek capability deta hai; broad tool use sab kuch de deta hai.
+  - id: tool-results
+    type: short_text
+    topics: [tool-calling, prompt-injection]
+    explanation:
+      en: Content returned by tools (web pages, emails, documents) can contain injected instructions, so it is data, never commands.
+      hinglish: Tools se aaya content (web pages, emails, documents) injected instructions rakh sakta hai, isliye woh data hai, commands kabhi nahi.
+    prompt:
+      en: Why should tool results be treated as untrusted data?
+      hinglish: Tool results ko untrusted data kyun maanna chahiye?
+    rubric:
+      - id: injection
+        idea:
+          en: They can contain text (such as injected instructions) that the model might wrongly follow
+          hinglish: Unmein aisa text (jaise injected instructions) ho sakta hai jise model galti se follow kar le
+        anyOf:
+          [
+            injection,
+            inject,
+            instruction,
+            instructions,
+            follow,
+            obey,
+            malicious,
+            attacker,
+            untrusted,
+            command,
+            commands,
+            manipulate,
+          ]
+    sampleAnswer:
+      en: A tool can return a web page or document containing instructions like "ignore your rules"; if treated as trusted, the model might follow them.
+      hinglish: Tool aisa web page ya document de sakta hai jismein "apne rules ignore karo" jaise instructions hon; trusted maana to model unhe follow kar sakta hai.

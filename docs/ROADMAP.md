@@ -29,7 +29,7 @@ Content schema + validator, idempotent seeder, courses/modules/lessons with prer
 renderer (localized, programming-language-aware code), progress tracking, notes/bookmarks,
 assessment engine (MCQ + short answer, server scoring).
 
-Seed curriculum: **4 courses, 9 modules, 16 lessons, 16 quizzes (56 questions), 16 Python
+Seed curriculum: **5 courses, 11 modules, 18 lessons, 18 quizzes (64 questions), 18 Python
 exercises**. Every exercise's reference solution passes and its starter code fails, and every code
 example's printed output matches, when run with real CPython (`pnpm exercises:verify`).
 
@@ -99,7 +99,7 @@ with assistive technology.
 | Streaming knowledge answers     | The knowledge base answers in one response today; stream like the mentor once citation validation can run incrementally.                                 |
 | Email invitations               | Organizations can only add people who already have an account.                                                                                           |
 | OCR for scanned PDFs            | Scanned PDFs are rejected with a clear message today.                                                                                                    |
-| More curriculum                 | Neural networks, LLM APIs, agents & tool calling, production GenAI, fine-tuning courses.                                                                 |
+| More curriculum                 | Neural networks, LLM APIs, advanced RAG, agent frameworks, production GenAI, fine-tuning courses.                                                        |
 | LangGraph track                 | Framework implementation alongside the direct-SDK version.                                                                                               |
 | Fine-tuning lab                 | Real LoRA run when GPU + licensed model available; simulated (labelled) otherwise.                                                                       |
 | Billing                         | Real provider, signed + idempotent webhooks, server-side entitlements.                                                                                   |

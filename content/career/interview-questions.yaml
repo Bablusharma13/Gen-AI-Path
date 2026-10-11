@@ -463,12 +463,12 @@ questions:
         version log karta hoon taaki change ke baad failure rates compare kar sakoon.
 
   - id: prompt-injection
-    version: 1
+    version: 2
     status: published
     category: prompting
     level: intermediate
     tracks: [A, B, D]
-    relatedLessonIds: [llm-prompting-structured]
+    relatedLessonIds: [llm-prompting-structured, agent-safe-loop]
     question:
       en: What is prompt injection, and how do you defend an application against it?
       hinglish: Prompt injection kya hai, aur application ko isse kaise bachate ho?
@@ -668,12 +668,12 @@ questions:
         user aise document ke baare mein poochta hai jo sirf org B mein hai aur use kuch nahi milna chahiye.
 
   - id: agents-tool-calling
-    version: 1
+    version: 2
     status: published
     category: agents
     level: intermediate
     tracks: [A, B]
-    relatedLessonIds: []
+    relatedLessonIds: [agent-tool-calling]
     question:
       en: How does LLM tool calling (function calling) work?
       hinglish: LLM tool calling (function calling) kaise kaam karta hai?
@@ -708,12 +708,12 @@ questions:
         rakhta hoon.
 
   - id: agents-safety
-    version: 1
+    version: 2
     status: published
     category: agents
     level: advanced
     tracks: [B, D]
-    relatedLessonIds: []
+    relatedLessonIds: [agent-safe-loop, agent-tool-calling]
     question:
       en: How would you make an AI agent safe enough to run against real systems?
       hinglish: AI agent ko real systems par chalane layak safe kaise banaoge?
